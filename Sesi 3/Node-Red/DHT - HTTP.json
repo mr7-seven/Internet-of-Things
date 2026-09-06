@@ -1,0 +1,354 @@
+[
+    {
+        "id": "cab6f378c1142eb1",
+        "type": "tab",
+        "label": "DHT11",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "799e58291d335bce",
+        "type": "http in",
+        "z": "cab6f378c1142eb1",
+        "name": "DHT REQUEST",
+        "url": "/api/dht",
+        "method": "post",
+        "upload": false,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 340,
+        "y": 180,
+        "wires": [
+            [
+                "fe3e4aa4d65d5356",
+                "372eacefeb285b0b",
+                "20878ea1054c597f"
+            ]
+        ]
+    },
+    {
+        "id": "372eacefeb285b0b",
+        "type": "debug",
+        "z": "cab6f378c1142eb1",
+        "name": "DEBUG",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 580,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "fe3e4aa4d65d5356",
+        "type": "http response",
+        "z": "cab6f378c1142eb1",
+        "name": "RESPONSE",
+        "statusCode": "",
+        "headers": {},
+        "x": 590,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "b2e2ab86c7ec4d27",
+        "type": "ui-chart",
+        "z": "cab6f378c1142eb1",
+        "group": "d325d361b71f0970",
+        "name": "Suhu",
+        "label": "Suhu",
+        "order": 1,
+        "chartType": "line",
+        "category": "topic",
+        "categoryType": "msg",
+        "xAxisLabel": "",
+        "xAxisProperty": "",
+        "xAxisPropertyType": "timestamp",
+        "xAxisType": "time",
+        "xAxisFormat": "",
+        "xAxisFormatType": "auto",
+        "xmin": "",
+        "xmax": "",
+        "yAxisLabel": "",
+        "yAxisProperty": "payload",
+        "yAxisPropertyType": "msg",
+        "ymin": "",
+        "ymax": "",
+        "bins": 10,
+        "action": "append",
+        "stackSeries": false,
+        "pointShape": "circle",
+        "pointRadius": 4,
+        "showLegend": true,
+        "removeOlder": 1,
+        "removeOlderUnit": "3600",
+        "removeOlderPoints": "",
+        "colors": [
+            "#0095ff",
+            "#ff0000",
+            "#ff7f0e",
+            "#2ca02c",
+            "#a347e1",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "textColor": [
+            "#666666"
+        ],
+        "textColorDefault": true,
+        "gridColor": [
+            "#e5e5e5"
+        ],
+        "gridColorDefault": true,
+        "width": 6,
+        "height": "4",
+        "className": "",
+        "interpolation": "smooth",
+        "x": 750,
+        "y": 220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "20878ea1054c597f",
+        "type": "function",
+        "z": "cab6f378c1142eb1",
+        "name": "PARSING",
+        "func": "const data = msg.payload;\n\nconst temperatureMsg = {\n    topic: \"Temperature\",\n    payload: Number(data.temperature)\n};\n\nconst humidityMsg = {\n    topic: \"Humidity\",\n    payload: Number(data.humidity)\n};\n\nreturn [temperatureMsg, humidityMsg];",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 580,
+        "y": 260,
+        "wires": [
+            [
+                "b2e2ab86c7ec4d27"
+            ],
+            [
+                "bf5744497820d533"
+            ]
+        ]
+    },
+    {
+        "id": "8c33a7bd766b5b30",
+        "type": "ui-template",
+        "z": "cab6f378c1142eb1",
+        "group": "f61b53563b5576bf",
+        "page": "",
+        "ui": "",
+        "name": "ID",
+        "order": 1,
+        "width": "0",
+        "height": "0",
+        "head": "",
+        "format": "<template>\n    <div class=\"profil-container\">\n\n        <!-- Bagian kiri: foto -->\n        <div class=\"profil-foto\">\n            <img\n                src=\"/images/foto.png\"\n                alt=\"Foto\"\n            >\n        </div>\n\n        <!-- Bagian kanan: identitas -->\n        <div class=\"profil-data\">\n\n            <div class=\"data-row\">\n                <span class=\"label\">Nama</span>\n                <span class=\"colon\">:</span>\n                <span class=\"value\">Nama Lengkap</span>\n            </div>\n\n            <div class=\"data-row\">\n                <span class=\"label\">NIM</span>\n                <span class=\"colon\">:</span>\n                <span class=\"value\">123456789</span>\n            </div>\n\n            <div class=\"data-row\">\n                <span class=\"label\">Kelas</span>\n                <span class=\"colon\">:</span>\n                <span class=\"value\">TI-3A</span>\n            </div>\n\n        </div>\n\n    </div>\n</template>\n\n<style>\n.profil-container {\n    width: 100%;\n    display: flex;\n    flex-direction: row;\n    align-items: center;\n    gap: 25px;\n\n    padding: 15px;\n    box-sizing: border-box;\n}\n\n/* FOTO */\n.profil-foto {\n    flex: 0 0 130px;\n\n    display: flex;\n    justify-content: center;\n    align-items: center;\n}\n\n.profil-foto img {\n    width: 120px;\n    height: 150px;\n\n    object-fit: cover;\n\n    border-radius: 10px;\n}\n\n/* DATA IDENTITAS */\n.profil-data {\n    flex: 1;\n\n    display: flex;\n    flex-direction: column;\n    justify-content: center;\n\n    gap: 12px;\n}\n\n/* Setiap baris */\n.data-row {\n    display: flex;\n    align-items: center;\n\n    font-size: 18px;\n    line-height: 1.5;\n}\n\n/* Nama, NIM, Kelas */\n.label {\n    flex: 0 0 65px;\n    font-weight: 600;\n}\n\n/* Titik dua */\n.colon {\n    flex: 0 0 20px;\n    font-weight: 600;\n}\n\n/* Nilai */\n.value {\n    flex: 1;\n}\n\n/* Responsive */\n@media (max-width: 500px) {\n    .profil-container {\n        flex-direction: column;\n        text-align: left;\n    }\n\n    .profil-foto {\n        flex: none;\n    }\n\n    .profil-data {\n        width: 100%;\n    }\n}\n</style>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 310,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bf5744497820d533",
+        "type": "ui-chart",
+        "z": "cab6f378c1142eb1",
+        "group": "958c948f72ab54b5",
+        "name": "Kelembapan",
+        "label": "Kelembapan",
+        "order": 1,
+        "chartType": "line",
+        "category": "topic",
+        "categoryType": "msg",
+        "xAxisLabel": "",
+        "xAxisProperty": "",
+        "xAxisPropertyType": "timestamp",
+        "xAxisType": "time",
+        "xAxisFormat": "",
+        "xAxisFormatType": "auto",
+        "xmin": "",
+        "xmax": "",
+        "yAxisLabel": "",
+        "yAxisProperty": "payload",
+        "yAxisPropertyType": "msg",
+        "ymin": "",
+        "ymax": "",
+        "bins": 10,
+        "action": "append",
+        "stackSeries": false,
+        "pointShape": "circle",
+        "pointRadius": 4,
+        "showLegend": true,
+        "removeOlder": 1,
+        "removeOlderUnit": "3600",
+        "removeOlderPoints": "",
+        "colors": [
+            "#ff0000",
+            "#ff0000",
+            "#ff7f0e",
+            "#2ca02c",
+            "#a347e1",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "textColor": [
+            "#666666"
+        ],
+        "textColorDefault": true,
+        "gridColor": [
+            "#e5e5e5"
+        ],
+        "gridColorDefault": true,
+        "width": 6,
+        "height": "4",
+        "className": "",
+        "interpolation": "smooth",
+        "x": 770,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d325d361b71f0970",
+        "type": "ui-group",
+        "name": "TEMP",
+        "page": "8b89d47daff9f6ef",
+        "width": 6,
+        "height": 1,
+        "order": 2,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "f61b53563b5576bf",
+        "type": "ui-group",
+        "name": "ID",
+        "page": "8b89d47daff9f6ef",
+        "width": "12",
+        "height": 1,
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "958c948f72ab54b5",
+        "type": "ui-group",
+        "name": "HUM",
+        "page": "8b89d47daff9f6ef",
+        "width": 6,
+        "height": 1,
+        "order": 3,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "8b89d47daff9f6ef",
+        "type": "ui-page",
+        "name": "DHT11",
+        "ui": "0df8b8a20bb13f1b",
+        "path": "/dht",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "9080d5e37181d534",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": 13,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "0df8b8a20bb13f1b",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": true
+    },
+    {
+        "id": "9080d5e37181d534",
+        "type": "ui-theme",
+        "name": "Default Theme",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0094CE",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "3a881459736567f8",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "@flowfuse/node-red-dashboard": "1.30.2"
+        }
+    }
+]

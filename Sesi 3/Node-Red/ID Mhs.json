@@ -1,0 +1,131 @@
+[
+    {
+        "id": "4251fb01d844f497",
+        "type": "tab",
+        "label": "Template Identitas Mahasiswa",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "3ce5d47a3a3470b4",
+        "type": "ui-template",
+        "z": "4251fb01d844f497",
+        "group": "80c22d97e04f676b",
+        "page": "",
+        "ui": "",
+        "name": "ID",
+        "order": 1,
+        "width": "0",
+        "height": "0",
+        "head": "",
+        "format": "<template>\n    <div class=\"profil-container\">\n\n        <!-- Bagian kiri: foto -->\n        <div class=\"profil-foto\">\n            <img\n                src=\"/images/foto.png\"\n                alt=\"Foto\"\n            >\n        </div>\n\n        <!-- Bagian kanan: identitas -->\n        <div class=\"profil-data\">\n\n            <div class=\"data-row\">\n                <span class=\"label\">Nama</span>\n                <span class=\"colon\">:</span>\n                <span class=\"value\">Nama Lengkap</span>\n            </div>\n\n            <div class=\"data-row\">\n                <span class=\"label\">NIM</span>\n                <span class=\"colon\">:</span>\n                <span class=\"value\">123456789</span>\n            </div>\n\n            <div class=\"data-row\">\n                <span class=\"label\">Kelas</span>\n                <span class=\"colon\">:</span>\n                <span class=\"value\">TI-3A</span>\n            </div>\n\n        </div>\n\n    </div>\n</template>\n\n<style>\n.profil-container {\n    width: 100%;\n    display: flex;\n    flex-direction: row;\n    align-items: center;\n    gap: 25px;\n\n    padding: 15px;\n    box-sizing: border-box;\n}\n\n/* FOTO */\n.profil-foto {\n    flex: 0 0 130px;\n\n    display: flex;\n    justify-content: center;\n    align-items: center;\n}\n\n.profil-foto img {\n    width: 120px;\n    height: 150px;\n\n    object-fit: cover;\n\n    border-radius: 10px;\n}\n\n/* DATA IDENTITAS */\n.profil-data {\n    flex: 1;\n\n    display: flex;\n    flex-direction: column;\n    justify-content: center;\n\n    gap: 12px;\n}\n\n/* Setiap baris */\n.data-row {\n    display: flex;\n    align-items: center;\n\n    font-size: 18px;\n    line-height: 1.5;\n}\n\n/* Nama, NIM, Kelas */\n.label {\n    flex: 0 0 65px;\n    font-weight: 600;\n}\n\n/* Titik dua */\n.colon {\n    flex: 0 0 20px;\n    font-weight: 600;\n}\n\n/* Nilai */\n.value {\n    flex: 1;\n}\n\n/* Responsive */\n@media (max-width: 500px) {\n    .profil-container {\n        flex-direction: column;\n        text-align: left;\n    }\n\n    .profil-foto {\n        flex: none;\n    }\n\n    .profil-data {\n        width: 100%;\n    }\n}\n</style>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 470,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "80c22d97e04f676b",
+        "type": "ui-group",
+        "name": "ID",
+        "page": "511381e1c8ec4b60",
+        "width": "6",
+        "height": 1,
+        "order": 1,
+        "showTitle": false,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "511381e1c8ec4b60",
+        "type": "ui-page",
+        "name": "SESI X",
+        "ui": "0df8b8a20bb13f1b",
+        "path": "/IoT",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "9080d5e37181d534",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": 1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "0df8b8a20bb13f1b",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "icon",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": true
+    },
+    {
+        "id": "9080d5e37181d534",
+        "type": "ui-theme",
+        "name": "Default Theme",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0094CE",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "ca021365dfe1086b",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "@flowfuse/node-red-dashboard": "1.30.2"
+        }
+    }
+]
