@@ -1,0 +1,217 @@
+[
+    {
+        "id": "a00dcaa81350e40d",
+        "type": "tab",
+        "label": "SRF-04",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "23d3f933e4a38a53",
+        "type": "http in",
+        "z": "a00dcaa81350e40d",
+        "name": "SRF-04 REQUEST",
+        "url": "/api/level",
+        "method": "post",
+        "upload": false,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 330,
+        "y": 160,
+        "wires": [
+            [
+                "edac324d1c542a40",
+                "9e937d1620e2c90e",
+                "566ee2caeafe7c41"
+            ]
+        ]
+    },
+    {
+        "id": "edac324d1c542a40",
+        "type": "debug",
+        "z": "a00dcaa81350e40d",
+        "name": "DEBUG",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 560,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "9e937d1620e2c90e",
+        "type": "http response",
+        "z": "a00dcaa81350e40d",
+        "name": "RESPONSE",
+        "statusCode": "",
+        "headers": {},
+        "x": 570,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "566ee2caeafe7c41",
+        "type": "ui-template",
+        "z": "a00dcaa81350e40d",
+        "group": "580616db58051885",
+        "page": "",
+        "ui": "",
+        "name": "WATER TANK LEVEL",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "head": "",
+        "format": "<template>\n    <div class=\"srf04-card\">\n        <div class=\"srf04-title\">Water Tank Level</div>\n\n        <div class=\"srf04-content\">\n            <div class=\"srf04-tank\">\n                <div\n                    class=\"srf04-water\"\n                    :class=\"statusClass\"\n                    :style=\"{ height: levelPercent + '%' }\"\n                >\n                    <div class=\"srf04-wave\"></div>\n                </div>\n\n                <div class=\"srf04-percentage\">\n                    {{ levelPercent.toFixed(1) }}%\n                </div>\n            </div>\n\n            <div class=\"srf04-information\">\n                <div class=\"srf04-value\">\n                    <span>Jarak Sensor</span>\n                    <strong>{{ distanceText }}</strong>\n                </div>\n\n                <div class=\"srf04-value\">\n                    <span>Ketinggian Air</span>\n                    <strong>{{ levelText }}</strong>\n                </div>\n\n                <div class=\"srf04-value\">\n                    <span>Status</span>\n                    <div class=\"srf04-status\" :class=\"statusClass\">\n                        {{ statusText }}\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</template>\n\n<script>\nexport default {\n    data() {\n        return {\n            tankHeightCm: 100\n        }\n    },\n\n    computed: {\n        sensorData() {\n            const payload = this.msg?.payload\n\n            if (typeof payload === \"string\") {\n                try {\n                    return JSON.parse(payload)\n                } catch (error) {\n                    return {}\n                }\n            }\n\n            return payload || {}\n        },\n\n        distanceCm() {\n            const value = Number(this.sensorData.distance_cm)\n            return Number.isFinite(value) ? value : null\n        },\n\n        levelCm() {\n            if (this.distanceCm === null) {\n                return 0\n            }\n\n            return Math.max(\n                0,\n                Math.min(\n                    this.tankHeightCm,\n                    this.tankHeightCm - this.distanceCm\n                )\n            )\n        },\n\n        levelPercent() {\n            if (this.distanceCm === null || this.tankHeightCm <= 0) {\n                return 0\n            }\n\n            return (this.levelCm / this.tankHeightCm) * 100\n        },\n\n        distanceText() {\n            if (this.distanceCm === null) {\n                return \"--\"\n            }\n\n            return this.distanceCm.toFixed(1) + \" cm\"\n        },\n\n        levelText() {\n            if (this.distanceCm === null) {\n                return \"--\"\n            }\n\n            return this.levelCm.toFixed(1) + \" cm\"\n        },\n\n        statusText() {\n            if (this.distanceCm === null) {\n                return \"NO DATA\"\n            }\n\n            if (this.levelPercent >= 80) {\n                return \"PENUH\"\n            }\n\n            if (this.levelPercent >= 30) {\n                return \"NORMAL\"\n            }\n\n            if (this.levelPercent >= 10) {\n                return \"RENDAH\"\n            }\n\n            return \"KRITIS\"\n        },\n\n        statusClass() {\n            if (this.distanceCm === null) {\n                return \"status-nodata\"\n            }\n\n            if (this.levelPercent >= 80) {\n                return \"status-full\"\n            }\n\n            if (this.levelPercent >= 30) {\n                return \"status-normal\"\n            }\n\n            if (this.levelPercent >= 10) {\n                return \"status-low\"\n            }\n\n            return \"status-critical\"\n        }\n    }\n}\n</script>\n\n<style>\n.srf04-card {\n    height: 100%;\n    box-sizing: border-box;\n    padding: 18px;\n    border-radius: 14px;\n    background: var(--v-theme-surface);\n    color: var(--v-theme-on-surface);\n}\n\n.srf04-title {\n    margin-bottom: 18px;\n    font-size: 20px;\n    font-weight: 600;\n    text-align: center;\n}\n\n.srf04-content {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    gap: 28px;\n}\n\n.srf04-tank {\n    position: relative;\n    width: 120px;\n    height: 190px;\n    overflow: hidden;\n    border: 5px solid #607d8b;\n    border-top: none;\n    border-radius: 0 0 16px 16px;\n    background: rgba(120, 144, 156, 0.12);\n}\n\n.srf04-water {\n    position: absolute;\n    right: 0;\n    bottom: 0;\n    left: 0;\n    min-height: 0;\n    background: #2196f3;\n    transition: height 0.8s ease, background-color 0.4s ease;\n}\n\n.srf04-wave {\n    position: absolute;\n    top: -5px;\n    width: 100%;\n    height: 10px;\n    border-radius: 50%;\n    background: rgba(255, 255, 255, 0.35);\n}\n\n.srf04-percentage {\n    position: absolute;\n    top: 50%;\n    right: 0;\n    left: 0;\n    z-index: 2;\n    transform: translateY(-50%);\n    color: #ffffff;\n    font-size: 24px;\n    font-weight: 700;\n    text-align: center;\n    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);\n}\n\n.srf04-information {\n    display: flex;\n    min-width: 165px;\n    flex-direction: column;\n    gap: 14px;\n}\n\n.srf04-value {\n    display: flex;\n    flex-direction: column;\n    gap: 3px;\n}\n\n.srf04-value span {\n    font-size: 13px;\n    opacity: 0.7;\n}\n\n.srf04-value strong {\n    font-size: 20px;\n}\n\n.srf04-status {\n    width: fit-content;\n    padding: 5px 14px;\n    border-radius: 20px;\n    color: #ffffff;\n    font-size: 13px;\n    font-weight: 700;\n}\n\n.status-full {\n    background-color: #1565c0;\n}\n\n.status-normal {\n    background-color: #2e7d32;\n}\n\n.status-low {\n    background-color: #f9a825;\n}\n\n.status-critical {\n    background-color: #c62828;\n}\n\n.status-nodata {\n    background-color: #616161;\n}\n\n@media (max-width: 500px) {\n    .srf04-content {\n        flex-direction: column;\n    }\n}\n</style>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 600,
+        "y": 220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e2a2e913c83ee8c8",
+        "type": "ui-template",
+        "z": "a00dcaa81350e40d",
+        "group": "93a3cdc7e6c9b975",
+        "page": "",
+        "ui": "",
+        "name": "ID",
+        "order": 1,
+        "width": "0",
+        "height": "0",
+        "head": "",
+        "format": "<template>\n    <div class=\"profil-container\">\n\n        <!-- Bagian kiri: foto -->\n        <div class=\"profil-foto\">\n            <img\n                src=\"/images/foto.png\"\n                alt=\"Foto\"\n            >\n        </div>\n\n        <!-- Bagian kanan: identitas -->\n        <div class=\"profil-data\">\n\n            <div class=\"data-row\">\n                <span class=\"label\">Nama</span>\n                <span class=\"colon\">:</span>\n                <span class=\"value\">Nama Lengkap</span>\n            </div>\n\n            <div class=\"data-row\">\n                <span class=\"label\">NIM</span>\n                <span class=\"colon\">:</span>\n                <span class=\"value\">123456789</span>\n            </div>\n\n            <div class=\"data-row\">\n                <span class=\"label\">Kelas</span>\n                <span class=\"colon\">:</span>\n                <span class=\"value\">TI-3A</span>\n            </div>\n\n        </div>\n\n    </div>\n</template>\n\n<style>\n.profil-container {\n    width: 100%;\n    display: flex;\n    flex-direction: row;\n    align-items: center;\n    gap: 25px;\n\n    padding: 15px;\n    box-sizing: border-box;\n}\n\n/* FOTO */\n.profil-foto {\n    flex: 0 0 130px;\n\n    display: flex;\n    justify-content: center;\n    align-items: center;\n}\n\n.profil-foto img {\n    width: 120px;\n    height: 150px;\n\n    object-fit: cover;\n\n    border-radius: 10px;\n}\n\n/* DATA IDENTITAS */\n.profil-data {\n    flex: 1;\n\n    display: flex;\n    flex-direction: column;\n    justify-content: center;\n\n    gap: 12px;\n}\n\n/* Setiap baris */\n.data-row {\n    display: flex;\n    align-items: center;\n\n    font-size: 18px;\n    line-height: 1.5;\n}\n\n/* Nama, NIM, Kelas */\n.label {\n    flex: 0 0 65px;\n    font-weight: 600;\n}\n\n/* Titik dua */\n.colon {\n    flex: 0 0 20px;\n    font-weight: 600;\n}\n\n/* Nilai */\n.value {\n    flex: 1;\n}\n\n/* Responsive */\n@media (max-width: 500px) {\n    .profil-container {\n        flex-direction: column;\n        text-align: left;\n    }\n\n    .profil-foto {\n        flex: none;\n    }\n\n    .profil-data {\n        width: 100%;\n    }\n}\n</style>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 290,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "580616db58051885",
+        "type": "ui-group",
+        "name": "LEVEL",
+        "page": "8728473feaf8f858",
+        "width": 6,
+        "height": 1,
+        "order": 2,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "93a3cdc7e6c9b975",
+        "type": "ui-group",
+        "name": "ID",
+        "page": "8728473feaf8f858",
+        "width": "12",
+        "height": 1,
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "8728473feaf8f858",
+        "type": "ui-page",
+        "name": "SRF-04",
+        "ui": "0df8b8a20bb13f1b",
+        "path": "/level",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "9080d5e37181d534",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": 14,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "0df8b8a20bb13f1b",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": true
+    },
+    {
+        "id": "9080d5e37181d534",
+        "type": "ui-theme",
+        "name": "Default Theme",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0094CE",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "a044b1a0d01196d2",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "@flowfuse/node-red-dashboard": "1.30.2"
+        }
+    }
+]
