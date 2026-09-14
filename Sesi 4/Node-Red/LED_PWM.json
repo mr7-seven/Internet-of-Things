@@ -1,0 +1,238 @@
+[
+    {
+        "id": "7985609579c75d70",
+        "type": "tab",
+        "label": "KENDALI LED PWM",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "21e7979b45f4f919",
+        "type": "ui-template",
+        "z": "7985609579c75d70",
+        "group": "826197a87de983b0",
+        "page": "",
+        "ui": "",
+        "name": "LED PWM",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "head": "",
+        "format": "<template>\n    <div class=\"traffic-container\">\n        <div v-for=\"light in lights\" :key=\"light.id\" class=\"traffic-card\">\n            <div class=\"traffic-title\">\n                {{ light.label }}\n            </div>\n\n            <div class=\"traffic-lamp\" :style=\"lampStyle(light)\"></div>\n\n            <div class=\"traffic-status\" :class=\"{ active: light.on }\">\n                {{ light.on ? \"ON\" : \"OFF\" }}\n            </div>\n\n            <label class=\"traffic-switch\">\n                <input\n                    type=\"checkbox\"\n                    :checked=\"light.on\"\n                    @change=\"toggleLight(light, $event)\"\n                >\n\n                <span class=\"switch-track\">\n                    <span class=\"switch-thumb\"></span>\n                </span>\n            </label>\n\n            <div class=\"pwm-value\">\n                <span>PWM</span>\n                <strong>{{ light.pwm }}</strong>\n            </div>\n\n            <input\n                class=\"pwm-slider\"\n                type=\"range\"\n                min=\"0\"\n                max=\"255\"\n                step=\"1\"\n                :value=\"light.pwm\"\n                :style=\"{ accentColor: light.color }\"\n                @input=\"updatePwm(light, $event)\"\n                @change=\"sendLight(light)\"\n            >\n        </div>\n    </div>\n</template>\n\n<script>\n    export default {\n    data() {\n        return {\n            // Ganti dengan NIM yang sama seperti program ESP32\n            mqttTopic: \"data/iot/actuator/12345\",\n\n            lights: [\n                {\n                    id: \"red\",\n                    label: \"R\",\n                    color: \"#ef4444\",\n                    on: false,\n                    pwm: 255\n                },\n                {\n                    id: \"yellow\",\n                    label: \"Y\",\n                    color: \"#facc15\",\n                    on: false,\n                    pwm: 255\n                },\n                {\n                    id: \"green\",\n                    label: \"G\",\n                    color: \"#22c55e\",\n                    on: false,\n                    pwm: 255\n                }\n            ]\n        }\n    },\n\n    methods: {\n        updatePwm(light, event) {\n            // Hanya memperbarui tampilan saat slider bergerak\n            light.pwm = Number(event.target.value)\n        },\n\n        toggleLight(light, event) {\n            light.on = event.target.checked\n            this.sendLight(light)\n        },\n\n        sendLight(light) {\n            const data = {\n                led: light.id,\n                state: light.on ? \"ON\" : \"OFF\",\n                pwm: light.on ? light.pwm : 0\n            }\n\n            this.send({\n                topic: this.mqttTopic,\n                payload: JSON.stringify(data)\n            })\n        },\n\n        lampStyle(light) {\n            const intensity = light.on\n                ? Math.max(light.pwm, 10) / 255\n                : 0\n\n            return {\n                backgroundColor: light.on\n                    ? light.color\n                    : \"#374151\",\n\n                opacity: light.on\n                    ? 0.4 + (intensity * 0.6)\n                    : 0.25,\n\n                boxShadow: light.on\n                    ? `0 0 ${10 + intensity * 25}px ${light.color}`\n                    : \"none\"\n            }\n        }\n    }\n}\n</script>\n\n<style>\n    .traffic-container {\n        width: 100%;\n        display: flex;\n        flex-wrap: wrap;\n        align-items: stretch;\n        justify-content: center;\n        gap: 16px;\n        box-sizing: border-box;\n    }\n\n    .traffic-card {\n        flex: 1 1 160px;\n        min-width: 150px;\n        max-width: 230px;\n        display: flex;\n        flex-direction: column;\n        align-items: center;\n        gap: 13px;\n        padding: 20px 16px;\n        border-radius: 16px;\n        box-sizing: border-box;\n        background: rgb(var(--v-theme-surface));\n        color: rgb(var(--v-theme-on-surface));\n        border: 1px solid rgba(var(--v-theme-on-surface), 0.12);\n        box-shadow: 0 5px 16px rgba(0, 0, 0, 0.12);\n    }\n\n    .traffic-title {\n        font-size: 16px;\n        font-weight: 700;\n        letter-spacing: 1px;\n    }\n\n    .traffic-lamp {\n        width: 72px;\n        height: 72px;\n        border: 5px solid #1f2937;\n        border-radius: 50%;\n        transition:\n            background-color 0.25s,\n            box-shadow 0.25s,\n            opacity 0.25s;\n    }\n\n    .traffic-status {\n        min-width: 54px;\n        padding: 4px 12px;\n        border-radius: 20px;\n        background: #6b7280;\n        color: #ffffff;\n        font-size: 13px;\n        font-weight: 700;\n        text-align: center;\n    }\n\n    .traffic-status.active {\n        background: #2563eb;\n    }\n\n    .traffic-switch {\n        display: inline-flex;\n        cursor: pointer;\n        user-select: none;\n    }\n\n    .traffic-switch input {\n        position: absolute;\n        opacity: 0;\n        pointer-events: none;\n    }\n\n    .switch-track {\n        position: relative;\n        width: 52px;\n        height: 28px;\n        border-radius: 30px;\n        background: #9ca3af;\n        transition: background 0.25s;\n    }\n\n    .switch-thumb {\n        position: absolute;\n        top: 3px;\n        left: 3px;\n        width: 22px;\n        height: 22px;\n        border-radius: 50%;\n        background: #ffffff;\n        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);\n        transition: transform 0.25s;\n    }\n\n    .traffic-switch input:checked+.switch-track {\n        background: #2563eb;\n    }\n\n    .traffic-switch input:checked+.switch-track .switch-thumb {\n        transform: translateX(24px);\n    }\n\n    .pwm-value {\n        width: 100%;\n        display: flex;\n        justify-content: space-between;\n        align-items: center;\n        font-size: 14px;\n    }\n\n    .pwm-value strong {\n        min-width: 48px;\n        padding: 4px 8px;\n        border-radius: 8px;\n        background: rgba(var(--v-theme-on-surface), 0.08);\n        text-align: center;\n        font-size: 16px;\n    }\n\n    .pwm-slider {\n        width: 100%;\n        cursor: pointer;\n    }\n\n    @media (max-width: 600px) {\n        .traffic-container {\n            flex-direction: column;\n        }\n\n        .traffic-card {\n            width: 100%;\n            max-width: none;\n        }\n    }\n</style>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 430,
+        "y": 180,
+        "wires": [
+            [
+                "11ea433088a78cbf",
+                "b0f47f710e9e3973"
+            ]
+        ]
+    },
+    {
+        "id": "b0f47f710e9e3973",
+        "type": "debug",
+        "z": "7985609579c75d70",
+        "name": "DEBUG",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 620,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "11ea433088a78cbf",
+        "type": "mqtt out",
+        "z": "7985609579c75d70",
+        "name": "SEND PWM",
+        "topic": "data/iot/actuator/12345",
+        "qos": "1",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "6980b8f3cb3430be",
+        "x": 630,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "968e809d0c29c4b4",
+        "type": "ui-template",
+        "z": "7985609579c75d70",
+        "group": "3e3febc527231a1b",
+        "page": "",
+        "ui": "",
+        "name": "ID",
+        "order": 1,
+        "width": "0",
+        "height": "0",
+        "head": "",
+        "format": "<template>\n    <div class=\"profil-container\">\n\n        <!-- Bagian kiri: foto -->\n        <div class=\"profil-foto\">\n            <img\n                src=\"/images/foto.png\"\n                alt=\"Foto\"\n            >\n        </div>\n\n        <!-- Bagian kanan: identitas -->\n        <div class=\"profil-data\">\n\n            <div class=\"data-row\">\n                <span class=\"label\">Nama</span>\n                <span class=\"colon\">:</span>\n                <span class=\"value\">Nama Lengkap</span>\n            </div>\n\n            <div class=\"data-row\">\n                <span class=\"label\">NIM</span>\n                <span class=\"colon\">:</span>\n                <span class=\"value\">123456789</span>\n            </div>\n\n            <div class=\"data-row\">\n                <span class=\"label\">Kelas</span>\n                <span class=\"colon\">:</span>\n                <span class=\"value\">TI-3A</span>\n            </div>\n\n        </div>\n\n    </div>\n</template>\n\n<style>\n.profil-container {\n    width: 100%;\n    display: flex;\n    flex-direction: row;\n    align-items: center;\n    gap: 25px;\n\n    padding: 15px;\n    box-sizing: border-box;\n}\n\n/* FOTO */\n.profil-foto {\n    flex: 0 0 130px;\n\n    display: flex;\n    justify-content: center;\n    align-items: center;\n}\n\n.profil-foto img {\n    width: 120px;\n    height: 150px;\n\n    object-fit: cover;\n\n    border-radius: 10px;\n}\n\n/* DATA IDENTITAS */\n.profil-data {\n    flex: 1;\n\n    display: flex;\n    flex-direction: column;\n    justify-content: center;\n\n    gap: 12px;\n}\n\n/* Setiap baris */\n.data-row {\n    display: flex;\n    align-items: center;\n\n    font-size: 18px;\n    line-height: 1.5;\n}\n\n/* Nama, NIM, Kelas */\n.label {\n    flex: 0 0 65px;\n    font-weight: 600;\n}\n\n/* Titik dua */\n.colon {\n    flex: 0 0 20px;\n    font-weight: 600;\n}\n\n/* Nilai */\n.value {\n    flex: 1;\n}\n\n/* Responsive */\n@media (max-width: 500px) {\n    .profil-container {\n        flex-direction: column;\n        text-align: left;\n    }\n\n    .profil-foto {\n        flex: none;\n    }\n\n    .profil-data {\n        width: 100%;\n    }\n}\n</style>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 410,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "826197a87de983b0",
+        "type": "ui-group",
+        "name": "KENDALI LED PWM",
+        "page": "b6418ca414415855",
+        "width": 6,
+        "height": 1,
+        "order": 2,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "6980b8f3cb3430be",
+        "type": "mqtt-broker",
+        "name": "HIVEMQ BROKER",
+        "broker": "broker.hivemq.com",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "3e3febc527231a1b",
+        "type": "ui-group",
+        "name": "ID",
+        "page": "b6418ca414415855",
+        "width": "12",
+        "height": 1,
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "b6418ca414415855",
+        "type": "ui-page",
+        "name": "LED PWM",
+        "ui": "0df8b8a20bb13f1b",
+        "path": "/led",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "9080d5e37181d534",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": 15,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "0df8b8a20bb13f1b",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": true
+    },
+    {
+        "id": "9080d5e37181d534",
+        "type": "ui-theme",
+        "name": "Default Theme",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0094CE",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "bbc364977fa3cfdd",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "@flowfuse/node-red-dashboard": "1.30.2"
+        }
+    }
+]
