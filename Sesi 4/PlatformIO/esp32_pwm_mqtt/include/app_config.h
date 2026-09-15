@@ -2,11 +2,11 @@
 
 #include <Arduino.h>
 
-#define DEVICE_NIM "12345"
+#define DEVICE_NIM "GANTI_DENGAN_NIM"
 
 namespace AppConfig {
-inline constexpr char WIFI_SSID[] = "IoT";
-inline constexpr char WIFI_PASSWORD[] = "12345678";
+inline constexpr char WIFI_SSID[] = "NAMA_WIFI";
+inline constexpr char WIFI_PASSWORD[] = "PASSWORD_WIFI";
 
 inline constexpr char MQTT_HOST[] = "broker.hivemq.com";
 inline constexpr uint16_t MQTT_PORT = 1883;
