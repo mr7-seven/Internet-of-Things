@@ -1,0 +1,289 @@
+[
+    {
+        "id": "21946c7b9ab388b7",
+        "type": "tab",
+        "label": "Smart Parking Production",
+        "disabled": false,
+        "info": "Monitoring 10 slot parkir dari multi-node ESP32 melalui MQTT."
+    },
+    {
+        "id": "381fbae54fb3b06f",
+        "type": "ui-template",
+        "z": "21946c7b9ab388b7",
+        "group": "441044287cb7cf75",
+        "page": "",
+        "ui": "",
+        "name": "Smart Parking Dashboard",
+        "order": 1,
+        "width": "12",
+        "height": "0",
+        "head": "",
+        "format": "<template>\n  <div class=\"parking-shell\">\n    <header class=\"parking-header\">\n      <div><span>MULTI-NODE ESP32</span><h2>Case Study - Smart Parking Control Center</h2></div>\n      <div class=\"live\"><i></i> SISTEM AKTIF</div>\n    </header>\n\n    <section class=\"panel node-panel\">\n      <div class=\"toolbar\">\n        <div><h3>Tim dan Topologi Perangkat</h3></div>\n        <div class=\"mode\">\n          <button :class=\"{ active: state.topology === 2 }\" @click=\"setTopology(2)\">2 NODE</button>\n          <button :class=\"{ active: state.topology === 3 }\" @click=\"setTopology(3)\">3 NODE</button>\n        </div>\n      </div>\n      <div class=\"node-grid\" :class=\"'mode-' + state.topology\">\n        <article v-for=\"node in visibleNodes\" :key=\"node.id\">\n          <img :src=\"node.photo\" :alt=\"node.student\" @error=\"useDefaultPhoto\">\n          <div class=\"node-info\">\n            <div class=\"node-head\"><strong>{{ node.name }}</strong><span :class=\"{ online: node.online }\">{{ node.online ? 'ONLINE' : 'OFFLINE' }}</span></div>\n            <h4>{{ node.student }}</h4>\n            <p>{{ node.nim }} · {{ node.className }}</p>\n            <small>{{ node.role }}</small>\n          </div>\n        </article>\n      </div>\n    </section>\n\n    <main>\n      <section class=\"panel map-panel\">\n        <div class=\"panel-title\">\n          <div><h3>Denah Parkir</h3></div>\n          <div class=\"legend\"><span><i class=\"free\"></i>Kosong</span><span><i class=\"busy\"></i>Terisi</span></div>\n        </div>\n        <div class=\"slots\">\n          <div v-for=\"slot in state.slots\" :key=\"slot.id\" class=\"slot\" :class=\"{ occupied: slot.occupied }\">\n            <span>#{{ String(slot.id).padStart(2, '0') }}</span>\n            <div>{{ slot.occupied ? '🚗' : 'P' }}</div>\n            <small>{{ slot.occupied ? 'TERISI' : 'KOSONG' }}</small>\n          </div>\n        </div>\n      </section>\n\n      <aside>\n        <section class=\"panel signal\">\n          <div>\n            <h3>Traffic Signal</h3>\n          </div>\n          <div class=\"signal-content\">\n            <div class=\"traffic\">\n              <i class=\"red\" :class=\"{ on: state.level === 'RED' }\"></i>\n              <i class=\"yellow\" :class=\"{ on: state.level === 'YELLOW' }\"></i>\n              <i class=\"green\" :class=\"{ on: state.level === 'GREEN' }\"></i>\n            </div>\n            <div class=\"buzzer\" :class=\"{ active: state.buzzer }\">\n              <span>🔊</span>\n              <div>\n                <strong>Buzzer {{ state.buzzer ? 'BEEP' : 'OFF' }}</strong><small>{{ state.buzzer ? 'Parkir penuh' : 'Kondisi normal' }}</small>\n              </div>\n            </div>\n          </div>\n        </section>\n\n        <section class=\"panel summary\">\n          <h3>Ringkasan Parkir</h3>\n          <div class=\"status\" :class=\"state.level.toLowerCase()\">\n            <span>Status</span><strong>{{ statusText }}</strong><small>{{ state.lastEvent }}</small>\n          </div>\n          <div class=\"summary-grid\">\n            <div><span>Kapasitas</span><strong>10</strong><small>slot</small></div>\n            <div><span>Terisi</span><strong>{{ state.occupied }}</strong><small>kendaraan</small></div>\n            <div><span>Tersedia</span><strong>{{ state.available }}</strong><small>slot</small></div>\n            <div><span>Okupansi</span><strong>{{ state.percent }}%</strong><small>{{ state.level }}</small></div>\n          </div>\n        </section>\n\n      </aside>\n    </main>\n  </div>\n</template>\n\n<script>\nexport default {\n  data() {\n    return {\n      defaultPhoto: '/images/mahasiswa-default.png',\n\n      // Ganti identitas dan alamat foto mahasiswa di sini.\n      studentNodes: {\n        node1: { student: 'Nama Mahasiswa 1', nim: 'NIM 001', className: 'Kelas 1A', photo: '/images/mahasiswa-1.jpg' },\n        node2: { student: 'Nama Mahasiswa 2', nim: 'NIM 002', className: 'Kelas 1A', photo: '/images/mahasiswa-2.jpg' },\n        node3: { student: 'Nama Mahasiswa 3', nim: 'NIM 003', className: 'Kelas 1A', photo: '/images/mahasiswa-3.jpg' }\n      },\n      state: {\n        occupied: 0, available: 10, percent: 0, level: 'GREEN', buzzer: false, topology: 3,\n        lastEvent: 'Menunggu event',\n        slots: Array.from({ length: 10 }, (_, index) => ({ id: index + 1, occupied: false })),\n        nodes: {}\n      }\n    }\n  },\n  computed: {\n    statusText() {\n      if (this.state.level === 'RED') return 'PENUH'\n      if (this.state.level === 'YELLOW') return 'HAMPIR PENUH'\n      return 'TERSEDIA'\n    },\n    visibleNodes() {\n      const online = id => Boolean(this.state.nodes?.[id]?.online)\n      const make = (id, name, role) => ({ id, name, role, online: online(id), ...this.studentNodes[id] })\n      if (this.state.topology === 2) return [\n        make('node1', 'Node 1', 'IR Sensor + LED Traffic Light'),\n        make('node2', 'Node 2', 'Push Button + Buzzer')\n      ]\n      return [\n        make('node1', 'Node 1', 'IR Sensor'),\n        make('node2', 'Node 2', 'LED Traffic Light'),\n        make('node3', 'Node 3', 'Push Button')\n      ]\n    }\n  },\n  methods: {\n    emit(action, extra = {}) {\n      this.send({ payload: { action, eventId: Date.now() + '-' + Math.random(), ...extra } })\n    },\n    setTopology(topology) {\n      if (this.state.topology !== topology) this.emit('set_topology', { topology })\n    },\n    useDefaultPhoto(event) {\n      if (!event.target.dataset.fallback) {\n        event.target.dataset.fallback = 'true'\n        event.target.src = this.defaultPhoto\n      }\n    }\n  },\n  watch: {\n    msg(message) {\n      if (message?.payload?.action === 'parking_state') this.state = message.payload\n    }\n  },\n  mounted() {\n    this.emit('request_state')\n  }\n}\n</script>\n\n<style>\n@scope (.parking-shell) {\n.parking-shell{width:100%;box-sizing:border-box;color:#152238;font-family:Inter,Arial,sans-serif}.parking-header{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:22px 24px;border-radius:18px;color:#fff;background:linear-gradient(135deg,#071a38,#124da0)}.parking-header>div>span{color:#93c5fd;font-size:11px;font-weight:800;letter-spacing:1.5px}.parking-header h2{margin:5px 0;font-size:27px}.parking-header p,.panel p{margin:0;opacity:.7}.live{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800}.live i{width:10px;height:10px;border-radius:50%;background:#22c55e;box-shadow:0 0 14px #22c55e}.panel{padding:18px;border-radius:16px;background:#fff;box-shadow:0 5px 18px rgba(15,23,42,.08)}.panel h3{margin:0 0 4px}.node-panel{margin:15px 0}.toolbar{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:15px}.mode{display:flex;gap:8px}.mode button{padding:9px 16px;border:1px solid #bfdbfe;border-radius:9px;color:#1d4ed8;background:#eff6ff;font-weight:800;cursor:pointer}.mode button.active{color:#fff;border-color:#2563eb;background:#2563eb;box-shadow:0 4px 12px rgba(37,99,235,.25)}.node-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}.node-grid.mode-2{grid-template-columns:repeat(2,minmax(0,1fr))}.node-grid article{display:flex;align-items:center;min-width:0;gap:12px;padding:12px;border:1px solid #dbe3ef;border-radius:12px}.node-grid img{width:58px;height:58px;flex:0 0 58px;border-radius:50%;object-fit:cover;background:#e2e8f0}.node-info{min-width:0;flex:1}.node-head{display:flex;justify-content:space-between;gap:8px}.node-head span{color:#dc2626;font-size:9px;font-weight:900}.node-head span.online{color:#16a34a}.node-grid h4{overflow:hidden;margin:5px 0 2px;font-size:14px;text-overflow:ellipsis;white-space:nowrap}.node-grid p{overflow:hidden;font-size:11px;text-overflow:ellipsis;white-space:nowrap}.node-grid small{display:block;margin-top:5px;color:#2563eb;font-size:10px}main{display:grid;grid-template-columns:minmax(0,2.15fr) minmax(280px,.85fr);gap:15px;align-items:start}.panel-title{display:flex;justify-content:space-between;gap:15px;margin-bottom:17px}.legend{display:flex;align-items:center;gap:12px;font-size:11px}.legend span{display:flex;align-items:center;gap:5px}.legend i{width:9px;height:9px;border-radius:50%}.legend .free{background:#22c55e}.legend .busy{background:#ef4444}.slots{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.slot{display:grid;justify-items:center;gap:8px;padding:13px 7px;border:2px solid #86efac;border-radius:13px;color:#166534;background:#f0fdf4;transition:.25s}.slot.occupied{border-color:#fca5a5;color:#991b1b;background:#fef2f2}.slot>span,.slot small{font-size:10px;font-weight:800}.slot>div{display:grid;width:54px;height:54px;place-items:center;border-radius:11px;font-size:27px;background:rgba(255,255,255,.8)}aside{display:grid;gap:15px}.status{display:grid;gap:3px;margin:13px 0;padding:13px;border-left:6px solid #22c55e;border-radius:10px;background:#f8fafc}.status.yellow{border-color:#eab308}.status.red{border-color:#ef4444}.status span,.status small,.summary-grid span,.summary-grid small{color:#64748b;font-size:10px}.status strong{font-size:18px}.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.summary-grid div{display:grid;padding:10px;border-radius:10px;background:#f1f5f9}.summary-grid strong{font-size:22px}.signal>div:first-child{margin-bottom:13px}.signal-content{display:flex;align-items:center;gap:14px}.traffic{display:grid;flex:0 0 auto;gap:8px;padding:11px;border-radius:15px;background:#172033;box-shadow:inset 0 0 12px #020617}.traffic i{width:39px;height:39px;border-radius:50%;opacity:.18}.traffic i.on{opacity:1}.traffic .red{background:#ef4444}.traffic .yellow{background:#facc15}.traffic .green{background:#22c55e}.buzzer{display:flex;align-items:center;min-width:0;gap:8px;padding:11px;border-radius:11px;background:#f1f5f9}.buzzer>span{font-size:23px}.buzzer div{display:grid}.buzzer small{color:#64748b}.buzzer.active{color:#991b1b;background:#fee2e2;animation:pulse .8s infinite}@keyframes pulse{50%{box-shadow:0 0 18px rgba(239,68,68,.5)}}@media(max-width:900px){main{grid-template-columns:1fr}.node-grid,.node-grid.mode-2{grid-template-columns:1fr}.parking-header,.panel-title,.toolbar{align-items:stretch;flex-direction:column}.mode button{flex:1}}@media(max-width:560px){.slots{grid-template-columns:repeat(2,1fr)}.parking-header h2{font-size:22px}}\n/* CSS hanya mengatur isi widget; ukuran luar mengikuti grid Dashboard 2.0. */\n.parking-shell{display:block;width:100%;min-width:0;max-width:100%;margin:0;overflow:visible}\n.parking-shell *{box-sizing:border-box}\n.node-grid{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}\n.node-grid.mode-2{grid-template-columns:repeat(2,minmax(240px,1fr))}\n.map-panel,.parking-side,main,aside{min-width:0}\n\n@media(max-width:1100px){main{grid-template-columns:minmax(0,1.7fr) minmax(250px,.8fr)}.panel{padding:14px}.slots{gap:9px}.slot{padding:10px 5px}}\n@media(max-width:800px){main{grid-template-columns:1fr}.node-grid,.node-grid.mode-2{grid-template-columns:1fr 1fr}.parking-header h2{font-size:23px}}\n@media(max-width:600px){.parking-header,.toolbar,.panel-title{align-items:stretch;flex-direction:column}.node-grid,.node-grid.mode-2{grid-template-columns:1fr}.slots{grid-template-columns:repeat(2,minmax(0,1fr))}.mode{width:100%}.mode button{flex:1}.parking-header{padding:17px}.panel{padding:13px}}\n}\n</style>\n",
+        "storeOutMessages": false,
+        "passthru": false,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 180,
+        "y": 180,
+        "wires": [
+            [
+                "43281825352d9bff"
+            ]
+        ]
+    },
+    {
+        "id": "43281825352d9bff",
+        "type": "function",
+        "z": "21946c7b9ab388b7",
+        "name": "Parking State Controller",
+        "func": "const SLOT_COUNT = 10;\n\nlet state = flow.get(\"smartParkingState\");\nif (!state || !Array.isArray(state.slots) || state.slots.length !== SLOT_COUNT) {\n    state = {\n        slots: Array(SLOT_COUNT).fill(false),\n        topology: 3,\n        nodes: {},\n        lastEvent: \"Sistem diinisialisasi\"\n    };\n}\n\nlet input = msg.payload;\nif (Buffer.isBuffer(input)) input = input.toString();\nif (typeof input === \"string\") {\n    try { input = JSON.parse(input); }\n    catch (_) { input = { event: input }; }\n}\nif (!input || typeof input !== \"object\") input = {};\n\nconst topicParts = String(msg.topic || \"\").split(\"/\");\nconst topicNode = String(input.node_id || (topicParts.length >= 2 ? topicParts[1] : \"\"));\nlet action = String(input.action || input.event || \"\").toLowerCase();\n\nif (msg.topic?.endsWith(\"/status\")) {\n    action = \"node_status\";\n}\n\nconst seen = flow.get(\"smartParkingEvents\") || {};\nconst eventId = String(input.eventId || input.event_id || \"\");\nif (eventId && seen[eventId]) return null;\nif (eventId) {\n    seen[eventId] = Date.now();\n    const ids = Object.keys(seen);\n    if (ids.length > 60) ids.sort((a, b) => seen[a] - seen[b]).slice(0, ids.length - 60).forEach(id => delete seen[id]);\n    flow.set(\"smartParkingEvents\", seen);\n}\n\nconst randomItem = indexes => indexes[Math.floor(Math.random() * indexes.length)];\nconst emptyIndexes = () => state.slots.map((occupied, index) => occupied ? -1 : index).filter(index => index >= 0);\nconst busyIndexes = () => state.slots.map((occupied, index) => occupied ? index : -1).filter(index => index >= 0);\nlet publishCommand = false;\n\nif (action === \"entry\") {\n    const available = emptyIndexes();\n    if (available.length) {\n        const index = randomItem(available);\n        state.slots[index] = true;\n        state.lastEvent = `Mobil masuk → slot P${String(index + 1).padStart(2, \"0\")}`;\n    } else {\n        state.lastEvent = \"Mobil ditolak → parkir penuh\";\n    }\n    publishCommand = true;\n} else if (action === \"exit\") {\n    const occupied = busyIndexes();\n    if (occupied.length) {\n        const index = randomItem(occupied);\n        state.slots[index] = false;\n        state.lastEvent = `Mobil keluar ← slot P${String(index + 1).padStart(2, \"0\")}`;\n    } else {\n        state.lastEvent = \"Tidak ada kendaraan untuk keluar\";\n    }\n    publishCommand = true;\n} else if (action === \"set_count\") {\n    const target = Math.max(0, Math.min(SLOT_COUNT, Number(input.count) || 0));\n    const indexes = Array.from({ length: SLOT_COUNT }, (_, index) => index);\n    for (let i = indexes.length - 1; i > 0; i--) {\n        const j = Math.floor(Math.random() * (i + 1));\n        [indexes[i], indexes[j]] = [indexes[j], indexes[i]];\n    }\n    state.slots = Array(SLOT_COUNT).fill(false);\n    indexes.slice(0, target).forEach(index => state.slots[index] = true);\n    state.lastEvent = `Simulasi diatur menjadi ${target} kendaraan`;\n    publishCommand = true;\n} else if (action === \"reset\") {\n    state.slots = Array(SLOT_COUNT).fill(false);\n    state.lastEvent = \"Area parkir direset\";\n    publishCommand = true;\n} else if (action === \"set_topology\") {\n    state.topology = Number(input.topology) === 2 ? 2 : 3;\n    state.lastEvent = `Topologi ${state.topology} node dipilih`;\n} else if (action === \"node_status\" && topicNode) {\n    if (Number(input.topology) === 2 || Number(input.topology) === 3) {\n        state.topology = Number(input.topology);\n    }\n    state.nodes[topicNode] = {\n        online: input.online === true || String(input.status).toLowerCase() === \"online\",\n        rssi: Number(input.rssi) || 0,\n        updatedAt: Date.now()\n    };\n}\n\nconst occupied = state.slots.filter(Boolean).length;\nconst available = SLOT_COUNT - occupied;\nconst level = occupied < 5 ? \"GREEN\" : occupied < 10 ? \"YELLOW\" : \"RED\";\nconst buzzer = occupied === SLOT_COUNT;\n\nflow.set(\"smartParkingState\", state);\n\nconst uiMessage = {\n    payload: {\n        action: \"parking_state\",\n        slots: state.slots.map((isOccupied, index) => ({ id: index + 1, occupied: isOccupied })),\n        occupied,\n        available,\n        percent: occupied * 10,\n        level,\n        buzzer,\n        topology: state.topology,\n        nodes: state.nodes,\n        lastEvent: state.lastEvent\n    }\n};\n\nconst mqttMessage = publishCommand ? {\n    topic: \"parking/kelompok01/system/command\",\n    payload: JSON.stringify({\n        signal: level.toLowerCase(),\n        buzzer: buzzer ? \"blink\" : \"off\",\n        occupied\n    }),\n    qos: 1,\n    retain: true\n} : null;\n\nreturn [uiMessage, mqttMessage];\n",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 180,
+        "wires": [
+            [
+                "381fbae54fb3b06f"
+            ],
+            [
+                "af3cbdbd372482a9",
+                "b9a1bf5107ae3c6c"
+            ]
+        ]
+    },
+    {
+        "id": "bf690faffc97dd7e",
+        "type": "mqtt in",
+        "z": "21946c7b9ab388b7",
+        "name": "ESP32 Events",
+        "topic": "parking/kelompok01/+/event",
+        "qos": "1",
+        "datatype": "auto-detect",
+        "broker": "6980b8f3cb3430be",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 180,
+        "y": 260,
+        "wires": [
+            [
+                "43281825352d9bff"
+            ]
+        ]
+    },
+    {
+        "id": "1b5c82b21dda2404",
+        "type": "mqtt in",
+        "z": "21946c7b9ab388b7",
+        "name": "ESP32 Status",
+        "topic": "parking/kelompok01/+/status",
+        "qos": "1",
+        "datatype": "auto-detect",
+        "broker": "6980b8f3cb3430be",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 180,
+        "y": 320,
+        "wires": [
+            [
+                "43281825352d9bff"
+            ]
+        ]
+    },
+    {
+        "id": "af3cbdbd372482a9",
+        "type": "mqtt out",
+        "z": "21946c7b9ab388b7",
+        "name": "Traffic + Buzzer Command",
+        "topic": "",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "6980b8f3cb3430be",
+        "x": 820,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "f01c5705115eb095",
+        "type": "inject",
+        "z": "21946c7b9ab388b7",
+        "name": "Initialize Dashboard",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.5,
+        "topic": "",
+        "payload": "{\"action\":\"request_state\"}",
+        "payloadType": "json",
+        "x": 190,
+        "y": 100,
+        "wires": [
+            [
+                "43281825352d9bff"
+            ]
+        ]
+    },
+    {
+        "id": "b9a1bf5107ae3c6c",
+        "type": "debug",
+        "z": "21946c7b9ab388b7",
+        "name": "MQTT Command",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 790,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "441044287cb7cf75",
+        "type": "ui-group",
+        "name": "Smart Parking",
+        "page": "e1780b91817e404e",
+        "width": "12",
+        "height": "1",
+        "order": 1,
+        "showTitle": false,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "6980b8f3cb3430be",
+        "type": "mqtt-broker",
+        "name": "HIVEMQ BROKER",
+        "broker": "broker.hivemq.com",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "e1780b91817e404e",
+        "type": "ui-page",
+        "name": "Smart Parking",
+        "ui": "0df8b8a20bb13f1b",
+        "path": "/smart-parking",
+        "icon": "local_parking",
+        "layout": "grid",
+        "theme": "parking_theme",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": 2,
+        "className": "",
+        "visible": true,
+        "disabled": false
+    },
+    {
+        "id": "0df8b8a20bb13f1b",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": true
+    },
+    {
+        "id": "parking_theme",
+        "type": "ui-theme",
+        "name": "Parking Theme",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#2563eb",
+            "bgPage": "#eef2f7",
+            "groupBg": "#ffffff",
+            "groupOutline": "#dbe3ef"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "12px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "c832c7897713f805",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "@flowfuse/node-red-dashboard": "1.31.0"
+        }
+    }
+]
