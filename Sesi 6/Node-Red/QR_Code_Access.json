@@ -1,0 +1,409 @@
+[
+    {
+        "id": "a2a52833336af998",
+        "type": "tab",
+        "label": "QR Access IoT",
+        "disabled": false,
+        "info": "QR access control dengan Dashboard 2.0, SQLite, dan MQTT."
+    },
+    {
+        "id": "7654309641819275",
+        "type": "ui-template",
+        "z": "a2a52833336af998",
+        "group": "5ae7d249871fbe91",
+        "page": "",
+        "ui": "",
+        "name": "QR Access UI",
+        "order": 1,
+        "width": "12",
+        "height": "10",
+        "head": "",
+        "format": "<template>\n  <div class=\"qrac-shell\">\n    <header class=\"qrac-header\">\n      <div>\n        <h2>QR Access Control</h2>\n        <p>Pemindai kartu mahasiswa berbasis <i>Internet of Things</i></p>\n      </div>\n      <div class=\"qrac-nav\">\n        <button :class=\"{ active: page === 'scan' }\" @click=\"showPage('scan')\">\n          Scan Akses\n        </button>\n        <button :class=\"{ active: page === 'register' }\" @click=\"showPage('register')\">\n          Registrasi\n        </button>\n      </div>\n    </header>\n    <main v-if=\"page === 'scan'\" class=\"qrac-scan-layout\">\n      <section class=\"qrac-card\">\n        <div class=\"qrac-section-title\">\n          <div>\n            <h3>Pemindai QR Code</h3>\n            <p>Arahkan QR kartu ke kamera</p>\n          </div>\n          <span class=\"qrac-camera-state\" :class=\"{ active: scannerActive }\">\n            {{ scannerActive ? 'KAMERA AKTIF' : 'KAMERA NONAKTIF' }}\n          </span>\n        </div>\n        <div class=\"qrac-reader-stage\">\n          <div id=\"qr-access-reader\" class=\"qrac-reader\" v-once></div>\n          <div v-if=\"!scannerActive\" class=\"qrac-reader-placeholder\">\n            <span class=\"qrac-camera-icon\">▣</span>\n            <p v-if=\"cameraError\" class=\"qrac-camera-error\">{{ cameraError }}</p>\n            <p v-else>{{ scannerStarting ? 'Membuka kamera...' : 'Tekan tombol Scan untuk membuka webcam' }}</p>\n          </div>\n        </div>\n        <div class=\"qrac-actions\">\n          <button type=\"button\" class=\"qrac-button primary\" :disabled=\"scannerActive || scannerStarting\" @click=\"startScanner\">\n            {{ scannerStarting ? 'Membuka...' : 'Scan' }}\n          </button>\n          <button\n            type=\"button\"\n            class=\"qrac-button danger\"\n            :disabled=\"!scannerAvailable && !scannerActive && !scannerStarting\"\n            @click.stop.prevent=\"stopScanner\">\n            Tutup\n          </button>\n        </div>\n      </section>\n      <aside class=\"qrac-card qrac-status-card\" :class=\"accessClass\">\n        <div class=\"qrac-status-label\">STATUS AKSES</div>\n        <div class=\"qrac-status-value\">{{ accessStatus }}</div>\n        <img class=\"qrac-profile-photo\" :src=\"accessUser.photo || unknownPhoto\" alt=\"Foto pengguna\">\n        <div class=\"qrac-profile-data\">\n          <div>\n            <span>Nama</span>\n            <strong>{{ accessUser.name || 'Unknown' }}</strong>\n          </div>\n          <div>\n            <span>NIM</span>\n            <strong>{{ accessUser.nim || '-' }}</strong>\n          </div>\n          <div>\n            <span>Kelas</span>\n            <strong>{{ accessUser.className || '-' }}</strong>\n          </div>\n        </div>\n      </aside>\n    </main>\n    <main v-else class=\"qrac-register-layout\">\n      <section class=\"qrac-card\">\n        <div class=\"qrac-section-title\">\n          <div>\n            <h3>Registrasi Mahasiswa</h3>\n            <p>QR token dibuat otomatis dari NIM dan nilai acak</p>\n          </div>\n        </div>\n        <form class=\"qrac-form\" @submit.prevent=\"registerStudent\">\n          <label>\n            <span>Nama lengkap</span>\n            <input v-model.trim=\"form.name\" required maxlength=\"80\" placeholder=\"Nama mahasiswa\">\n          </label>\n          <label>\n            <span>NIM</span>\n            <input v-model.trim=\"form.nim\" required maxlength=\"30\" placeholder=\"Contoh: C020321001\">\n          </label>\n          <label>\n            <span>Kelas</span>\n            <input v-model.trim=\"form.className\" required maxlength=\"40\" placeholder=\"Contoh: 3A Elektro\">\n          </label>\n          <label>\n            <span>Foto</span>\n            <input type=\"file\" accept=\"image/jpeg,image/png,image/webp\" @change=\"selectPhoto\">\n          </label>\n          <div class=\"qrac-photo-preview-wrap\">\n            <img class=\"qrac-photo-preview\" :src=\"form.photo || unknownPhoto\" alt=\"Pratinjau foto\">\n            <small>Foto otomatis diperkecil sebelum disimpan ke SQLite.</small>\n          </div>\n          <label>\n            <span>Logo kartu (opsional)</span>\n            <input type=\"file\" accept=\"image/jpeg,image/png,image/webp\" @change=\"selectLogo\">\n          </label>\n          <div v-if=\"form.logo\" class=\"qrac-logo-preview-wrap\">\n            <img class=\"qrac-logo-preview\" :src=\"form.logo\" alt=\"Pratinjau logo\">\n            <button type=\"button\" class=\"qrac-button danger\" @click=\"form.logo = ''\">Hapus Logo</button>\n          </div>\n          <button type=\"submit\" class=\"qrac-button primary full\" :disabled=\"registering\">\n            {{ registering ? 'Menyimpan...' : 'Daftarkan dan Buat Kartu' }}\n          </button>\n        </form>\n      </section>\n      <aside class=\"qrac-card qrac-card-preview\">\n        <div v-if=\"registeredStudent\" class=\"qrac-card-result\">\n          <h3>Kartu Berhasil Dibuat</h3>\n          <div class=\"qrac-student-card\">\n            <div class=\"qrac-student-card-head\">\n              <img v-if=\"registeredStudent.logo\" class=\"qrac-campus-logo\" :src=\"registeredStudent.logo\" alt=\"Logo kampus\">\n              <div v-else class=\"qrac-campus-mark\">AC</div>\n              <div>\n                <strong>KARTU MAHASISWA</strong>\n                <small>IoT Access Control Card</small>\n              </div>\n            </div>\n            <img class=\"qrac-card-photo\" :src=\"registeredStudent.photo || unknownPhoto\" alt=\"Foto mahasiswa\">\n            <div class=\"qrac-card-identity\">\n              <strong>{{ registeredStudent.name }}</strong>\n              <span>{{ registeredStudent.nim }}</span>\n              <small>{{ registeredStudent.className }}</small>\n            </div>\n            <div class=\"qrac-card-qr-wrap\">\n              <img class=\"qrac-generated-qr\" :src=\"registeredStudent.qrImage\" alt=\"QR mahasiswa\">\n              <small>SCAN UNTUK AKSES</small>\n            </div>\n            <div class=\"qrac-card-footer\">IDENTITAS DIGITAL MAHASISWA</div>\n          </div>\n          <button type=\"button\" class=\"qrac-button success full\" @click=\"downloadCard\">\n            Download Kartu PNG\n          </button>\n        </div>\n        <div v-else class=\"qrac-empty-card\">\n          <span>▦</span>\n          <p>Kartu akan muncul setelah registrasi berhasil.</p>\n        </div>\n        <canvas ref=\"cardCanvas\" width=\"720\" height=\"1100\" hidden></canvas>\n      </aside>\n    </main>\n  </div>\n</template>\n<script src=\"https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/sweetalert2@11\"></script>\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js\"></script>\n<script>\n  export default {\n  data() {\n    const unknownSvg = `\n      <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"400\" height=\"500\" viewBox=\"0 0 400 500\">\n        <rect width=\"400\" height=\"500\" fill=\"#e5e7eb\"/>\n        <circle cx=\"200\" cy=\"170\" r=\"78\" fill=\"#9ca3af\"/>\n        <path d=\"M70 455c8-112 57-170 130-170s122 58 130 170\" fill=\"#9ca3af\"/>\n        <text x=\"200\" y=\"485\" text-anchor=\"middle\" font-family=\"Arial\" font-size=\"24\" fill=\"#4b5563\">UNKNOWN</text>\n      </svg>`\n    return {\n      page: 'scan',\n      scannerAvailable: false,\n      scannerSession: 0,\n      scannerStore: Object.freeze({ slots: [null] }),\n      scannerActive: false,\n      scannerStarting: false,\n      scannerStopRequested: false,\n      cameraError: '',\n      scanLocked: false,\n      scanRequestPending: false,\n      lastScannedToken: '',\n      lastScannedAt: 0,\n      scanCooldownTimer: null,\n      scanRequestTimer: null,\n      registerTimer: null,\n      registering: false,\n      accessStatus: 'MENUNGGU',\n      accessUser: {},\n      activeAccessEventId: '',\n      form: {\n        name: '',\n        nim: '',\n        className: '',\n        photo: '',\n        logo: ''\n      },\n      registeredStudent: null,\n      unknownPhoto: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(unknownSvg)}`,\n      grantedAudioUrl: '/audio/access-granted.mp3',\n      deniedAudioUrl: '/audio/access-denied.mp3',\n      backendMessage: null\n    }\n  },\n  computed: {\n    accessClass() {\n      if (this.accessStatus === 'GRANTED') return 'granted'\n      if (this.accessStatus === 'DENIED') return 'denied'\n      return 'idle'\n    }\n  },\n  methods: {\n    async showPage(target) {\n      if (target === this.page) return\n      if (target === 'register') await this.stopScanner()\n      this.page = target\n    },\n    async waitForLibrary(name, timeoutMs = 8000) {\n      const started = Date.now()\n      while (!window[name] && Date.now() - started < timeoutMs) {\n        await new Promise(resolve => setTimeout(resolve, 100))\n      }\n      return Boolean(window[name])\n    },\n    async startScanner() {\n      if (this.scannerActive || this.scannerStarting) return\n      this.scannerStarting = true\n      this.scannerStopRequested = false\n      this.cameraError = ''\n      const session = ++this.scannerSession\n      let scanner = null\n      if (!window.isSecureContext && location.hostname !== 'localhost') {\n        this.scannerStarting = false\n        this.cameraError = 'Gunakan HTTPS atau localhost agar kamera dapat dibuka.'\n        this.showAlert('error', 'Kamera tidak tersedia', 'Dashboard harus dibuka melalui HTTPS atau localhost.')\n        return\n      }\n      if (!(await this.waitForLibrary('Html5Qrcode'))) {\n        this.scannerStarting = false\n        this.cameraError = 'Library pemindai QR gagal dimuat.'\n        this.showAlert('error', 'Library gagal dimuat', 'Periksa koneksi internet atau akses CDN.')\n        return\n      }\n      try {\n        scanner = new Html5Qrcode('qr-access-reader')\n        this.scannerStore.slots[0] = scanner\n        this.scannerAvailable = true\n        const scanConfig = { fps: 8, qrbox: { width: 190, height: 190 } }\n        try {\n          await scanner.start(\n            { facingMode: { ideal: 'environment' } },\n            scanConfig,\n            this.onQrDetected,\n            () => {}\n          )\n        } catch (primaryError) {\n          try { scanner.clear() } catch (_) {}\n          if (this.scannerStopRequested || session !== this.scannerSession) {\n            throw new Error('SCAN_CANCELLED')\n          }\n          const cameras = await Html5Qrcode.getCameras()\n          if (!cameras.length) throw primaryError\n          scanner = new Html5Qrcode('qr-access-reader')\n          this.scannerStore.slots[0] = scanner\n          this.scannerAvailable = true\n          await scanner.start(\n            cameras[0].id,\n            scanConfig,\n            this.onQrDetected,\n            () => {}\n          )\n        }\n        if (this.scannerStopRequested || session !== this.scannerSession) {\n          try { await scanner.stop() } catch (_) {}\n          try { scanner.clear() } catch (_) {}\n          this.scannerStore.slots[0] = null\n          this.scannerAvailable = false\n          this.scannerStarting = false\n          this.scannerActive = false\n          return\n        }\n        this.scannerStarting = false\n        this.scannerActive = true\n        this.cameraError = ''\n        this.scanLocked = false\n        this.scanRequestPending = false\n      } catch (error) {\n        if (scanner) {\n          try { await scanner.stop() } catch (_) {}\n          try { scanner.clear() } catch (_) {}\n        }\n        this.scannerStarting = false\n        if (session === this.scannerSession) {\n          this.scannerStore.slots[0] = null\n          this.scannerAvailable = false\n        }\n        this.scannerActive = false\n        if (this.scannerStopRequested || error?.message === 'SCAN_CANCELLED') return\n        this.cameraError = error?.message || String(error || 'Izin kamera ditolak.')\n        this.showAlert('error', 'Webcam gagal dibuka', this.cameraError)\n      }\n    },\n    async stopScanner() {\n      this.scannerStopRequested = true\n      this.scannerSession += 1\n      const scanner = this.scannerStore.slots[0]\n      this.scannerStore.slots[0] = null\n      this.scannerAvailable = false\n      this.scannerActive = false\n      this.cameraError = ''\n      this.scanLocked = false\n      this.scanRequestPending = false\n      clearTimeout(this.scanCooldownTimer)\n      clearTimeout(this.scanRequestTimer)\n      if (!scanner) return\n      try {\n        await scanner.stop()\n      } catch (_) {\n      }\n      try {\n        scanner.clear()\n      } catch (_) {\n      }\n    },\n    onQrDetected(decodedText) {\n      const token = String(decodedText || '').trim()\n      const now = Date.now()\n      if (!token || this.scanLocked || this.scanRequestPending) return\n      if (token === this.lastScannedToken && now - this.lastScannedAt < 6000) return\n      this.scanLocked = true\n      this.scanRequestPending = true\n      this.lastScannedToken = token\n      this.lastScannedAt = now\n      this.activeAccessEventId = ''\n      this.accessStatus = 'MEMERIKSA'\n      this.accessUser = {}\n      this.send({\n        payload: {\n          action: 'scan',\n          token\n        }\n      })\n      clearTimeout(this.scanRequestTimer)\n      this.scanRequestTimer = setTimeout(() => {\n        if (!this.scanRequestPending) return\n        this.scanRequestPending = false\n        this.releaseScanner(0)\n        this.accessStatus = 'ERROR'\n        this.showAlert('error', 'Pemeriksaan gagal', 'Node-RED tidak memberikan respons dalam 10 detik.')\n      }, 10000)\n    },\n    releaseScanner(delay = 2200) {\n      clearTimeout(this.scanCooldownTimer)\n      this.scanCooldownTimer = setTimeout(() => {\n        this.scanLocked = false\n      }, delay)\n    },\n    async selectPhoto(event) {\n      const file = event.target.files?.[0]\n      if (!file) return\n      if (file.size > 5 * 1024 * 1024) {\n        this.showAlert('warning', 'Foto terlalu besar', 'Gunakan file foto maksimum 5 MB.')\n        event.target.value = ''\n        return\n      }\n      try {\n        this.form.photo = await this.resizePhoto(file, 320, 400)\n      } catch (_) {\n        this.showAlert('error', 'Foto gagal dibaca', 'Pilih file JPG, PNG, atau WebP yang valid.')\n      }\n    },\n    async selectLogo(event) {\n      const file = event.target.files?.[0]\n      if (!file) return\n      if (file.size > 3 * 1024 * 1024) {\n        this.showAlert('warning', 'Logo terlalu besar', 'Gunakan file logo maksimum 3 MB.')\n        event.target.value = ''\n        return\n      }\n      try {\n        this.form.logo = await this.resizePhoto(file, 256, 256, 'image/png', 0.92)\n      } catch (_) {\n        this.showAlert('error', 'Logo gagal dibaca', 'Pilih file JPG, PNG, atau WebP yang valid.')\n      }\n    },\n    resizePhoto(file, width, height, outputType = 'image/jpeg', quality = 0.78) {\n      return new Promise((resolve, reject) => {\n        const reader = new FileReader()\n        reader.onerror = reject\n        reader.onload = () => {\n          const image = new Image()\n          image.onerror = reject\n          image.onload = () => {\n            const canvas = document.createElement('canvas')\n            const context = canvas.getContext('2d')\n            const scale = Math.max(width / image.width, height / image.height)\n            const drawWidth = image.width * scale\n            const drawHeight = image.height * scale\n            canvas.width = width\n            canvas.height = height\n            context.drawImage(\n              image,\n              (width - drawWidth) / 2,\n              (height - drawHeight) / 2,\n              drawWidth,\n              drawHeight\n            )\n            resolve(canvas.toDataURL(outputType, quality))\n          }\n          image.src = reader.result\n        }\n        reader.readAsDataURL(file)\n      })\n    },\n    registerStudent() {\n      if (this.registering) return\n      if (!this.form.name || !this.form.nim || !this.form.className) {\n        this.showAlert('warning', 'Data belum lengkap', 'Nama, NIM, dan kelas wajib diisi.')\n        return\n      }\n      this.registering = true\n      this.send({\n        payload: {\n          action: 'register',\n          data: {\n            name: this.form.name,\n            nim: this.form.nim.toUpperCase(),\n            className: this.form.className,\n            photo: this.form.photo || this.unknownPhoto,\n            logo: this.form.logo\n          }\n        }\n      })\n      clearTimeout(this.registerTimer)\n      this.registerTimer = setTimeout(() => {\n        if (!this.registering) return\n        this.registering = false\n        this.showAlert('error', 'Registrasi gagal', 'Node-RED tidak memberikan respons dalam 10 detik.')\n      }, 10000)\n    },\n    async handleBackend(payload) {\n      if (!payload?.action) return\n      if (payload.action === 'device_feedback') {\n        const status = String(payload.status || '').toUpperCase()\n        const eventId = String(payload.eventId || payload.event_id || '')\n        if (status !== 'STANDBY') return\n        if (!eventId || eventId !== this.activeAccessEventId) return\n        this.accessStatus = 'MENUNGGU'\n        this.accessUser = {}\n        this.activeAccessEventId = ''\n        return\n      }\n      if (payload.action === 'access_result' && !this.scanRequestPending) return\n      if (['registered', 'register_error'].includes(payload.action) && !this.registering) return\n      if (payload.action === 'system_error' && !this.scanRequestPending && !this.registering) return\n      if (this.isDuplicateEvent(payload)) return\n      if (payload.action === 'access_result') {\n        clearTimeout(this.scanRequestTimer)\n        this.scanRequestPending = false\n        this.releaseScanner()\n        this.accessStatus = payload.granted ? 'GRANTED' : 'DENIED'\n        this.accessUser = payload.granted ? payload.user : {}\n        this.activeAccessEventId = String(payload.eventId || '')\n        await this.$nextTick()\n        this.showAlert(\n          payload.granted ? 'success' : 'error',\n          payload.granted ? 'Akses diterima' : 'Akses ditolak',\n          payload.granted ? `Selamat datang, ${payload.user.name}` : 'QR Code tidak terdaftar atau tidak aktif.'\n        )\n        this.playAccessAudio(payload.granted)\n      }\n      if (payload.action === 'registered') {\n        clearTimeout(this.registerTimer)\n        try {\n          const qrImage = await this.createQrImage(payload.user.qrToken)\n          this.registeredStudent = { ...payload.user, qrImage }\n          this.showAlert('success', 'Registrasi berhasil', 'Kartu mahasiswa siap diunduh.')\n        } catch (error) {\n          this.showAlert('error', 'QR gagal dibuat', error.message || 'Library QR Code tidak tersedia.')\n        } finally {\n          this.registering = false\n        }\n      }\n      if (payload.action === 'register_error') {\n        clearTimeout(this.registerTimer)\n        this.registering = false\n        this.showAlert('error', 'Registrasi gagal', payload.message || 'Data tidak dapat disimpan.')\n      }\n      if (payload.action === 'system_error') {\n        clearTimeout(this.registerTimer)\n        clearTimeout(this.scanRequestTimer)\n        this.registering = false\n        this.scanRequestPending = false\n        this.releaseScanner(0)\n        this.accessStatus = 'ERROR'\n        this.accessUser = {}\n        this.showAlert('error', 'Sistem bermasalah', payload.message || 'Operasi tidak dapat diproses.')\n      }\n    },\n    showAlert(icon, title, text) {\n      if (window.Swal) {\n        Swal.fire({\n          toast: true,\n          position: 'top-end',\n          icon,\n          title,\n          text,\n          timer: 5000,\n          timerProgressBar: true,\n          showConfirmButton: false\n        })\n      }\n    },\n    isDuplicateEvent(payload) {\n      if (payload.action === 'access_result' && !payload.eventId) return true\n      if (!payload.eventId) return false\n      try {\n        const storageKey = 'qrac:lastHandledEventId'\n        if (localStorage.getItem(storageKey) === payload.eventId) return true\n        localStorage.setItem(storageKey, payload.eventId)\n      } catch (_) {\n      }\n      return false\n    },\n    async playAccessAudio(granted) {\n      const source = granted ? this.grantedAudioUrl : this.deniedAudioUrl\n      try {\n        const audio = new Audio(source)\n        audio.volume = 0.9\n        await audio.play()\n      } catch (_) {\n      }\n    },\n    async createQrImage(token) {\n      if (!(await this.waitForLibrary('QRCode'))) {\n        throw new Error('Library QR Code belum tersedia')\n      }\n      const holder = document.createElement('div')\n      holder.style.position = 'fixed'\n      holder.style.left = '-9999px'\n      document.body.appendChild(holder)\n      try {\n        new QRCode(holder, {\n          text: token,\n          width: 280,\n          height: 280,\n          colorDark: '#111827',\n          colorLight: '#ffffff',\n          correctLevel: QRCode.CorrectLevel.H\n        })\n        await new Promise(resolve => setTimeout(resolve, 80))\n        const canvas = holder.querySelector('canvas')\n        const image = holder.querySelector('img')\n        if (canvas) return canvas.toDataURL('image/png')\n        if (image?.src) return image.src\n        throw new Error('Gambar QR tidak berhasil dirender.')\n      } finally {\n        holder.remove()\n      }\n    },\n    loadImage(source) {\n      return new Promise((resolve, reject) => {\n        const image = new Image()\n        image.onload = () => resolve(image)\n        image.onerror = reject\n        image.src = source\n      })\n    },\n    async downloadCard() {\n      if (!this.registeredStudent) return\n      const student = this.registeredStudent\n      const canvas = this.$refs.cardCanvas\n      const context = canvas.getContext('2d')\n      const photo = await this.loadImage(student.photo || this.unknownPhoto)\n      const qr = await this.loadImage(student.qrImage)\n      let logo = null\n      if (student.logo) {\n        try { logo = await this.loadImage(student.logo) } catch (_) {}\n      }\n      const gradient = context.createLinearGradient(0, 0, 720, 1100)\n      gradient.addColorStop(0, '#071a38')\n      gradient.addColorStop(0.6, '#0f2f61')\n      gradient.addColorStop(1, '#124da0')\n      context.fillStyle = gradient\n      context.fillRect(0, 0, 720, 1100)\n      context.fillStyle = 'rgba(255,255,255,0.08)'\n      context.beginPath()\n      context.arc(650, 90, 220, 0, Math.PI * 2)\n      context.fill()\n      context.fillStyle = '#ffffff'\n      context.font = '700 34px Arial'\n      context.fillText('KARTU MAHASISWA', 130, 68)\n      context.font = '18px Arial'\n      context.fillText('IoT Access Control Card', 130, 99)\n      context.fillStyle = '#ffffff'\n      context.beginPath()\n      context.arc(70, 70, 38, 0, Math.PI * 2)\n      context.fill()\n      if (logo) {\n        context.save()\n        context.beginPath()\n        context.arc(70, 70, 34, 0, Math.PI * 2)\n        context.clip()\n        context.drawImage(logo, 36, 36, 68, 68)\n        context.restore()\n      } else {\n        context.fillStyle = '#124da0'\n        context.font = '700 22px Arial'\n        context.textAlign = 'center'\n        context.fillText('AC', 70, 78)\n      }\n      context.save()\n      context.beginPath()\n      context.arc(360, 285, 132, 0, Math.PI * 2)\n      context.clip()\n      context.drawImage(photo, 228, 120, 264, 330)\n      context.restore()\n      context.lineWidth = 8\n      context.strokeStyle = '#ffffff'\n      context.beginPath()\n      context.arc(360, 285, 136, 0, Math.PI * 2)\n      context.stroke()\n      context.textAlign = 'center'\n      context.fillStyle = '#ffffff'\n      context.font = '700 34px Arial'\n      context.fillText(student.name.slice(0, 28), 360, 490)\n      context.fillStyle = '#bfdbfe'\n      context.font = '700 25px Arial'\n      context.fillText(student.nim, 360, 530)\n      context.font = '20px Arial'\n      context.fillText(student.className.slice(0, 34), 360, 565)\n      context.fillStyle = '#ffffff'\n      context.fillRect(185, 605, 350, 350)\n      context.drawImage(qr, 205, 625, 310, 310)\n      context.fillStyle = '#dbeafe'\n      context.font = '700 17px Arial'\n      context.fillText('SCAN UNTUK AKSES', 360, 990)\n      context.font = '15px Arial'\n      context.fillText('IDENTITAS DIGITAL MAHASISWA', 360, 1040)\n      context.textAlign = 'left'\n      const link = document.createElement('a')\n      link.download = `kartu-${student.nim}.png`\n      link.href = canvas.toDataURL('image/png')\n      link.click()\n    }\n  },\n  mounted() {\n    this.accessStatus = 'MENUNGGU'\n    this.accessUser = {}\n    try { localStorage.removeItem('qrac:lastAccess') } catch (_) {}\n  },\n  watch: {\n    msg(message) {\n      if (message?.payload) this.handleBackend(message.payload)\n    }\n  },\n  unmounted() {\n    clearTimeout(this.scanCooldownTimer)\n    clearTimeout(this.scanRequestTimer)\n    clearTimeout(this.registerTimer)\n    this.stopScanner()\n  }\n}\n</script>\n<style>\n  .qrac-shell {\n    width: 100%;\n    box-sizing: border-box;\n    color: rgb(var(--v-theme-on-surface));\n  }\n\n  .qrac-header,\n  .qrac-section-title,\n  .qrac-actions,\n  .qrac-nav {\n    display: flex;\n    align-items: center;\n  }\n\n  .qrac-header {\n    justify-content: space-between;\n    gap: 20px;\n    margin-bottom: 18px;\n    padding: 18px 22px;\n    border-radius: 16px;\n    background: #0f172a;\n    color: #ffffff;\n  }\n\n  .qrac-header h2,\n  .qrac-header p,\n  .qrac-section-title h3,\n  .qrac-section-title p,\n  .qrac-card-preview h3 {\n    margin: 0;\n  }\n\n  .qrac-header p,\n  .qrac-section-title p {\n    margin-top: 4px;\n    opacity: 0.7;\n  }\n\n  .qrac-nav {\n    gap: 8px;\n  }\n\n  .qrac-nav button,\n  .qrac-button {\n    border: 0;\n    border-radius: 10px;\n    padding: 10px 17px;\n    font-weight: 700;\n    cursor: pointer;\n  }\n\n  .qrac-nav button {\n    background: rgba(255, 255, 255, 0.12);\n    color: #ffffff;\n  }\n\n  .qrac-nav button.active {\n    background: #2563eb;\n  }\n\n  .qrac-scan-layout,\n  .qrac-register-layout {\n    display: grid;\n    grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.8fr);\n    gap: 18px;\n  }\n\n  .qrac-card {\n    position: relative;\n    padding: 20px;\n    border: 1px solid rgba(var(--v-theme-on-surface), 0.12);\n    border-radius: 16px;\n    background: rgb(var(--v-theme-surface));\n    box-shadow: 0 5px 18px rgba(15, 23, 42, 0.1);\n  }\n\n  .qrac-section-title {\n    justify-content: space-between;\n    gap: 15px;\n    margin-bottom: 18px;\n  }\n\n  .qrac-camera-state,\n  .qrac-status-label {\n    padding: 5px 10px;\n    border-radius: 20px;\n    background: #64748b;\n    color: #ffffff;\n    font-size: 11px;\n    font-weight: 800;\n  }\n\n  .qrac-camera-state.active {\n    background: #16a34a;\n  }\n\n  .qrac-reader-stage {\n    position: relative;\n    width: min(100%, 560px);\n    min-height: 280px;\n    max-height: 360px;\n    margin-inline: auto;\n    overflow: hidden;\n    border: 2px dashed #94a3b8;\n    border-radius: 14px;\n    background: #0f172a;\n  }\n\n  .qrac-reader {\n    width: 100%;\n    min-height: 280px;\n    border: 0 !important;\n  }\n\n  .qrac-reader video,\n  .qrac-reader canvas {\n    max-height: 360px !important;\n    object-fit: cover;\n  }\n\n  .qrac-reader-placeholder {\n    position: absolute;\n    inset: 0;\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    justify-content: center;\n    color: #cbd5e1;\n    text-align: center;\n    pointer-events: none;\n  }\n\n  .qrac-camera-error {\n    max-width: 90%;\n    padding: 10px 12px;\n    border-radius: 9px;\n    background: rgba(220, 38, 38, 0.2);\n    color: #fecaca;\n    font-weight: 700;\n  }\n\n  .qrac-camera-icon,\n  .qrac-empty-card span {\n    font-size: 70px;\n  }\n\n  .qrac-actions {\n    position: relative;\n    z-index: 20;\n    justify-content: center;\n    gap: 12px;\n    margin-top: 18px;\n  }\n\n  .qrac-button.primary {\n    background: #2563eb;\n    color: #ffffff;\n  }\n\n  .qrac-button.danger {\n    background: #dc2626;\n    color: #ffffff;\n  }\n\n  .qrac-button.success {\n    background: #16a34a;\n    color: #ffffff;\n  }\n\n  .qrac-button.full {\n    width: 100%;\n  }\n\n  .qrac-button:disabled {\n    opacity: 0.45;\n    cursor: not-allowed;\n  }\n\n  .qrac-button {\n    position: relative;\n    z-index: 21;\n    pointer-events: auto;\n  }\n\n  .qrac-status-card,\n  .qrac-card-preview>div {\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n  }\n\n  .qrac-status-card.idle {\n    border-top: 8px solid #64748b;\n  }\n\n  .qrac-status-card.granted {\n    border-top: 8px solid #16a34a;\n  }\n\n  .qrac-status-card.denied {\n    border-top: 8px solid #dc2626;\n  }\n\n  .qrac-status-card.granted .qrac-status-value {\n    color: #16a34a;\n  }\n\n  .qrac-status-card.denied .qrac-status-value {\n    color: #dc2626;\n  }\n\n  .qrac-status-value {\n    margin: 12px 0 18px;\n    font-size: 30px;\n    font-weight: 900;\n  }\n\n  .qrac-profile-photo,\n  .qrac-photo-preview {\n    object-fit: cover;\n    border-radius: 14px;\n    background: #e5e7eb;\n  }\n\n  .qrac-profile-photo {\n    width: 190px;\n    height: 238px;\n  }\n\n  .qrac-profile-data {\n    width: 100%;\n    margin-top: 18px;\n  }\n\n  .qrac-profile-data div {\n    display: flex;\n    justify-content: space-between;\n    gap: 12px;\n    padding: 11px 0;\n    border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.1);\n  }\n\n  .qrac-profile-data span,\n  .qrac-form label>span {\n    color: #64748b;\n    font-size: 13px;\n  }\n\n  .qrac-form {\n    display: grid;\n    gap: 15px;\n  }\n\n  .qrac-form label {\n    display: grid;\n    gap: 6px;\n  }\n\n  .qrac-form input {\n    width: 100%;\n    padding: 11px 12px;\n    box-sizing: border-box;\n    border: 1px solid #cbd5e1;\n    border-radius: 9px;\n    background: transparent;\n    color: inherit;\n  }\n\n  .qrac-photo-preview-wrap {\n    display: flex;\n    align-items: center;\n    gap: 14px;\n  }\n\n  .qrac-logo-preview-wrap {\n    display: flex;\n    align-items: center;\n    gap: 14px;\n  }\n\n  .qrac-photo-preview {\n    width: 82px;\n    height: 102px;\n  }\n\n  .qrac-logo-preview {\n    width: 72px;\n    height: 72px;\n    padding: 5px;\n    border: 1px solid #cbd5e1;\n    border-radius: 50%;\n    background: #ffffff;\n    object-fit: contain;\n  }\n\n  .qrac-card-result {\n    width: 100%;\n  }\n\n  .qrac-student-card {\n    width: min(100%, 360px);\n    min-height: 550px;\n    margin: 18px auto 4px;\n    box-sizing: border-box;\n    overflow: hidden;\n    border: 1px solid rgba(255, 255, 255, 0.18);\n    border-radius: 24px;\n    background:\n      radial-gradient(circle at 95% 3%, rgba(255, 255, 255, 0.14) 0 20%, transparent 20.5%),\n      linear-gradient(155deg, #071a38 0%, #0f2f61 62%, #124da0 100%);\n    color: #ffffff;\n    box-shadow: 0 18px 40px rgba(7, 26, 56, 0.28);\n  }\n\n  .qrac-student-card-head {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    padding: 20px 22px 12px;\n  }\n\n  .qrac-student-card-head>div:last-child {\n    display: grid;\n    gap: 2px;\n    text-align: left;\n  }\n\n  .qrac-student-card-head strong {\n    font-size: 15px;\n    letter-spacing: 0.8px;\n  }\n\n  .qrac-student-card-head small {\n    color: #bfdbfe;\n    font-size: 9px;\n    letter-spacing: 1.2px;\n  }\n\n  .qrac-campus-mark {\n    display: grid;\n    width: 42px;\n    height: 42px;\n    flex: 0 0 42px;\n    place-items: center;\n    border-radius: 50%;\n    background: #22c55e;\n    font-weight: 900;\n  }\n\n  .qrac-campus-logo {\n    width: 42px;\n    height: 42px;\n    flex: 0 0 42px;\n    padding: 3px;\n    box-sizing: border-box;\n    border-radius: 50%;\n    background: #ffffff;\n    object-fit: contain;\n  }\n\n  .qrac-card-photo {\n    width: 126px;\n    height: 150px;\n    margin-top: 8px;\n    border: 4px solid #ffffff;\n    border-radius: 50%;\n    object-fit: cover;\n    box-shadow: 0 7px 18px rgba(0, 0, 0, 0.25);\n  }\n\n  .qrac-card-identity {\n    display: grid;\n    gap: 3px;\n    margin-top: 12px;\n    text-align: center;\n  }\n\n  .qrac-card-identity strong {\n    font-size: 20px;\n  }\n\n  .qrac-card-identity span {\n    color: #bfdbfe;\n    font-size: 15px;\n    font-weight: 800;\n  }\n\n  .qrac-card-identity small {\n    color: #dbeafe;\n  }\n\n  .qrac-card-qr-wrap {\n    display: grid;\n    justify-items: center;\n    gap: 7px;\n    margin-top: 16px;\n  }\n\n  .qrac-generated-qr {\n    width: min(58vw, 185px);\n    padding: 9px;\n    border-radius: 12px;\n    background: #ffffff;\n  }\n\n  .qrac-card-qr-wrap small {\n    color: #dbeafe;\n    font-size: 10px;\n    font-weight: 800;\n    letter-spacing: 1.4px;\n  }\n\n  .qrac-card-footer {\n    margin-top: 14px;\n    padding: 10px;\n    background: rgba(255, 255, 255, 0.08);\n    font-size: 9px;\n    letter-spacing: 1.2px;\n    text-align: center;\n  }\n\n  .qrac-card-preview .qrac-button {\n    margin-top: 20px;\n  }\n\n  .qrac-empty-card {\n    min-height: 420px;\n    justify-content: center;\n    color: #64748b;\n    text-align: center;\n  }\n\n  @media (max-width: 850px) {\n\n    .qrac-header,\n    .qrac-photo-preview-wrap {\n      align-items: stretch;\n      flex-direction: column;\n    }\n\n    .qrac-scan-layout,\n    .qrac-register-layout {\n      grid-template-columns: 1fr;\n    }\n\n    .qrac-nav button {\n      flex: 1;\n    }\n  }\n</style>",
+        "storeOutMessages": false,
+        "passthru": false,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 180,
+        "y": 220,
+        "wires": [
+            [
+                "0b85e8fddf6ed45a"
+            ]
+        ]
+    },
+    {
+        "id": "0b85e8fddf6ed45a",
+        "type": "switch",
+        "z": "a2a52833336af998",
+        "name": "Aksi UI",
+        "property": "payload.action",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "register",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "scan",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 390,
+        "y": 220,
+        "wires": [
+            [
+                "ca6253818654612f"
+            ],
+            [
+                "063172b62685337c"
+            ]
+        ]
+    },
+    {
+        "id": "ca6253818654612f",
+        "type": "function",
+        "z": "a2a52833336af998",
+        "name": "Validasi + Token QR",
+        "func": "const data = msg.payload?.data;\nconst eventMeta = () => ({\n    eventId: `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,\n    emittedAt: new Date().toISOString()\n});\n\nif (!data || !data.name || !data.nim || !data.className) {\n    return [{\n        payload: {\n            action: \"register_error\",\n            ...eventMeta(),\n            message: \"Nama, NIM, dan kelas wajib diisi.\"\n        }\n    }, null];\n}\n\nconst clean = {\n    name: String(data.name).trim().slice(0, 80),\n    nim: String(data.nim).trim().toUpperCase().slice(0, 30),\n    className: String(data.className).trim().slice(0, 40),\n    photo: String(data.photo || \"\"),\n    logo: String(data.logo || \"\")\n};\n\nif (!/^data:image\\/(jpeg|png|webp);base64,/i.test(clean.photo) || clean.photo.length > 400000) {\n    clean.photo = \"\";\n}\n\nif (!/^data:image\\/(jpeg|png|webp);base64,/i.test(clean.logo) || clean.logo.length > 250000) {\n    clean.logo = \"\";\n}\n\nif (!/^[A-Z0-9._-]+$/.test(clean.nim)) {\n    return [{\n        payload: {\n            action: \"register_error\",\n            ...eventMeta(),\n            message: \"Format NIM hanya boleh berisi huruf, angka, titik, garis bawah, atau tanda minus.\"\n        }\n    }, null];\n}\n\nconst randomPart = Math.random().toString(36).slice(2, 10).toUpperCase();\nconst timePart = Date.now().toString(36).toUpperCase();\nconst qrToken = `${clean.nim}-${timePart}-${randomPart}`;\n\nmsg.student = {\n    ...clean,\n    qrToken\n};\n\nmsg.qracOperation = \"register\";\n\nmsg.params = {\n    $qr_token: qrToken,\n    $nim: clean.nim,\n    $name: clean.name,\n    $class_name: clean.className,\n    $photo: clean.photo\n};\n\nreturn [null, msg];\n",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 180,
+        "wires": [
+            [
+                "7654309641819275"
+            ],
+            [
+                "d1a11305a877c0ed"
+            ]
+        ]
+    },
+    {
+        "id": "d1a11305a877c0ed",
+        "type": "sqlite",
+        "z": "a2a52833336af998",
+        "mydb": "",
+        "sqlquery": "prepared",
+        "sql": "INSERT INTO access_users (qr_token, nim, name, class_name, photo, active, updated_at) VALUES ($qr_token, $nim, $name, $class_name, $photo, 1, CURRENT_TIMESTAMP) ON CONFLICT(nim) DO UPDATE SET qr_token=excluded.qr_token, name=excluded.name, class_name=excluded.class_name, photo=excluded.photo, active=1, updated_at=CURRENT_TIMESTAMP;",
+        "name": "Simpan Mahasiswa",
+        "x": 850,
+        "y": 180,
+        "wires": [
+            [
+                "f4ca17fd0889bfd2"
+            ]
+        ]
+    },
+    {
+        "id": "f4ca17fd0889bfd2",
+        "type": "function",
+        "z": "a2a52833336af998",
+        "name": "Registrasi Berhasil",
+        "func": "const student = msg.student;\n\nif (!student) {\n    msg.payload = {\n        action: \"register_error\",\n        message: \"Respons registrasi tidak lengkap.\"\n    };\n    return msg;\n}\n\nmsg.payload = {\n    action: \"registered\",\n    eventId: `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,\n    emittedAt: new Date().toISOString(),\n    user: student\n};\n\ndelete msg.params;\ndelete msg.student;\ndelete msg.qracOperation;\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1090,
+        "y": 180,
+        "wires": [
+            [
+                "7654309641819275"
+            ]
+        ]
+    },
+    {
+        "id": "063172b62685337c",
+        "type": "function",
+        "z": "a2a52833336af998",
+        "name": "Siapkan Token Scan",
+        "func": "const token = String(msg.payload?.token || \"\").trim();\n\nmsg.qracOperation = \"scan\";\n\nif (!token || token.length > 160) {\n    msg.params = { $qr_token: \"__INVALID__\" };\n    return msg;\n}\n\nmsg.params = { $qr_token: token };\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 280,
+        "wires": [
+            [
+                "99bf2e4d156ffbf9"
+            ]
+        ]
+    },
+    {
+        "id": "99bf2e4d156ffbf9",
+        "type": "sqlite",
+        "z": "a2a52833336af998",
+        "mydb": "",
+        "sqlquery": "prepared",
+        "sql": "SELECT name, nim, class_name, photo FROM access_users WHERE qr_token=$qr_token AND active=1 LIMIT 1;",
+        "name": "Cari QR Aktif",
+        "x": 840,
+        "y": 280,
+        "wires": [
+            [
+                "3ef2b9c3979c2e89"
+            ]
+        ]
+    },
+    {
+        "id": "3ef2b9c3979c2e89",
+        "type": "function",
+        "z": "a2a52833336af998",
+        "name": "Hasil Akses + MQTT",
+        "func": "const rows = Array.isArray(msg.payload) ? msg.payload : [];\nconst row = rows[0];\nconst granted = Boolean(row);\n\nconst eventId =\n    `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;\n\nconst emittedAt = new Date().toISOString();\n\nconst uiMessage = {\n    payload: {\n        action: \"access_result\",\n        eventId,\n        emittedAt,\n        granted,\n        user: granted\n            ? {\n                name: row.name,\n                nim: row.nim,\n                className: row.class_name,\n                photo: row.photo\n            }\n            : null\n    }\n};\n\nconst mqttMessage = {\n    topic: \"data/iot/actuator/12345\",\n    payload: JSON.stringify({\n        device: \"access_control\",\n        access: granted ? \"GRANTED\" : \"DENIED\",\n        green_led: granted,\n        red_led: !granted,\n\n        // Harus sama dengan eventId untuk dashboard\n        event_id: eventId\n    }),\n    qos: 1,\n    retain: false\n};\n\nreturn [uiMessage, mqttMessage];",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1070,
+        "y": 280,
+        "wires": [
+            [
+                "7654309641819275"
+            ],
+            [
+                "a83b559b391c6ec3"
+            ]
+        ]
+    },
+    {
+        "id": "a83b559b391c6ec3",
+        "type": "mqtt out",
+        "z": "a2a52833336af998",
+        "name": "Perintah ESP32",
+        "topic": "",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "mqtt_emqx",
+        "x": 1300,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "822ab9c2a2a353de",
+        "type": "catch",
+        "z": "a2a52833336af998",
+        "name": "Tangkap Error SQLite",
+        "scope": [
+            "d1a11305a877c0ed",
+            "99bf2e4d156ffbf9"
+        ],
+        "uncaught": false,
+        "x": 200,
+        "y": 380,
+        "wires": [
+            [
+                "e7a1679fbd154218"
+            ]
+        ]
+    },
+    {
+        "id": "e7a1679fbd154218",
+        "type": "function",
+        "z": "a2a52833336af998",
+        "name": "Pesan Error Database",
+        "func": "msg.payload = {\n    action: \"system_error\",\n    eventId: `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,\n    emittedAt: new Date().toISOString(),\n    operation: msg.qracOperation || \"unknown\",\n    message: \"Operasi database gagal. Periksa node SQLite dan log Node-RED.\"\n};\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 200,
+        "y": 320,
+        "wires": [
+            [
+                "7654309641819275"
+            ]
+        ]
+    },
+    {
+        "id": "ac83c3c16d5e3cc6",
+        "type": "mqtt in",
+        "z": "a2a52833336af998",
+        "name": "Response ESP32",
+        "topic": "data/iot/status/12345",
+        "qos": "1",
+        "datatype": "auto-detect",
+        "broker": "mqtt_emqx",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 130,
+        "y": 100,
+        "wires": [
+            [
+                "7e9f34853956ecfe"
+            ]
+        ]
+    },
+    {
+        "id": "7e9f34853956ecfe",
+        "type": "function",
+        "z": "a2a52833336af998",
+        "name": "Feedback to Dashboard",
+        "func": "let data = msg.payload;\n\nif (typeof data === \"string\") {\n    try {\n        data = JSON.parse(data);\n    } catch (error) {\n        node.warn(\"Feedback ESP32 bukan JSON yang valid\");\n        return null;\n    }\n}\n\nif (data?.device !== \"access_control\" || data?.status !== \"STANDBY\") {\n    return null;\n}\n\nmsg.payload = {\n    action: \"device_feedback\",\n    status: \"STANDBY\",\n    eventId: String(data.event_id || \"\"),\n    nodeId: String(data.node_id || \"\")\n};\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 100,
+        "wires": [
+            [
+                "7654309641819275"
+            ]
+        ]
+    },
+    {
+        "id": "5ae7d249871fbe91",
+        "type": "ui-group",
+        "name": "QR Access",
+        "page": "917d13104537969b",
+        "width": "12",
+        "height": "1",
+        "order": 1,
+        "showTitle": false,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "mqtt_emqx",
+        "type": "mqtt-broker",
+        "name": "EMQX Public",
+        "broker": "broker.emqx.io",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "917d13104537969b",
+        "type": "ui-page",
+        "name": "QR Access",
+        "ui": "0df8b8a20bb13f1b",
+        "path": "/qr-access",
+        "icon": "qr_code_scanner",
+        "layout": "grid",
+        "theme": "4ffad18aa636bdcb",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": 4,
+        "className": "",
+        "visible": true,
+        "disabled": false
+    },
+    {
+        "id": "0df8b8a20bb13f1b",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": true
+    },
+    {
+        "id": "4ffad18aa636bdcb",
+        "type": "ui-theme",
+        "name": "QR Access Theme",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#2563eb",
+            "bgPage": "#eef2f7",
+            "groupBg": "#ffffff",
+            "groupOutline": "#dbe3ef"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "12px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "c80c0a8a4b1d5910",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "@flowfuse/node-red-dashboard": "1.31.0",
+            "node-red-node-sqlite": "2.0.1"
+        }
+    }
+]
