@@ -1,0 +1,1220 @@
+[
+    {
+        "id": "916314cc65df36ac",
+        "type": "tab",
+        "label": "RFID Toll Payment",
+        "disabled": false,
+        "info": "Perbaikan flow tol RFID - MFRC522v2 firmware tetap.\n\n1. Ganti flow lama, jangan jalankan dua flow pembayaran terhadap database yang sama. Pertahankan path database lama pada konfigurasi SQLite.\n2. Dependensi: @flowfuse/node-red-dashboard dan node-red-node-sqlite.\n3. Login awal admin / admin123. Ganti pada Function Admin Login dan Router. Login ini pembatas aplikasi praktikum; untuk akses internet gunakan autentikasi/HTTPS pada server.\n4. Dua identitas: edit data().students di Dashboard Pembayaran Tol. Foto: /images/student-1.jpg dan /images/student-2.jpg, tersedia fallback bila foto belum ada.\n5. Halaman admin: Biaya Sekali Tap > SIMPAN BIAYA. Default 5000 hanya untuk database baru. Tabel settings menyimpan tarif, users dan transactions tetap tabel utama berelasi.\n6. Pendaftaran menggunakan prepared statement. Notifikasi operasi admin memiliki tombol OK tanpa timer.\n7. Pembayaran: INSERT transaksi + trigger debit dalam satu statement atomik. event_id unik mencegah debit ulang. Respons PAID dikirim setelah query selesai. Jangan melakukan UPDATE debit manual pada flow lain.\n8. Standby menunggu EXECUTION_COMPLETE dengan event_id yang sama.\n9. Tarif 0 berarti gratis untuk kartu terdaftar. Nilai rupiah harus bilangan bulat.\n10. Diuji: sintaks JS/JSON, referensi node, binding parameter, sesi per socket, pendaftaran/UID duplikat, topup, pembayaran/duplikat, saldo kurang, UID tidak dikenal, persistensi tarif, rollback. Belum diuji end-to-end dengan perangkat fisik pada revisi ini.\n"
+    },
+    {
+        "id": "ebe1051a7383da89",
+        "type": "inject",
+        "z": "916314cc65df36ac",
+        "name": "1x Inisialisasi Database",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 100,
+        "wires": [
+            [
+                "ddf3f10dbf258508"
+            ]
+        ]
+    },
+    {
+        "id": "ddf3f10dbf258508",
+        "type": "function",
+        "z": "916314cc65df36ac",
+        "name": "Buat Tabel SQLite",
+        "func": "flow.set(\"toll_db_ready\",false); msg.topic=\"PRAGMA foreign_keys = ON;\\n\\nCREATE TABLE IF NOT EXISTS users (\\n    id INTEGER PRIMARY KEY AUTOINCREMENT,\\n    uid TEXT NOT NULL UNIQUE,\\n    name TEXT NOT NULL,\\n    balance INTEGER NOT NULL DEFAULT 0 CHECK(balance >= 0),\\n    created_at TEXT NOT NULL DEFAULT (datetime('now','localtime')),\\n    updated_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))\\n);\\n\\nCREATE TABLE IF NOT EXISTS transactions (\\n    id INTEGER PRIMARY KEY AUTOINCREMENT,\\n    event_id TEXT NOT NULL UNIQUE,\\n    user_id INTEGER,\\n    uid TEXT NOT NULL,\\n    amount INTEGER NOT NULL DEFAULT 0,\\n    balance_before INTEGER,\\n    balance_after INTEGER,\\n    status TEXT NOT NULL CHECK(status IN ('PAID','DENIED')),\\n    reason TEXT NOT NULL,\\n    created_at TEXT NOT NULL DEFAULT (datetime('now','localtime')),\\n    FOREIGN KEY(user_id) REFERENCES users(id)\\n        ON UPDATE CASCADE\\n        ON DELETE SET NULL\\n);\\n\\nCREATE INDEX IF NOT EXISTS idx_transactions_time\\nON transactions(created_at);\\n\\nCREATE INDEX IF NOT EXISTS idx_transactions_uid\\nON transactions(uid);\\n\\nCREATE TRIGGER IF NOT EXISTS toll_debit_after_insert\\nAFTER INSERT ON transactions WHEN NEW.status = 'PAID'\\nBEGIN\\n UPDATE users SET balance=balance-NEW.amount, updated_at=datetime('now','localtime')\\n WHERE id=NEW.user_id AND balance>=NEW.amount;\\n SELECT CASE WHEN changes()!=1 THEN RAISE(ABORT,'DEBIT_FAILED') END;\\nEND;\\n\\nCREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY CHECK(id=1),fee INTEGER NOT NULL CHECK(fee>=0 AND fee<=1000000000));\\nINSERT OR IGNORE INTO settings(id,fee) VALUES(1,5000);\\n\";return msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "flow.set(\"toll_db_ready\",false);",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 100,
+        "wires": [
+            [
+                "16a3e63822adfe68"
+            ]
+        ]
+    },
+    {
+        "id": "65e006509bdaf25d",
+        "type": "mqtt in",
+        "z": "916314cc65df36ac",
+        "name": "RFID Event",
+        "topic": "toll/kelompok-00/rfid/event",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "toll_mqtt_broker",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 140,
+        "y": 300,
+        "wires": [
+            [
+                "a9333c043e348d52"
+            ]
+        ]
+    },
+    {
+        "id": "a9333c043e348d52",
+        "type": "json",
+        "z": "916314cc65df36ac",
+        "name": "Parse RFID JSON",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 470,
+        "y": 300,
+        "wires": [
+            [
+                "7d50ff97df7978c1"
+            ]
+        ]
+    },
+    {
+        "id": "7d50ff97df7978c1",
+        "type": "function",
+        "z": "916314cc65df36ac",
+        "name": "Validasi dan Route Mode",
+        "func": "const p=msg.payload;\nif (!p || p.group_id!=='kelompok-01' || msg.retain) return null;\nconst uid=String(p.uid||'').trim().toUpperCase();\nif (!/^(?:[0-9A-F]{8}|[0-9A-F]{14}|[0-9A-F]{20})$/.test(uid) || !p.node_id || typeof p.event_id!=='string' || !p.event_id || p.event_id.length>160) {node.warn('Event RFID tidak valid');return null;}\nif (!flow.get('toll_db_ready')) {node.error('Database belum siap',msg);return null;}\nmsg._event={...p,uid};\nif(p.mode==='REGISTER') return [null,{payload:{action:'registration_uid',uid,event_id:p.event_id,node_id:p.node_id}}];\nif(p.mode!=='PAYMENT') return null;\nmsg.params={$event_id:p.event_id,$uid:uid};\nreturn [msg,null];",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 760,
+        "y": 300,
+        "wires": [
+            [
+                "28786f98ae508671"
+            ],
+            [
+                "1c96590d8dd0d864"
+            ]
+        ]
+    },
+    {
+        "id": "28786f98ae508671",
+        "type": "sqlite",
+        "z": "916314cc65df36ac",
+        "mydb": "toll_sqlite_db",
+        "sqlquery": "prepared",
+        "sql": "INSERT INTO transactions(event_id,user_id,uid,amount,balance_before,balance_after,status,reason)\nSELECT $event_id,u.id,$uid,\n CASE WHEN u.balance >= (SELECT fee FROM settings WHERE id=1) THEN (SELECT fee FROM settings WHERE id=1) ELSE 0 END,u.balance,\n CASE WHEN u.balance >= (SELECT fee FROM settings WHERE id=1) THEN u.balance-(SELECT fee FROM settings WHERE id=1) ELSE u.balance END,\n CASE WHEN u.balance >= (SELECT fee FROM settings WHERE id=1) THEN 'PAID' ELSE 'DENIED' END,\n CASE WHEN u.id IS NULL THEN 'UID_NOT_REGISTERED' WHEN u.balance >= (SELECT fee FROM settings WHERE id=1) THEN 'PAYMENT_SUCCESS' ELSE 'INSUFFICIENT_BALANCE' END\nFROM (SELECT 1) AS seed LEFT JOIN users u ON u.uid=$uid\nWHERE 1 ON CONFLICT(event_id) DO NOTHING",
+        "name": "Pembayaran atomik",
+        "x": 1060,
+        "y": 300,
+        "wires": [
+            [
+                "af2e079995416c94"
+            ]
+        ]
+    },
+    {
+        "id": "b9e914219819dddf",
+        "type": "function",
+        "z": "916314cc65df36ac",
+        "name": "Hasil pembayaran tersimpan",
+        "func": "const e=msg._event; const t=Array.isArray(msg.payload)?msg.payload[0]:null;\nif(!t || t.uid!==e.uid){node.error('Hasil transaksi tidak cocok',msg);return null;}\nconst reasonText={PAYMENT_SUCCESS:'Pembayaran berhasil',UID_NOT_REGISTERED:'UID kartu tidak terdaftar',INSUFFICIENT_BALANCE:'Saldo tidak cukup'}[t.reason]||t.reason;\nconst mqtt={topic:`toll/${e.group_id}/esp32/command`,payload:{command:'ACCESS_RESULT',event_id:e.event_id,result:t.status,reason:reasonText},qos:0,retain:false};\nlet seen=context.get('seen')||{};const now=Date.now();for(const k of Object.keys(seen)) if(now-seen[k]>300000) delete seen[k];\nconst duplicate=Boolean(seen[e.event_id]); seen[e.event_id]=now;context.set('seen',seen);\nconst ui={payload:{action:'access_result',event_id:e.event_id,uid:e.uid,result:t.status,reason:t.reason,reason_text:reasonText,user:t.user_id?{name:t.name,balance_before:t.balance_before,balance_after:t.balance_after}:null}};\nreturn [null,mqtt,duplicate?null:ui];",
+        "outputs": 3,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1910,
+        "y": 300,
+        "wires": [
+            [],
+            [
+                "32bf5c19d285418a"
+            ],
+            [
+                "a32922c3acf7c0e1"
+            ]
+        ]
+    },
+    {
+        "id": "32bf5c19d285418a",
+        "type": "json",
+        "z": "916314cc65df36ac",
+        "name": "Command ke JSON",
+        "property": "payload",
+        "action": "str",
+        "pretty": false,
+        "x": 2200,
+        "y": 280,
+        "wires": [
+            [
+                "0d29d5ec885df385"
+            ]
+        ]
+    },
+    {
+        "id": "0d29d5ec885df385",
+        "type": "mqtt out",
+        "z": "916314cc65df36ac",
+        "name": "Perintah ESP32",
+        "topic": "",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "toll_mqtt_broker",
+        "x": 2460,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "72a12f5d39e9826a",
+        "type": "mqtt in",
+        "z": "916314cc65df36ac",
+        "name": "Feedback ESP32",
+        "topic": "toll/kelompok-00/esp32/status",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "toll_mqtt_broker",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 180,
+        "y": 480,
+        "wires": [
+            [
+                "8032865f97645dec"
+            ]
+        ]
+    },
+    {
+        "id": "8032865f97645dec",
+        "type": "json",
+        "z": "916314cc65df36ac",
+        "name": "Parse Feedback",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 470,
+        "y": 480,
+        "wires": [
+            [
+                "bbd0647305b4abf1"
+            ]
+        ]
+    },
+    {
+        "id": "bbd0647305b4abf1",
+        "type": "function",
+        "z": "916314cc65df36ac",
+        "name": "Feedback ke Dashboard",
+        "func": "const p = msg.payload || {};\nif (p.group_id !== 'kelompok-01') return null;\nif (p.status === 'EXECUTION_COMPLETE') {\n    return {payload:{action:'standby',message:'Silakan tap kartu',last_result:p.result,event_id:p.event_id}};\n}\nif (p.status === 'ONLINE') {\n    return {payload:{action:'device_online',message:'Perangkat terhubung'}};\n}\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 760,
+        "y": 480,
+        "wires": [
+            [
+                "91220dd457725883"
+            ]
+        ]
+    },
+    {
+        "id": "df7ea4c237b4fb46",
+        "type": "function",
+        "z": "916314cc65df36ac",
+        "name": "Admin Login dan Router",
+        "func": "const ADMIN_USERNAME = 'admin';\nconst ADMIN_PASSWORD = 'admin123';\nconst SESSION_MS = 30 * 60 * 1000;\nconst p = msg.payload || {};\nconst action = String(p.action || '');\nlet sessions = flow.get('toll_admin_sessions') || {};\nconst now = Date.now();\nfor (const key of Object.keys(sessions)) {\n    if (sessions[key].expires < now) delete sessions[key];\n}\n\nfunction direct(payload) { return [{payload,_client:msg._client},null,null,null,null,null,null]; }\nconst socketId=msg._client && msg._client.socketId;\nif (!socketId) return null;\nfunction cleanUid(value) { return String(value || '').trim().toUpperCase(); }\n\nif (action === 'admin_login') {\n    if (p.username === ADMIN_USERNAME && p.password === ADMIN_PASSWORD) {\n        const token = `${now}-${Math.random().toString(36).slice(2,14)}`;\n        sessions[token] = {expires:now+SESSION_MS,socketId};\n        flow.set('toll_admin_sessions',sessions);\n        return direct({action:'login_result',success:true,token,message:'Login berhasil'});\n    }\n    return direct({action:'login_result',success:false,message:'Username atau password salah'});\n}\n\nconst token = String(p.token || '');\nif (!token || !sessions[token] || sessions[token].expires < now || sessions[token].socketId !== socketId) {\n    return direct({action:'session_expired',message:'Sesi berakhir, silakan login kembali'});\n}\nsessions[token] = {expires:now+SESSION_MS,socketId};\nflow.set('toll_admin_sessions',sessions);\n\nif (action === 'admin_logout') {\n    delete sessions[token];\n    flow.set('toll_admin_sessions',sessions);\n    return direct({action:'logout_result'});\n}\n\nif (!flow.get('toll_db_ready')) return direct({action:'operation_result',success:false,message:'Database belum siap. Periksa Debug.'});\n\nif(action==='get_settings'){msg.params={};return [null,null,null,null,null,msg,null];}\nif(action==='set_fee'){\n const fee=Number(p.fee);\n if(p.fee==='' || p.fee==null || !Number.isSafeInteger(fee)||fee<0||fee>1000000000)return direct({action:'operation_result',success:false,message:'Biaya harus berupa rupiah bulat antara 0 sampai 1 miliar'});\n msg.params={$fee:fee};msg._admin_action='fee_update';return [null,null,null,null,null,null,msg];\n}\nif (action === 'register_user') {\n    const uid = cleanUid(p.uid);\n    const name = String(p.name || '').trim();\n    const balance = Number(p.balance);\n    if (! /^(?:[0-9A-F]{8}|[0-9A-F]{14}|[0-9A-F]{20})$/.test(uid) || !name || name.length>100 || p.balance==='' || p.balance==null || !Number.isSafeInteger(balance) || balance < 0) {\n        return direct({action:'operation_result',success:false,message:'Data pendaftaran tidak valid'});\n    }\n    msg.topic = 'INSERT INTO users (uid,name,balance) VALUES (?,?,?) ON CONFLICT(uid) DO NOTHING RETURNING id,uid,name,balance';\n    msg.params = {$uid:uid,$name:name,$balance:balance};\n    msg._admin_action = 'register';\n    return [null,msg,null,null,null];\n}\n\nif (action === 'topup_balance') {\n    const uid = cleanUid(p.uid);\n    const amount = Number(p.amount);\n    if (! /^(?:[0-9A-F]{8}|[0-9A-F]{14}|[0-9A-F]{20})$/.test(uid) || !Number.isSafeInteger(amount) || amount <= 0) {\n        return direct({action:'operation_result',success:false,message:'UID atau nominal isi saldo tidak valid'});\n    }\n    msg.topic = 'UPDATE users SET balance = balance + ?, updated_at = datetime(\\'now\\',\\'localtime\\') WHERE uid = ? RETURNING id,uid,name,balance';\n    msg.params = {$amount:amount,$uid:uid};\n    msg._admin_action = 'topup';\n    return [null,null,msg,null,null];\n}\n\nif (action === 'get_users') {\n    msg.topic = 'SELECT id,uid,name,balance,created_at,updated_at FROM users ORDER BY name';\n    msg.payload = [];\n    msg._admin_action = 'users';\n    return [null,null,null,msg,null];\n}\n\nif (action === 'get_history') {\n    msg.topic = `SELECT t.id,t.created_at,t.uid,COALESCE(u.name,'Tidak terdaftar') AS name,t.amount,t.balance_before,t.balance_after,t.status,t.reason FROM transactions t LEFT JOIN users u ON u.id=t.user_id ORDER BY t.id DESC LIMIT 200`;\n    msg.payload = [];\n    msg._admin_action = 'history';\n    return [null,null,null,null,msg];\n}\n\nreturn direct({action:'operation_result',success:false,message:'Perintah admin tidak dikenali'});",
+        "outputs": 7,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 760,
+        "wires": [
+            [
+                "ffcb416eabd94971"
+            ],
+            [
+                "6128f54f33ec4108"
+            ],
+            [
+                "2ecd61deab059c51"
+            ],
+            [
+                "a99bb4aa2f062d78"
+            ],
+            [
+                "9f64c594d943d11b"
+            ],
+            [
+                "5344cb1c446c0c5e"
+            ],
+            [
+                "c689dfcb82d2e5fc"
+            ]
+        ]
+    },
+    {
+        "id": "c86a921216150be5",
+        "type": "sqlite",
+        "z": "916314cc65df36ac",
+        "mydb": "toll_sqlite_db",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "Query Admin",
+        "x": 770,
+        "y": 800,
+        "wires": [
+            [
+                "941af95556d9c411"
+            ]
+        ]
+    },
+    {
+        "id": "941af95556d9c411",
+        "type": "function",
+        "z": "916314cc65df36ac",
+        "name": "Format Respons Admin",
+        "func": "const rows = Array.isArray(msg.payload) ? msg.payload : [];\nlet payload;\nswitch (msg._admin_action) {\n    case 'register':\n        payload = rows.length ? {action:'operation_result',success:true,message:'Kartu berhasil didaftarkan'} : {action:'operation_result',success:false,message:'UID sudah terdaftar'};\n        break;\n    case 'topup':\n        payload = rows.length ? {action:'operation_result',success:true,message:`Isi saldo berhasil. Saldo baru Rp ${Number(rows[0].balance).toLocaleString('id-ID')}`} : {action:'operation_result',success:false,message:'UID tidak ditemukan'};\n        break;\n    case 'users':\n        payload = {action:'users_data',users:rows};\n        break;\n    case 'history':\n        payload = {action:'history_data',history:rows};\n        break;\n    default:\n        return null;\n}\npayload.operation = msg._admin_action;\nreturn {payload,_client:msg._client};",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1070,
+        "y": 780,
+        "wires": [
+            [
+                "d888784d2c698e3e"
+            ]
+        ]
+    },
+    {
+        "id": "16a3e63822adfe68",
+        "type": "sqlite",
+        "z": "916314cc65df36ac",
+        "mydb": "toll_sqlite_db",
+        "sqlquery": "batch",
+        "sql": "",
+        "name": "Inisialisasi skema dan trigger",
+        "x": 780,
+        "y": 100,
+        "wires": [
+            [
+                "398c29bf11c1bc96"
+            ]
+        ]
+    },
+    {
+        "id": "8cdc3d59fee335b3",
+        "type": "debug",
+        "z": "916314cc65df36ac",
+        "name": "SQLite Result",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 770,
+        "y": 1130,
+        "wires": []
+    },
+    {
+        "id": "144977f3ed325661",
+        "type": "ui-template",
+        "z": "916314cc65df36ac",
+        "group": "baa8cc3c57271c12",
+        "page": "",
+        "ui": "",
+        "name": "Dashboard Pembayaran Tol",
+        "order": 1,
+        "width": "12",
+        "height": "0",
+        "head": "",
+        "format": "<template>\n<div class=\"toll-shell\">\n  <header class=\"student-header\">\n    <div class=\"identity-heading\"><div class=\"eyebrow\">Sistem Pembayaran Tol dengan RFID</div><div class=\"device-pill\"><span :class=\"['dot',deviceOnline?'online':'offline']\"></span>{{deviceOnline?'ESP32 TERDETEKSI':'MENUNGGU ESP32'}}</div></div>\n    <div class=\"student-list\"><article class=\"student-person\" v-for=\"(student,index) in students\" :key=\"index\"><img :src=\"student.photo\" @error=\"photoError\" class=\"student-photo\"><div><h2>{{student.name}}</h2><p>{{student.nim}}</p><p>{{student.className}}</p></div></article></div>\n  </header>\n  <section class=\"hero\">\n    <div><div class=\"eyebrow\">RFID TOLL PAYMENT</div><h1>Akses Pembayaran Tol</h1><p>Tempelkan kartu RFID pada reader untuk melakukan transaksi.</p></div>\n    <div class=\"fee-card\"><span>BIAYA SEKALI TAP</span><strong>{{rupiah(fee)}}</strong></div>\n  </section>\n  <section :class=\"['status-card',status.toLowerCase()]\">\n    <div class=\"status-icon\">{{statusIcon}}</div>\n    <div><span>STATUS TRANSAKSI</span><h2>{{status}}</h2><p>{{message}}</p></div>\n  </section>\n  <section class=\"detail-grid\">\n    <div><span>UID TERAKHIR</span><strong>{{lastUid || '-'}}</strong></div>\n    <div><span>NAMA PENGGUNA</span><strong>{{userName || '-'}}</strong></div>\n    <div><span>SALDO AKHIR</span><strong>{{balanceAfter === null ? '-' : rupiah(balanceAfter)}}</strong></div>\n  </section>\n</div>\n</template>\n<script>\nexport default {\n data(){return {students:[{name:'Nama Mahasiswa 1',nim:'NIM Mahasiswa 1',className:'Kelas 1',photo:'/images/student-1.jpg'},{name:'Nama Mahasiswa 2',nim:'NIM Mahasiswa 2',className:'Kelas 2',photo:'/images/student-2.jpg'}],activeEventId:'',fee:5000,status:'STANDBY',message:'Silakan tap kartu',lastUid:'',userName:'',balanceAfter:null,deviceOnline:false}},\n computed:{statusIcon(){return this.status==='PAID'?'✓':this.status==='DENIED'?'×':'⌁'}},\n watch:{msg:{deep:true,handler(v){if(v&&v.payload)this.handle(v.payload)}}},\n mounted(){this.loadSwal();this.send({payload:{action:'get_public_settings'}})},\n methods:{\n  rupiah(v){return new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(Number(v||0))},\n  photoError(e){e.target.src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'120\\' height=\\'120\\' viewBox=\\'0 0 120 120\\'%3E%3Crect width=\\'120\\' height=\\'120\\' fill=\\'%23e5e7eb\\'/%3E%3Ccircle cx=\\'60\\' cy=\\'43\\' r=\\'22\\' fill=\\'%239ca3af\\'/%3E%3Cpath d=\\'M20 110c5-28 21-40 40-40s35 12 40 40\\' fill=\\'%239ca3af\\'/%3E%3C/svg%3E'},\n  loadSwal(){if(window.Swal)return;const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/sweetalert2@11';document.head.appendChild(s)},\n  alert(icon,title,text){if(window.Swal)window.Swal.fire({icon,title,text,timer:5000,timerProgressBar:true,showConfirmButton:false,position:'center'})},\n  handle(p){\n   if(p.action==='fee_updated'){this.fee=Number(p.fee);return}\n   if(p.action==='device_online'){this.deviceOnline=true;return}\n   if(p.action==='standby'){if(!this.activeEventId||p.event_id!==this.activeEventId)return;this.activeEventId='';this.status='STANDBY';this.message='Silakan tap kartu';this.lastUid='';this.userName='';this.balanceAfter=null;return}\n   if(p.action!=='access_result')return;\n   if(this.activeEventId===p.event_id)return;this.activeEventId=p.event_id;this.deviceOnline=true;this.lastUid=p.uid||'';this.status=p.result;this.message=p.reason_text||'';this.userName=p.user?p.user.name:'';this.balanceAfter=p.user?p.user.balance_after:null;\n   if(p.result==='PAID')this.alert('success','Pembayaran Berhasil',`Saldo tersisa ${this.rupiah(this.balanceAfter)}`);\n   else this.alert('error','Pembayaran Ditolak',p.reason_text||'Kartu tidak dapat diproses');\n  }\n }\n}\n</script>\n<style>\n.toll-shell{font-family:Inter,Arial,sans-serif;max-width:1180px;margin:auto;color:#10213b}.toll-shell .student-header,.toll-shell .hero,.toll-shell .status-card,.toll-shell .detail-grid{display:flex;align-items:center}.toll-shell .student-header{gap:16px;padding:18px 22px;background:#fff;border:1px solid #dce4ee;border-radius:18px}.toll-shell .student-photo{width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid #2563eb}.toll-shell .student-header h2,.toll-shell .student-header p,.toll-shell .hero h1,.toll-shell .hero p,.toll-shell .status-card h2,.toll-shell .status-card p{margin:3px 0}.toll-shell .eyebrow,.toll-shell .fee-card span,.toll-shell .status-card span,.toll-shell .detail-grid span{font-size:11px;letter-spacing:.12em;font-weight:800;color:#64748b}.toll-shell .device-pill{margin-left:auto;padding:10px 14px;border-radius:99px;background:#f1f5f9;font-size:12px;font-weight:800}.toll-shell .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:8px}.toll-shell .online{background:#22c55e}.toll-shell .offline{background:#94a3b8}.toll-shell .hero{justify-content:space-between;margin-top:16px;padding:28px;background:linear-gradient(135deg,#0f274d,#164b91);color:#fff;border-radius:20px}.toll-shell .hero .eyebrow,.toll-shell .hero p{color:#c9dcff}.toll-shell .fee-card{min-width:230px;padding:18px 22px;text-align:right;background:#fff;color:#10213b;border-radius:15px}.toll-shell .fee-card strong{display:block;font-size:30px;margin-top:5px}.toll-shell .status-card{gap:20px;margin-top:16px;padding:25px;border-radius:18px;border-left:8px solid #eab308;background:#fff;border-top:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0}.toll-shell .status-card.paid{border-left-color:#22c55e;background:#f0fdf4}.toll-shell .status-card.denied{border-left-color:#ef4444;background:#fef2f2}.toll-shell .status-icon{display:grid;place-items:center;width:58px;height:58px;border-radius:50%;background:#f1f5f9;font-size:32px;font-weight:900}.toll-shell .paid .status-icon{background:#dcfce7;color:#15803d}.toll-shell .denied .status-icon{background:#fee2e2;color:#b91c1c}.toll-shell .detail-grid{gap:14px;margin-top:16px}.toll-shell .detail-grid>div{flex:1;padding:18px;background:#fff;border:1px solid #e2e8f0;border-radius:14px}.toll-shell .detail-grid strong{display:block;margin-top:8px;font-size:17px}@media(max-width:700px){.student-header,.hero,.detail-grid{align-items:stretch;flex-direction:column}.toll-shell .device-pill{margin-left:0}.toll-shell .fee-card{text-align:left;min-width:0}.toll-shell .detail-grid{gap:8px}}\n.toll-shell{width:100%;max-width:none;box-sizing:border-box}.toll-shell button:disabled{opacity:.55;cursor:wait} .toll-shell .student-header{display:block}.toll-shell .identity-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px}.toll-shell .student-list{display:flex;gap:16px;flex-wrap:wrap}.toll-shell .student-person{display:flex;gap:14px;align-items:center;flex:1 1 280px;min-width:0;padding:12px;background:#f8fafc;border-radius:12px}.toll-shell .student-person h2{font-size:18px;overflow-wrap:anywhere}.toll-shell .student-person p{font-size:14px}.toll-shell .student-photo{flex-shrink:0}\n</style>",
+        "storeOutMessages": false,
+        "passthru": false,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 2460,
+        "y": 430,
+        "wires": [
+            [
+                "a98350b134d995de"
+            ]
+        ]
+    },
+    {
+        "id": "0c52515adabf5f13",
+        "type": "ui-template",
+        "z": "916314cc65df36ac",
+        "group": "9a384bbf668e6a7a",
+        "page": "",
+        "ui": "",
+        "name": "Admin Kartu dan Transaksi",
+        "order": 1,
+        "width": "12",
+        "height": "0",
+        "head": "",
+        "format": "<template>\n<div class=\"admin-shell\">\n <div v-if=\"!loggedIn\" class=\"login-card\"><div class=\"lock\">🔒</div><h2>Login Administrator</h2><p>Akses pendaftaran kartu dan riwayat transaksi.</p><input v-model.trim=\"login.username\" placeholder=\"Username\"><input v-model=\"login.password\" type=\"password\" placeholder=\"Password\" @keyup.enter=\"doLogin\"><button @click=\"doLogin\">MASUK</button><small>{{loginMessage}}</small></div>\n <div v-else>\n  <header class=\"admin-header\"><div><span>RFID TOLL MANAGEMENT</span><h2>Administrasi Kartu</h2></div><button class=\"ghost\" @click=\"logout\">Keluar</button></header>\n  <p role=\"status\">{{operationMessage}}</p><section class=\"panel table-panel\"><h3>Biaya Sekali Tap</h3><label>Tarif dalam rupiah (0 untuk gratis)</label><input v-model.number=\"fee\" type=\"number\" min=\"0\" max=\"1000000000\" step=\"1000\"><button :disabled=\"busy\" @click=\"saveFee\">SIMPAN BIAYA</button><p>Berlaku untuk transaksi berikutnya.</p></section><div class=\"admin-grid\">\n   <section class=\"panel\"><h3>Pendaftaran Kartu</h3><label>UID hasil scan</label><input v-model=\"register.uid\" readonly placeholder=\"Tahan tombol 3 detik, lalu tap kartu\"><label>Nama pengguna</label><input v-model.trim=\"register.name\" placeholder=\"Nama pemilik kartu\"><label>Saldo awal</label><input v-model.number=\"register.balance\" type=\"number\" min=\"0\" step=\"1000\"><button :disabled=\"busy\" @click=\"registerUser\">DAFTARKAN KARTU</button></section>\n   <section class=\"panel\"><h3>Isi Saldo</h3><label>Pilih kartu</label><select v-model=\"topup.uid\"><option value=\"\">Pilih pengguna</option><option v-for=\"u in users\" :key=\"u.uid\" :value=\"u.uid\">{{u.name}} — {{u.uid}}</option></select><label>Nominal isi saldo</label><input v-model.number=\"topup.amount\" type=\"number\" min=\"1000\" step=\"1000\"><button :disabled=\"busy\" @click=\"topupBalance\">ISI SALDO</button></section>\n  </div>\n  <section class=\"panel table-panel\"><div class=\"panel-title\"><h3>Daftar Pengguna</h3><button class=\"small\" @click=\"refresh\">Refresh</button></div><div class=\"table-wrap\"><table><thead><tr><th>Nama</th><th>UID</th><th>Saldo</th><th>Diperbarui</th></tr></thead><tbody><tr v-for=\"u in users\" :key=\"u.id\"><td>{{u.name}}</td><td class=\"mono\">{{u.uid}}</td><td>{{rupiah(u.balance)}}</td><td>{{u.updated_at}}</td></tr><tr v-if=\"!users.length\"><td colspan=\"4\">Belum ada kartu terdaftar.</td></tr></tbody></table></div></section>\n  <section class=\"panel table-panel\"><h3>Riwayat Transaksi</h3><div class=\"table-wrap\"><table><thead><tr><th>Waktu</th><th>Nama</th><th>UID</th><th>Status</th><th>Biaya</th><th>Saldo Akhir</th><th>Keterangan</th></tr></thead><tbody><tr v-for=\"t in history\" :key=\"t.id\"><td>{{t.created_at}}</td><td>{{t.name}}</td><td class=\"mono\">{{t.uid}}</td><td><span :class=\"['badge',t.status.toLowerCase()]\">{{t.status}}</span></td><td>{{rupiah(t.amount)}}</td><td>{{t.balance_after===null?'-':rupiah(t.balance_after)}}</td><td>{{reasonText(t.reason)}}</td></tr><tr v-if=\"!history.length\"><td colspan=\"7\">Belum ada transaksi.</td></tr></tbody></table></div></section>\n </div>\n</div>\n</template>\n<script>\nexport default {\n data(){return {fee:5000,busy:false,operationMessage:'',loggedIn:false,token:'',login:{username:'',password:''},loginMessage:'',register:{uid:'',name:'',balance:50000},topup:{uid:'',amount:20000},users:[],history:[]}},\n watch:{msg:{deep:true,handler(v){if(v&&v.payload)this.handle(v.payload)}}},\n mounted(){this.loadSwal()},\n methods:{\n  sendAction(action,data={}){this.send({payload:{action,token:this.token,...data}})},\n  doLogin(){this.send({payload:{action:'admin_login',username:this.login.username,password:this.login.password}})},\n  logout(){this.sendAction('admin_logout')},\n  refresh(){if(!this.loggedIn)return;this.sendAction('get_users');this.sendAction('get_history');this.sendAction('get_settings')},\n  saveFee(){if(this.busy)return;this.busy=true;this.operationMessage='Menyimpan biaya...';this.sendAction('set_fee',{fee:this.fee})},\n  registerUser(){if(this.busy)return;this.busy=true;this.operationMessage='Memproses pendaftaran...';this.sendAction('register_user',this.register)},\n  topupBalance(){if(this.busy)return;this.busy=true;this.operationMessage='Memproses isi saldo...';this.sendAction('topup_balance',this.topup)},\n  rupiah(v){return new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(Number(v||0))},\n  reasonText(v){return {PAYMENT_SUCCESS:'Pembayaran berhasil',INSUFFICIENT_BALANCE:'Saldo tidak cukup',UID_NOT_REGISTERED:'UID tidak terdaftar'}[v]||v},\n  loadSwal(){if(window.Swal)return;const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/sweetalert2@11';document.head.appendChild(s)},\n  notify(icon,title,text){this.operationMessage=text;if(window.Swal)window.Swal.fire({icon,title,text,showConfirmButton:true,confirmButtonText:'OK',allowOutsideClick:false,allowEscapeKey:false,position:'center'});else window.alert(title+'\\n'+text)},\n  handle(p){\n   if(p.action==='fee_updated'){this.fee=Number(p.fee);return}\n   if(p.action==='registration_uid'){if(this.loggedIn&&!this.busy){this.register.uid=p.uid||'';this.notify('info','Kartu Terdeteksi','UID: '+this.register.uid+'. Silakan isi nama dan saldo awal.');}return;}\n   if(p.action==='login_result'){this.loginMessage=p.message||'';if(p.success){this.loggedIn=true;this.token=p.token;this.login.password='';this.refresh()}return}\n   if(p.action==='session_expired'||p.action==='logout_result'){this.busy=false;this.loggedIn=false;this.token='';this.users=[];this.history=[];this.loginMessage=p.message||'';return}\n   if(p.action==='users_data'){this.users=p.users||[];return}\n   if(p.action==='history_data'){this.history=p.history||[];return}\n   if(p.action==='operation_result'){this.busy=false;this.notify(p.success?'success':'error',p.success?'Berhasil':'Gagal',p.message||'');if(p.success){if(p.operation==='register'){this.register.name='';this.register.uid='';}this.refresh()}return}\n  }\n }\n}\n</script>\n<style>\n.admin-shell{font-family:Inter,Arial,sans-serif;max-width:1200px;margin:auto;color:#13233c}.admin-shell .login-card{max-width:390px;margin:60px auto;padding:30px;background:#fff;border:1px solid #dbe3ee;border-radius:20px;text-align:center;box-shadow:0 15px 40px #0f172a14}.admin-shell .lock{font-size:35px}.admin-shell .login-card p{color:#64748b}.admin-shell .login-card input,.admin-shell .panel input,.admin-shell .panel select{box-sizing:border-box;width:100%;margin:6px 0 12px;padding:12px;border:1px solid #cbd5e1;border-radius:10px;background:#fff}.admin-shell .login-card button,.admin-shell .panel button,.admin-shell .admin-header button{padding:12px 18px;border:0;border-radius:10px;background:#1558b0;color:#fff;font-weight:800;cursor:pointer}.admin-shell .login-card button{width:100%}.admin-shell .login-card small{display:block;min-height:20px;margin-top:12px;color:#dc2626}.admin-shell .admin-header{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;background:#102c55;color:#fff;border-radius:18px}.admin-shell .admin-header span{font-size:11px;letter-spacing:.12em}.admin-shell .admin-header h2{margin:4px 0}.admin-shell .admin-header .ghost{background:#ffffff20}.admin-shell .admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}.admin-shell .panel{padding:20px;background:#fff;border:1px solid #dbe3ee;border-radius:16px}.admin-shell .panel h3{margin-top:0}.admin-shell .panel label{font-size:12px;font-weight:800;color:#475569}.admin-shell .table-panel{margin-top:16px}.admin-shell .panel-title{display:flex;justify-content:space-between}.admin-shell .panel .small{padding:8px 13px}.admin-shell .table-wrap{overflow:auto}.admin-shell table{width:100%;border-collapse:collapse;font-size:13px}.admin-shell th,.admin-shell td{padding:11px;border-bottom:1px solid #e2e8f0;text-align:left;white-space:nowrap}.admin-shell th{background:#f8fafc;color:#475569}.admin-shell .mono{font-family:Consolas,monospace}.admin-shell .badge{padding:5px 9px;border-radius:99px;font-weight:800}.admin-shell .badge.paid{color:#15803d;background:#dcfce7}.admin-shell .badge.denied{color:#b91c1c;background:#fee2e2}@media(max-width:760px){.admin-grid{grid-template-columns:1fr}.admin-shell .admin-header{align-items:flex-start;gap:12px}}\n.admin-shell{width:100%;max-width:none;box-sizing:border-box}.admin-shell button:disabled{opacity:.55;cursor:wait}\n</style>",
+        "storeOutMessages": false,
+        "passthru": false,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 180,
+        "y": 760,
+        "wires": [
+            [
+                "df7ea4c237b4fb46"
+            ]
+        ]
+    },
+    {
+        "id": "727d51943507a165",
+        "type": "catch",
+        "z": "916314cc65df36ac",
+        "name": "Tangkap Error",
+        "scope": null,
+        "uncaught": false,
+        "x": 180,
+        "y": 1130,
+        "wires": [
+            [
+                "cd323b6c6fd155c8",
+                "1987cc59b04fdefd"
+            ]
+        ]
+    },
+    {
+        "id": "cd323b6c6fd155c8",
+        "type": "debug",
+        "z": "916314cc65df36ac",
+        "name": "Error Sistem Tol",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 470,
+        "y": 1080,
+        "wires": []
+    },
+    {
+        "id": "45af93003a0b6af7",
+        "type": "comment",
+        "z": "916314cc65df36ac",
+        "name": "Ganti identitas 2 mahasiswa pada data().students. Admin: admin / admin123. Ganti sandi di Admin Login dan Router.",
+        "info": "Setelah import, pasang @flowfuse/node-red-dashboard dan node-red-node-sqlite. Ubah kredensial admin pada Function 'Admin Login dan Router'.",
+        "x": 450,
+        "y": 1300,
+        "wires": []
+    },
+    {
+        "id": "398c29bf11c1bc96",
+        "type": "function",
+        "z": "916314cc65df36ac",
+        "name": "Database siap",
+        "func": "flow.set(\"toll_db_ready\",true);node.status({fill:\"green\",shape:\"dot\",text:\"Database siap\"});msg.params={};return msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1080,
+        "y": 100,
+        "wires": [
+            [
+                "252e0a39e3bc5136"
+            ]
+        ]
+    },
+    {
+        "id": "79fe14e1bd423bd1",
+        "type": "sqlite",
+        "z": "916314cc65df36ac",
+        "mydb": "toll_sqlite_db",
+        "sqlquery": "prepared",
+        "sql": "INSERT INTO users(uid,name,balance) VALUES($uid,$name,$balance) ON CONFLICT(uid) DO NOTHING RETURNING id,uid,name,balance",
+        "name": "Daftar kartu - parameter",
+        "x": 800,
+        "y": 650,
+        "wires": [
+            [
+                "941af95556d9c411"
+            ]
+        ]
+    },
+    {
+        "id": "38ff3c67073de9c8",
+        "type": "sqlite",
+        "z": "916314cc65df36ac",
+        "mydb": "toll_sqlite_db",
+        "sqlquery": "prepared",
+        "sql": "UPDATE users SET balance=balance+$amount,updated_at=datetime('now','localtime') WHERE uid=$uid AND balance <= 9007199254740991-$amount RETURNING id,uid,name,balance",
+        "name": "Isi saldo - parameter",
+        "x": 800,
+        "y": 710,
+        "wires": [
+            [
+                "941af95556d9c411"
+            ]
+        ]
+    },
+    {
+        "id": "af2e079995416c94",
+        "type": "function",
+        "z": "916314cc65df36ac",
+        "name": "Baca hasil tersimpan",
+        "func": "msg.params={$event_id:msg._event.event_id}; return msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1350,
+        "y": 300,
+        "wires": [
+            [
+                "853af3e9005e8005"
+            ]
+        ]
+    },
+    {
+        "id": "853af3e9005e8005",
+        "type": "sqlite",
+        "z": "916314cc65df36ac",
+        "mydb": "toll_sqlite_db",
+        "sqlquery": "prepared",
+        "sql": "SELECT t.*,u.name FROM transactions t LEFT JOIN users u ON u.id=t.user_id WHERE t.event_id=$event_id",
+        "name": "Hasil transaksi",
+        "x": 1630,
+        "y": 300,
+        "wires": [
+            [
+                "b9e914219819dddf"
+            ]
+        ]
+    },
+    {
+        "id": "1987cc59b04fdefd",
+        "type": "function",
+        "z": "916314cc65df36ac",
+        "name": "Error ke admin",
+        "func": "if(!msg._client)return null; return {_client:msg._client,payload:{action:'operation_result',success:false,message:'Operasi database gagal. Periksa Debug Error Sistem Tol.'}};",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 1170,
+        "wires": [
+            [
+                "b34d76b9280e10e4"
+            ]
+        ]
+    },
+    {
+        "id": "3539b5543b9e9a84",
+        "type": "sqlite",
+        "z": "916314cc65df36ac",
+        "mydb": "toll_sqlite_db",
+        "sqlquery": "prepared",
+        "sql": "SELECT fee FROM settings WHERE id=1",
+        "name": "Baca biaya tersimpan",
+        "x": 800,
+        "y": 880,
+        "wires": [
+            [
+                "b64a53efa0e79c4c"
+            ]
+        ]
+    },
+    {
+        "id": "539664a8f5b83f49",
+        "type": "sqlite",
+        "z": "916314cc65df36ac",
+        "mydb": "toll_sqlite_db",
+        "sqlquery": "prepared",
+        "sql": "UPDATE settings SET fee=$fee WHERE id=1 RETURNING fee",
+        "name": "Simpan biaya",
+        "x": 780,
+        "y": 960,
+        "wires": [
+            [
+                "b64a53efa0e79c4c"
+            ]
+        ]
+    },
+    {
+        "id": "b64a53efa0e79c4c",
+        "type": "function",
+        "z": "916314cc65df36ac",
+        "name": "Respons biaya",
+        "func": "const row=Array.isArray(msg.payload)?msg.payload[0]:null;\nif(!row){node.error('Biaya belum tersedia',msg);return null;}\nconst fee=Number(row.fee);const setting={payload:{action:'fee_updated',fee}};\nif(msg._admin_action==='fee_update')return [setting,{_client:msg._client,payload:{action:'operation_result',operation:'fee_update',success:true,message:'Biaya sekali tap berhasil diperbarui',fee}}];\nif(msg._client){setting._client=msg._client;return msg._public_request?[setting,null]:[null,setting];}\nreturn [setting,null];",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1040,
+        "y": 920,
+        "wires": [
+            [
+                "ce198df3305cad1c"
+            ],
+            [
+                "0312748eb4ce66ac"
+            ]
+        ]
+    },
+    {
+        "id": "3c4350f8540dda89",
+        "type": "function",
+        "z": "916314cc65df36ac",
+        "name": "Minta biaya halaman publik",
+        "func": "if(msg.payload?.action!=='get_public_settings')return null;msg._public_request=true;msg.params={};return msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2470,
+        "y": 570,
+        "wires": [
+            [
+                "b0bbaf385ab27f18"
+            ]
+        ]
+    },
+    {
+        "id": "b85474a3855dd547",
+        "type": "link in",
+        "z": "916314cc65df36ac",
+        "name": "Masuk: Query Admin",
+        "links": [
+            "a99bb4aa2f062d78",
+            "9f64c594d943d11b"
+        ],
+        "x": 610,
+        "y": 920,
+        "wires": [
+            [
+                "c86a921216150be5"
+            ]
+        ]
+    },
+    {
+        "id": "a99bb4aa2f062d78",
+        "type": "link out",
+        "z": "916314cc65df36ac",
+        "name": "Ke: Query Admin",
+        "mode": "link",
+        "links": [
+            "b85474a3855dd547"
+        ],
+        "x": 630,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "b423d890bb6fa254",
+        "type": "link in",
+        "z": "916314cc65df36ac",
+        "name": "Masuk: Baca biaya tersimpan",
+        "links": [
+            "b0bbaf385ab27f18",
+            "252e0a39e3bc5136",
+            "5344cb1c446c0c5e"
+        ],
+        "x": 610,
+        "y": 1010,
+        "wires": [
+            [
+                "3539b5543b9e9a84"
+            ]
+        ]
+    },
+    {
+        "id": "b0bbaf385ab27f18",
+        "type": "link out",
+        "z": "916314cc65df36ac",
+        "name": "Ke: Baca biaya tersimpan",
+        "mode": "link",
+        "links": [
+            "b423d890bb6fa254"
+        ],
+        "x": 2630,
+        "y": 645,
+        "wires": []
+    },
+    {
+        "id": "f70563fe13f078ec",
+        "type": "link in",
+        "z": "916314cc65df36ac",
+        "name": "Masuk: Admin Kartu dan Transaksi",
+        "links": [
+            "b34d76b9280e10e4",
+            "d888784d2c698e3e",
+            "1c96590d8dd0d864",
+            "0312748eb4ce66ac",
+            "ffcb416eabd94971"
+        ],
+        "x": 75,
+        "y": 860,
+        "wires": [
+            [
+                "0c52515adabf5f13"
+            ]
+        ]
+    },
+    {
+        "id": "b34d76b9280e10e4",
+        "type": "link out",
+        "z": "916314cc65df36ac",
+        "name": "Ke: Admin Kartu dan Transaksi",
+        "mode": "link",
+        "links": [
+            "f70563fe13f078ec"
+        ],
+        "x": 630,
+        "y": 1245,
+        "wires": []
+    },
+    {
+        "id": "82cc68e114587c5e",
+        "type": "link in",
+        "z": "916314cc65df36ac",
+        "name": "Masuk: Dashboard Pembayaran Tol",
+        "links": [
+            "a32922c3acf7c0e1",
+            "ce198df3305cad1c",
+            "91220dd457725883"
+        ],
+        "x": 2270,
+        "y": 560,
+        "wires": [
+            [
+                "144977f3ed325661"
+            ]
+        ]
+    },
+    {
+        "id": "a32922c3acf7c0e1",
+        "type": "link out",
+        "z": "916314cc65df36ac",
+        "name": "Ke: Dashboard Pembayaran Tol",
+        "mode": "link",
+        "links": [
+            "82cc68e114587c5e"
+        ],
+        "x": 2070,
+        "y": 445,
+        "wires": []
+    },
+    {
+        "id": "9f64c594d943d11b",
+        "type": "link out",
+        "z": "916314cc65df36ac",
+        "name": "Ke: Query Admin",
+        "mode": "link",
+        "links": [
+            "b85474a3855dd547"
+        ],
+        "x": 630,
+        "y": 975,
+        "wires": []
+    },
+    {
+        "id": "24dc3d2813c68f1c",
+        "type": "link in",
+        "z": "916314cc65df36ac",
+        "name": "Masuk: Simpan biaya",
+        "links": [
+            "c689dfcb82d2e5fc"
+        ],
+        "x": 610,
+        "y": 1090,
+        "wires": [
+            [
+                "539664a8f5b83f49"
+            ]
+        ]
+    },
+    {
+        "id": "c689dfcb82d2e5fc",
+        "type": "link out",
+        "z": "916314cc65df36ac",
+        "name": "Ke: Simpan biaya",
+        "mode": "link",
+        "links": [
+            "24dc3d2813c68f1c"
+        ],
+        "x": 630,
+        "y": 1045,
+        "wires": []
+    },
+    {
+        "id": "ce198df3305cad1c",
+        "type": "link out",
+        "z": "916314cc65df36ac",
+        "name": "Ke: Dashboard Pembayaran Tol",
+        "mode": "link",
+        "links": [
+            "82cc68e114587c5e"
+        ],
+        "x": 1290,
+        "y": 1005,
+        "wires": []
+    },
+    {
+        "id": "d888784d2c698e3e",
+        "type": "link out",
+        "z": "916314cc65df36ac",
+        "name": "Ke: Admin Kartu dan Transaksi",
+        "mode": "link",
+        "links": [
+            "f70563fe13f078ec"
+        ],
+        "x": 1290,
+        "y": 855,
+        "wires": []
+    },
+    {
+        "id": "252e0a39e3bc5136",
+        "type": "link out",
+        "z": "916314cc65df36ac",
+        "name": "Ke: Baca biaya tersimpan",
+        "mode": "link",
+        "links": [
+            "b423d890bb6fa254"
+        ],
+        "x": 1240,
+        "y": 175,
+        "wires": []
+    },
+    {
+        "id": "91220dd457725883",
+        "type": "link out",
+        "z": "916314cc65df36ac",
+        "name": "Ke: Dashboard Pembayaran Tol",
+        "mode": "link",
+        "links": [
+            "82cc68e114587c5e"
+        ],
+        "x": 920,
+        "y": 555,
+        "wires": []
+    },
+    {
+        "id": "1c96590d8dd0d864",
+        "type": "link out",
+        "z": "916314cc65df36ac",
+        "name": "Ke: Admin Kartu dan Transaksi",
+        "mode": "link",
+        "links": [
+            "f70563fe13f078ec"
+        ],
+        "x": 920,
+        "y": 410,
+        "wires": []
+    },
+    {
+        "id": "5344cb1c446c0c5e",
+        "type": "link out",
+        "z": "916314cc65df36ac",
+        "name": "Ke: Baca biaya tersimpan",
+        "mode": "link",
+        "links": [
+            "b423d890bb6fa254"
+        ],
+        "x": 630,
+        "y": 1010,
+        "wires": []
+    },
+    {
+        "id": "1ed980e24bd414be",
+        "type": "link in",
+        "z": "916314cc65df36ac",
+        "name": "Masuk: Daftar kartu - parameter",
+        "links": [
+            "6128f54f33ec4108"
+        ],
+        "x": 610,
+        "y": 780,
+        "wires": [
+            [
+                "79fe14e1bd423bd1"
+            ]
+        ]
+    },
+    {
+        "id": "6128f54f33ec4108",
+        "type": "link out",
+        "z": "916314cc65df36ac",
+        "name": "Ke: Daftar kartu - parameter",
+        "mode": "link",
+        "links": [
+            "1ed980e24bd414be"
+        ],
+        "x": 630,
+        "y": 870,
+        "wires": []
+    },
+    {
+        "id": "0312748eb4ce66ac",
+        "type": "link out",
+        "z": "916314cc65df36ac",
+        "name": "Ke: Admin Kartu dan Transaksi",
+        "mode": "link",
+        "links": [
+            "f70563fe13f078ec"
+        ],
+        "x": 1290,
+        "y": 1040,
+        "wires": []
+    },
+    {
+        "id": "ffcb416eabd94971",
+        "type": "link out",
+        "z": "916314cc65df36ac",
+        "name": "Ke: Admin Kartu dan Transaksi",
+        "mode": "link",
+        "links": [
+            "f70563fe13f078ec"
+        ],
+        "x": 630,
+        "y": 835,
+        "wires": []
+    },
+    {
+        "id": "f68fc7fa5509ef99",
+        "type": "link in",
+        "z": "916314cc65df36ac",
+        "name": "Masuk: Isi saldo - parameter",
+        "links": [
+            "2ecd61deab059c51"
+        ],
+        "x": 610,
+        "y": 840,
+        "wires": [
+            [
+                "38ff3c67073de9c8"
+            ]
+        ]
+    },
+    {
+        "id": "2ecd61deab059c51",
+        "type": "link out",
+        "z": "916314cc65df36ac",
+        "name": "Ke: Isi saldo - parameter",
+        "mode": "link",
+        "links": [
+            "f68fc7fa5509ef99"
+        ],
+        "x": 630,
+        "y": 905,
+        "wires": []
+    },
+    {
+        "id": "77664aed38ef3328",
+        "type": "link in",
+        "z": "916314cc65df36ac",
+        "name": "Masuk: Minta biaya halaman publik",
+        "links": [
+            "a98350b134d995de"
+        ],
+        "x": 2280,
+        "y": 700,
+        "wires": [
+            [
+                "3c4350f8540dda89"
+            ]
+        ]
+    },
+    {
+        "id": "a98350b134d995de",
+        "type": "link out",
+        "z": "916314cc65df36ac",
+        "name": "Ke: Minta biaya halaman publik",
+        "mode": "link",
+        "links": [
+            "77664aed38ef3328"
+        ],
+        "x": 2620,
+        "y": 505,
+        "wires": []
+    },
+    {
+        "id": "35667232b122423e",
+        "type": "comment",
+        "z": "916314cc65df36ac",
+        "name": "01 | DATABASE",
+        "info": "",
+        "x": 140,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "6e1656549d56c5fc",
+        "type": "comment",
+        "z": "916314cc65df36ac",
+        "name": "02 | RFID DAN PEMBAYARAN",
+        "info": "",
+        "x": 190,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "c19fbfb8d7e11066",
+        "type": "comment",
+        "z": "916314cc65df36ac",
+        "name": "03 | FEEDBACK PERANGKAT",
+        "info": "",
+        "x": 210,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "7ec0d17710863626",
+        "type": "comment",
+        "z": "916314cc65df36ac",
+        "name": "04 | DASHBOARD DAN ADMIN",
+        "info": "",
+        "x": 230,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "8faee171baaf31d6",
+        "type": "comment",
+        "z": "916314cc65df36ac",
+        "name": "05 | DIAGNOSTIK",
+        "info": "",
+        "x": 190,
+        "y": 1060,
+        "wires": []
+    },
+    {
+        "id": "toll_mqtt_broker",
+        "type": "mqtt-broker",
+        "name": "EMQX Public Toll",
+        "broker": "broker.emqx.io",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {}
+    },
+    {
+        "id": "toll_sqlite_db",
+        "type": "sqlitedb",
+        "db": "toll_rfid.db",
+        "mode": "RWC"
+    },
+    {
+        "id": "baa8cc3c57271c12",
+        "type": "ui-group",
+        "name": "Pembayaran",
+        "page": "a1870b3eb68afc2a",
+        "width": "12",
+        "height": "1",
+        "order": 1,
+        "showTitle": false,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "9a384bbf668e6a7a",
+        "type": "ui-group",
+        "name": "Administrasi",
+        "page": "28d138c4df456361",
+        "width": "12",
+        "height": "1",
+        "order": 1,
+        "showTitle": false,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "a1870b3eb68afc2a",
+        "type": "ui-page",
+        "name": "Pembayaran Tol",
+        "ui": "0df8b8a20bb13f1b",
+        "path": "/payment",
+        "icon": "contactless-payment-circle",
+        "layout": "grid",
+        "theme": "toll_ui_theme",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "tabs": [],
+        "order": 18,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "28d138c4df456361",
+        "type": "ui-page",
+        "name": "Admin Pembayaran Tol",
+        "ui": "0df8b8a20bb13f1b",
+        "path": "/admin",
+        "icon": "security",
+        "layout": "grid",
+        "theme": "toll_ui_theme",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "tabs": [],
+        "order": 2,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "0df8b8a20bb13f1b",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": true
+    },
+    {
+        "id": "toll_ui_theme",
+        "type": "ui-theme",
+        "name": "Toll Light",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#1558b0",
+            "bgPage": "#eef3f8",
+            "groupBg": "#eef3f8",
+            "groupOutline": "#eef3f8"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "16px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "cf9178c3c76f1552",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-node-sqlite": "2.0.1",
+            "@flowfuse/node-red-dashboard": "1.33.0"
+        }
+    }
+]
