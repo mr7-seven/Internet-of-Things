@@ -1,1222 +1,1260 @@
 [
-    {
-        "id": "97115755fcb80f56",
-        "type": "tab",
-        "label": "RFID Toll Payment",
-        "disabled": false,
-        "info": "Perbaikan flow tol RFID - MFRC522v2 firmware tetap.\n\n1. Ganti flow lama, jangan jalankan dua flow pembayaran terhadap database yang sama. Pertahankan path database lama pada konfigurasi SQLite.\n2. Dependensi: @flowfuse/node-red-dashboard dan node-red-node-sqlite.\n3. Login awal admin / admin123. Ganti pada Function Admin Login dan Router. Login ini pembatas aplikasi praktikum; untuk akses internet gunakan autentikasi/HTTPS pada server.\n4. Dua identitas: edit data().students di Dashboard Pembayaran Tol. Foto: /images/student-1.jpg dan /images/student-2.jpg, tersedia fallback bila foto belum ada.\n5. Halaman admin: Biaya Sekali Tap > SIMPAN BIAYA. Default 5000 hanya untuk database baru. Tabel settings menyimpan tarif, users dan transactions tetap tabel utama berelasi.\n6. Pendaftaran menggunakan prepared statement. Notifikasi operasi admin memiliki tombol OK tanpa timer.\n7. Pembayaran: INSERT transaksi + trigger debit dalam satu statement atomik. event_id unik mencegah debit ulang. Respons PAID dikirim setelah query selesai. Jangan melakukan UPDATE debit manual pada flow lain.\n8. Standby menunggu EXECUTION_COMPLETE dengan event_id yang sama.\n9. Tarif 0 berarti gratis untuk kartu terdaftar. Nilai rupiah harus bilangan bulat.\n10. Diuji: sintaks JS/JSON, referensi node, binding parameter, sesi per socket, pendaftaran/UID duplikat, topup, pembayaran/duplikat, saldo kurang, UID tidak dikenal, persistensi tarif, rollback. Belum diuji end-to-end dengan perangkat fisik pada revisi ini.\n"
-    },
-    {
-        "id": "bfc88b4a20bdfc97",
-        "type": "inject",
-        "z": "97115755fcb80f56",
-        "name": "1x Inisialisasi Database",
-        "props": [
-            {
-                "p": "payload"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": true,
-        "onceDelay": 1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 180,
-        "y": 100,
-        "wires": [
-            [
-                "2682bfc12d7d073e"
-            ]
-        ]
-    },
-    {
-        "id": "2682bfc12d7d073e",
-        "type": "function",
-        "z": "97115755fcb80f56",
-        "name": "Buat Tabel SQLite",
-        "func": "flow.set(\"toll_db_ready\", false);\nmsg.topic = \"PRAGMA foreign_keys = ON;\\n\\nCREATE TABLE IF NOT EXISTS users (\\n    id INTEGER PRIMARY KEY AUTOINCREMENT,\\n    uid TEXT NOT NULL UNIQUE,\\n    name TEXT NOT NULL,\\n    balance INTEGER NOT NULL DEFAULT 0 CHECK(balance >= 0),\\n    created_at TEXT NOT NULL DEFAULT (datetime('now','localtime')),\\n    updated_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))\\n);\\n\\nCREATE TABLE IF NOT EXISTS transactions (\\n    id INTEGER PRIMARY KEY AUTOINCREMENT,\\n    event_id TEXT NOT NULL UNIQUE,\\n    user_id INTEGER,\\n    uid TEXT NOT NULL,\\n    amount INTEGER NOT NULL DEFAULT 0,\\n    balance_before INTEGER,\\n    balance_after INTEGER,\\n    status TEXT NOT NULL CHECK(status IN ('PAID','DENIED')),\\n    reason TEXT NOT NULL,\\n    created_at TEXT NOT NULL DEFAULT (datetime('now','localtime')),\\n    FOREIGN KEY(user_id) REFERENCES users(id)\\n        ON UPDATE CASCADE\\n        ON DELETE SET NULL\\n);\\n\\nCREATE INDEX IF NOT EXISTS idx_transactions_time\\nON transactions(created_at);\\n\\nCREATE INDEX IF NOT EXISTS idx_transactions_uid\\nON transactions(uid);\\n\\nCREATE TRIGGER IF NOT EXISTS toll_debit_after_insert\\nAFTER INSERT ON transactions WHEN NEW.status = 'PAID'\\nBEGIN\\n UPDATE users SET balance=balance-NEW.amount, updated_at=datetime('now','localtime')\\n WHERE id=NEW.user_id AND balance>=NEW.amount;\\n SELECT CASE WHEN changes()!=1 THEN RAISE(ABORT,'DEBIT_FAILED') END;\\nEND;\\n\\nCREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY CHECK(id=1),fee INTEGER NOT NULL CHECK(fee>=0 AND fee<=1000000000));\\nINSERT OR IGNORE INTO settings(id,fee) VALUES(1,5000);\\n\";\nreturn msg;\n",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "flow.set(\"toll_db_ready\",false);",
-        "finalize": "",
-        "libs": [],
-        "x": 470,
-        "y": 100,
-        "wires": [
-            [
-                "8558a942255b217a"
-            ]
-        ]
-    },
-    {
-        "id": "a2e36d22d312e863",
-        "type": "mqtt in",
-        "z": "97115755fcb80f56",
-        "name": "RFID Event",
-        "topic": "toll/kelompok-00/rfid/event",
-        "qos": "0",
-        "datatype": "auto",
-        "broker": "toll_mqtt_broker",
-        "nl": false,
-        "rap": true,
-        "rh": 0,
-        "inputs": 0,
-        "x": 140,
-        "y": 300,
-        "wires": [
-            [
-                "24087b86a510b625"
-            ]
-        ]
-    },
-    {
-        "id": "24087b86a510b625",
-        "type": "json",
-        "z": "97115755fcb80f56",
-        "name": "Parse RFID JSON",
-        "property": "payload",
-        "action": "obj",
-        "pretty": false,
-        "x": 470,
-        "y": 300,
-        "wires": [
-            [
-                "03518aac465552e7"
-            ]
-        ]
-    },
-    {
-        "id": "03518aac465552e7",
-        "type": "function",
-        "z": "97115755fcb80f56",
-        "name": "Validasi dan Route Mode",
-        "func": "const p = msg.payload;\nif (!p || p.group_id !== 'kelompok-00' || msg.retain) return null;\nconst uid = String(p.uid || '').trim().toUpperCase();\nif (!/^(?:[0-9A-F]{8}|[0-9A-F]{14}|[0-9A-F]{20})$/.test(uid) || !p.node_id || typeof p.event_id !== 'string' || !p.event_id || p.event_id.length > 160) {\n  node.warn('Event RFID tidak valid');\n  return null;\n}\nif (!flow.get('toll_db_ready')) {\n  node.error('Database belum siap', msg);\n  return null;\n}\nmsg._event = {\n  ...p,\n  uid\n};\nif (p.mode === 'REGISTER') return [null, {\n  payload: {\n    action: 'registration_uid',\n    uid,\n    event_id: p.event_id,\n    node_id: p.node_id\n  }\n}];\nif (p.mode !== 'PAYMENT') return null;\nmsg.params = {\n  $event_id: p.event_id,\n  $uid: uid\n};\nreturn [msg, null];\n",
-        "outputs": 2,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 760,
-        "y": 300,
-        "wires": [
-            [
-                "45afb592f2580b1f"
-            ],
-            [
-                "d165b3183e896adc"
-            ]
-        ]
-    },
-    {
-        "id": "45afb592f2580b1f",
-        "type": "sqlite",
-        "z": "97115755fcb80f56",
-        "mydb": "toll_sqlite_db",
-        "sqlquery": "prepared",
-        "sql": "INSERT INTO transactions(event_id,user_id,uid,amount,balance_before,balance_after,status,reason)\nSELECT $event_id,u.id,$uid,\n CASE WHEN u.balance >= (SELECT fee FROM settings WHERE id=1) THEN (SELECT fee FROM settings WHERE id=1) ELSE 0 END,u.balance,\n CASE WHEN u.balance >= (SELECT fee FROM settings WHERE id=1) THEN u.balance-(SELECT fee FROM settings WHERE id=1) ELSE u.balance END,\n CASE WHEN u.balance >= (SELECT fee FROM settings WHERE id=1) THEN 'PAID' ELSE 'DENIED' END,\n CASE WHEN u.id IS NULL THEN 'UID_NOT_REGISTERED' WHEN u.balance >= (SELECT fee FROM settings WHERE id=1) THEN 'PAYMENT_SUCCESS' ELSE 'INSUFFICIENT_BALANCE' END\nFROM (SELECT 1) AS seed LEFT JOIN users u ON u.uid=$uid\nWHERE 1 ON CONFLICT(event_id) DO NOTHING",
-        "name": "Pembayaran atomik",
-        "x": 1060,
-        "y": 300,
-        "wires": [
-            [
-                "38e1f003697b286f"
-            ]
-        ]
-    },
-    {
-        "id": "710c60246c503a39",
-        "type": "function",
-        "z": "97115755fcb80f56",
-        "name": "Hasil pembayaran tersimpan",
-        "func": "const e = msg._event;\nconst t = Array.isArray(msg.payload) ? msg.payload[0] : null;\nif (!t || t.uid !== e.uid) {\n  node.error('Hasil transaksi tidak cocok', msg);\n  return null;\n}\nconst reasonText = {\n  PAYMENT_SUCCESS: 'Pembayaran berhasil',\n  UID_NOT_REGISTERED: 'UID kartu tidak terdaftar',\n  INSUFFICIENT_BALANCE: 'Saldo tidak cukup'\n} [t.reason] || t.reason;\nconst mqtt = {\n  topic: `toll/${e.group_id}/esp32/command`,\n  payload: {\n    command: 'ACCESS_RESULT',\n    event_id: e.event_id,\n    result: t.status,\n    reason: reasonText\n  },\n  qos: 0,\n  retain: false\n};\nlet seen = context.get('seen') || {};\nconst now = Date.now();\nfor (const k of Object.keys(seen))\n  if (now - seen[k] > 300000) delete seen[k];\nconst duplicate = Boolean(seen[e.event_id]);\nseen[e.event_id] = now;\ncontext.set('seen', seen);\nconst ui = {\n  payload: {\n    action: 'access_result',\n    event_id: e.event_id,\n    uid: e.uid,\n    result: t.status,\n    reason: t.reason,\n    reason_text: reasonText,\n    user: t.user_id ? {\n      name: t.name,\n      balance_before: t.balance_before,\n      balance_after: t.balance_after\n    } : null\n  }\n};\nreturn [duplicate ? null : {\n  payload: {\n    action: 'history_changed'\n  }\n}, mqtt, duplicate ? null : ui];\n",
-        "outputs": 3,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1910,
-        "y": 300,
-        "wires": [
-            [
-                "b1d7d131b4b7ee76"
-            ],
-            [
-                "a1a9850602dfacce"
-            ],
-            [
-                "5b735c078479e055"
-            ]
-        ]
-    },
-    {
-        "id": "a1a9850602dfacce",
-        "type": "json",
-        "z": "97115755fcb80f56",
-        "name": "Command ke JSON",
-        "property": "payload",
-        "action": "str",
-        "pretty": false,
-        "x": 2200,
-        "y": 280,
-        "wires": [
-            [
-                "716f921d1b7fb82b"
-            ]
-        ]
-    },
-    {
-        "id": "716f921d1b7fb82b",
-        "type": "mqtt out",
-        "z": "97115755fcb80f56",
-        "name": "Perintah ESP32",
-        "topic": "",
-        "qos": "",
-        "retain": "",
-        "respTopic": "",
-        "contentType": "",
-        "userProps": "",
-        "correl": "",
-        "expiry": "",
-        "broker": "toll_mqtt_broker",
-        "x": 2460,
-        "y": 280,
-        "wires": []
-    },
-    {
-        "id": "fd6ab1cf0e092ee7",
-        "type": "mqtt in",
-        "z": "97115755fcb80f56",
-        "name": "Feedback ESP32",
-        "topic": "toll/kelompok-00/esp32/status",
-        "qos": "0",
-        "datatype": "auto",
-        "broker": "toll_mqtt_broker",
-        "nl": false,
-        "rap": true,
-        "rh": 0,
-        "inputs": 0,
-        "x": 180,
-        "y": 480,
-        "wires": [
-            [
-                "f2d93d373606f186"
-            ]
-        ]
-    },
-    {
-        "id": "f2d93d373606f186",
-        "type": "json",
-        "z": "97115755fcb80f56",
-        "name": "Parse Feedback",
-        "property": "payload",
-        "action": "obj",
-        "pretty": false,
-        "x": 470,
-        "y": 480,
-        "wires": [
-            [
-                "da13d5530329197b"
-            ]
-        ]
-    },
-    {
-        "id": "da13d5530329197b",
-        "type": "function",
-        "z": "97115755fcb80f56",
-        "name": "Feedback ke Dashboard",
-        "func": "const p = msg.payload || {};\nif (p.group_id !== 'kelompok-00') return null;\nif (p.status === 'EXECUTION_COMPLETE') {\n  return {\n    payload: {\n      action: 'standby',\n      message: 'Silakan tap kartu',\n      last_result: p.result,\n      event_id: p.event_id\n    }\n  };\n}\nif (p.status === 'ONLINE') {\n  return {\n    payload: {\n      action: 'device_online',\n      message: 'Perangkat terhubung'\n    }\n  };\n}\nreturn null;\n",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 760,
-        "y": 480,
-        "wires": [
-            [
-                "ec45e4d89b76cb84"
-            ]
-        ]
-    },
-    {
-        "id": "c92f72ac6c7f2769",
-        "type": "function",
-        "z": "97115755fcb80f56",
-        "name": "Admin Login dan Router",
-        "func": "const ADMIN_USERNAME = 'admin';\nconst ADMIN_PASSWORD = 'admin123';\nconst SESSION_MS = 30 * 60 * 1000;\nconst p = msg.payload || {};\nconst action = String(p.action || '');\nlet sessions = flow.get('toll_admin_sessions') || {};\nconst now = Date.now();\nfor (const key of Object.keys(sessions)) {\n  if (sessions[key].expires < now) delete sessions[key];\n}\n\nfunction direct(payload) {\n  return [{\n    payload,\n    _client: msg._client\n  }, null, null, null, null, null, null];\n}\nconst socketId = msg._client && msg._client.socketId;\nif (!socketId) return null;\n\nfunction cleanUid(value) {\n  return String(value || '').trim().toUpperCase();\n}\nif (action === 'admin_login') {\n  if (p.username === ADMIN_USERNAME && p.password === ADMIN_PASSWORD) {\n    const token = `${now}-${Math.random().toString(36).slice(2,14)}`;\n    sessions[token] = {\n      expires: now + SESSION_MS,\n      socketId\n    };\n    flow.set('toll_admin_sessions', sessions);\n    return direct({\n      action: 'login_result',\n      success: true,\n      token,\n      message: 'Login berhasil'\n    });\n  }\n  return direct({\n    action: 'login_result',\n    success: false,\n    message: 'Username atau password salah'\n  });\n}\nconst token = String(p.token || '');\nif (!token || !sessions[token] || sessions[token].expires < now || sessions[token].socketId !== socketId) {\n  return direct({\n    action: 'session_expired',\n    message: 'Sesi berakhir, silakan login kembali'\n  });\n}\nsessions[token] = {\n  expires: now + SESSION_MS,\n  socketId\n};\nflow.set('toll_admin_sessions', sessions);\nif (action === 'admin_logout') {\n  delete sessions[token];\n  flow.set('toll_admin_sessions', sessions);\n  return direct({\n    action: 'logout_result'\n  });\n}\nif (!flow.get('toll_db_ready')) return direct({\n  action: 'operation_result',\n  success: false,\n  message: 'Database belum siap. Periksa Debug.'\n});\nif (action === 'get_settings') {\n  msg.params = {};\n  return [null, null, null, null, null, msg, null];\n}\nif (action === 'set_fee') {\n  const fee = Number(p.fee);\n  if (p.fee === '' || p.fee == null || !Number.isSafeInteger(fee) || fee < 0 || fee > 1000000000) return direct({\n    action: 'operation_result',\n    success: false,\n    message: 'Biaya harus berupa rupiah bulat antara 0 sampai 1 miliar'\n  });\n  msg.params = {\n    $fee: fee\n  };\n  msg._admin_action = 'fee_update';\n  return [null, null, null, null, null, null, msg];\n}\nif (action === 'register_user') {\n  const uid = cleanUid(p.uid);\n  const name = String(p.name || '').trim();\n  const balance = Number(p.balance);\n  if (!/^(?:[0-9A-F]{8}|[0-9A-F]{14}|[0-9A-F]{20})$/.test(uid) || !name || name.length > 100 || p.balance === '' || p.balance == null || !Number.isSafeInteger(balance) || balance < 0) {\n    return direct({\n      action: 'operation_result',\n      success: false,\n      message: 'Data pendaftaran tidak valid'\n    });\n  }\n  msg.topic = 'INSERT INTO users (uid,name,balance) VALUES (?,?,?) ON CONFLICT(uid) DO NOTHING RETURNING id,uid,name,balance';\n  msg.params = {\n    $uid: uid,\n    $name: name,\n    $balance: balance\n  };\n  msg._admin_action = 'register';\n  return [null, msg, null, null, null];\n}\nif (action === 'topup_balance') {\n  const uid = cleanUid(p.uid);\n  const amount = Number(p.amount);\n  if (!/^(?:[0-9A-F]{8}|[0-9A-F]{14}|[0-9A-F]{20})$/.test(uid) || !Number.isSafeInteger(amount) || amount <= 0) {\n    return direct({\n      action: 'operation_result',\n      success: false,\n      message: 'UID atau nominal isi saldo tidak valid'\n    });\n  }\n  msg.topic = 'UPDATE users SET balance = balance + ?, updated_at = datetime(\\'now\\',\\'localtime\\') WHERE uid = ? RETURNING id,uid,name,balance';\n  msg.params = {\n    $amount: amount,\n    $uid: uid\n  };\n  msg._admin_action = 'topup';\n  return [null, null, msg, null, null];\n}\nif (action === 'get_users') {\n  msg.topic = 'SELECT id,uid,name,balance,created_at,updated_at FROM users ORDER BY name';\n  msg.payload = [];\n  msg._admin_action = 'users';\n  return [null, null, null, msg, null];\n}\nif (action === 'get_history') {\n  msg.topic = `SELECT t.id,t.created_at,t.uid,COALESCE(u.name,'Tidak terdaftar') AS name,t.amount,t.balance_before,t.balance_after,t.status,t.reason FROM transactions t LEFT JOIN users u ON u.id=t.user_id ORDER BY t.id DESC LIMIT 200`;\n  msg.payload = [];\n  msg._admin_action = 'history';\n  return [null, null, null, null, msg];\n}\nreturn direct({\n  action: 'operation_result',\n  success: false,\n  message: 'Perintah admin tidak dikenali'\n});\n",
-        "outputs": 7,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 470,
-        "y": 760,
-        "wires": [
-            [
-                "059b4dca79b2c4fa"
-            ],
-            [
-                "624e196bca1799f1"
-            ],
-            [
-                "b4c893e9460acb8d"
-            ],
-            [
-                "d621f354e352f4ac"
-            ],
-            [
-                "382b801afff6f305"
-            ],
-            [
-                "caf8f8faca9d9542"
-            ],
-            [
-                "710ca3a034c11c91"
-            ]
-        ]
-    },
-    {
-        "id": "8677f60ff46e6a46",
-        "type": "sqlite",
-        "z": "97115755fcb80f56",
-        "mydb": "toll_sqlite_db",
-        "sqlquery": "msg.topic",
-        "sql": "",
-        "name": "Query Admin",
-        "x": 770,
-        "y": 800,
-        "wires": [
-            [
-                "7be8673399f00440"
-            ]
-        ]
-    },
-    {
-        "id": "7be8673399f00440",
-        "type": "function",
-        "z": "97115755fcb80f56",
-        "name": "Format Respons Admin",
-        "func": "const rows = Array.isArray(msg.payload) ? msg.payload : [];\nlet payload;\nswitch (msg._admin_action) {\n  case 'register':\n    payload = rows.length ? {\n      action: 'operation_result',\n      success: true,\n      message: 'Kartu berhasil didaftarkan'\n    } : {\n      action: 'operation_result',\n      success: false,\n      message: 'UID sudah terdaftar'\n    };\n    break;\n  case 'topup':\n    payload = rows.length ? {\n      action: 'operation_result',\n      success: true,\n      message: `Isi saldo berhasil. Saldo baru Rp ${Number(rows[0].balance).toLocaleString('id-ID')}`\n    } : {\n      action: 'operation_result',\n      success: false,\n      message: 'UID tidak ditemukan'\n    };\n    break;\n  case 'users':\n    payload = {\n      action: 'users_data',\n      users: rows\n    };\n    break;\n  case 'history':\n    payload = {\n      action: 'history_data',\n      history: rows\n    };\n    break;\n  default:\n    return null;\n}\npayload.operation = msg._admin_action;\nreturn {\n  payload,\n  _client: msg._client\n};\n",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1070,
-        "y": 780,
-        "wires": [
-            [
-                "1c5429e735937e60"
-            ]
-        ]
-    },
-    {
-        "id": "8558a942255b217a",
-        "type": "sqlite",
-        "z": "97115755fcb80f56",
-        "mydb": "toll_sqlite_db",
-        "sqlquery": "batch",
-        "sql": "",
-        "name": "Inisialisasi skema dan trigger",
-        "x": 780,
-        "y": 100,
-        "wires": [
-            [
-                "40f05999c4088b29"
-            ]
-        ]
-    },
-    {
-        "id": "8c9feb700a1c1c64",
-        "type": "debug",
-        "z": "97115755fcb80f56",
-        "name": "SQLite Result",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 770,
-        "y": 1130,
-        "wires": []
-    },
-    {
-        "id": "b3e776dc4366b1a7",
-        "type": "ui-template",
-        "z": "97115755fcb80f56",
-        "group": "e262be15dbf1e1c9",
-        "page": "",
-        "ui": "",
-        "name": "Dashboard Pembayaran Tol",
-        "order": 1,
-        "width": "12",
-        "height": "0",
-        "head": "",
-        "format": "<template>\n<div class=\"toll-shell\">\n  <header class=\"student-header\">\n    <div class=\"identity-heading\"><div class=\"eyebrow\">Sistem Pembayaran Tol dengan RFID</div><div class=\"device-pill\"><span :class=\"['dot',deviceOnline?'online':'offline']\"></span>{{deviceOnline?'ESP32 TERDETEKSI':'MENUNGGU ESP32'}}</div></div>\n    <div class=\"student-list\"><article class=\"student-person\" v-for=\"(student,index) in students\" :key=\"index\"><img :src=\"student.photo\" @error=\"photoError\" class=\"student-photo\"><div><h2>{{student.name}}</h2><p>{{student.nim}}</p><p>{{student.className}}</p></div></article></div>\n  </header>\n  <section class=\"hero\">\n    <div><div class=\"eyebrow\">RFID TOLL PAYMENT</div><h1>Akses Pembayaran Tol</h1><p>Tempelkan kartu RFID pada reader untuk melakukan transaksi.</p></div>\n    <div class=\"fee-card\"><span>BIAYA SEKALI TAP</span><strong>{{rupiah(fee)}}</strong></div>\n  </section>\n  <section :class=\"['status-card',status.toLowerCase()]\">\n    <div class=\"status-icon\">{{statusIcon}}</div>\n    <div><span>STATUS TRANSAKSI</span><h2>{{status}}</h2><p>{{message}}</p></div>\n  </section>\n  <section class=\"detail-grid\">\n    <div><span>UID TERAKHIR</span><strong>{{lastUid || '-'}}</strong></div>\n    <div><span>NAMA PENGGUNA</span><strong>{{userName || '-'}}</strong></div>\n    <div><span>SALDO AKHIR</span><strong>{{balanceAfter === null ? '-' : rupiah(balanceAfter)}}</strong></div>\n  </section>\n</div>\n</template>\n<script>\nexport default {\n  data() {\n    return {\n      students: [{\n        name: 'Nama Mahasiswa 1',\n        nim: 'NIM Mahasiswa 1',\n        className: 'Kelas 1',\n        photo: '/images/student-1.jpg'\n      }, {\n        name: 'Nama Mahasiswa 2',\n        nim: 'NIM Mahasiswa 2',\n        className: 'Kelas 2',\n        photo: '/images/student-2.jpg'\n      }],\n      activeEventId: '',\n      fee: 5000,\n      status: 'STANDBY',\n      message: 'Silakan tap kartu',\n      lastUid: '',\n      userName: '',\n      balanceAfter: null,\n      deviceOnline: false\n    }\n  },\n  computed: {\n    statusIcon() {\n      return this.status === 'PAID' ? '✓' : this.status === 'DENIED' ? '×' : '⌁'\n    }\n  },\n  watch: {\n    msg: {\n      deep: true,\n      handler(v) {\n        if (v && v.payload) this.handle(v.payload)\n      }\n    }\n  },\n  mounted() {\n    this.loadSwal();\n    this.send({\n      payload: {\n        action: 'get_public_settings'\n      }\n    })\n  },\n  methods: {\n    rupiah(v) {\n      return new Intl.NumberFormat('id-ID', {\n        style: 'currency',\n        currency: 'IDR',\n        maximumFractionDigits: 0\n      }).format(Number(v || 0))\n    },\n    photoError(e) {\n      e.target.src = 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'120\\' height=\\'120\\' viewBox=\\'0 0 120 120\\'%3E%3Crect width=\\'120\\' height=\\'120\\' fill=\\'%23e5e7eb\\'/%3E%3Ccircle cx=\\'60\\' cy=\\'43\\' r=\\'22\\' fill=\\'%239ca3af\\'/%3E%3Cpath d=\\'M20 110c5-28 21-40 40-40s35 12 40 40\\' fill=\\'%239ca3af\\'/%3E%3C/svg%3E'\n    },\n    loadSwal() {\n      if (window.Swal) return;\n      const s = document.createElement('script');\n      s.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';\n      document.head.appendChild(s)\n    },\n    alert(icon, title, text) {\n      if (window.Swal) window.Swal.fire({\n        icon,\n        title,\n        text,\n        timer: 5000,\n        timerProgressBar: true,\n        showConfirmButton: false,\n        position: 'center'\n      })\n    },\n    handle(p) {\n      if (p.action === 'fee_updated') {\n        this.fee = Number(p.fee);\n        return\n      }\n      if (p.action === 'device_online') {\n        this.deviceOnline = true;\n        return\n      }\n      if (p.action === 'standby') {\n        if (!this.activeEventId || p.event_id !== this.activeEventId) return;\n        this.activeEventId = '';\n        this.status = 'STANDBY';\n        this.message = 'Silakan tap kartu';\n        this.lastUid = '';\n        this.userName = '';\n        this.balanceAfter = null;\n        return\n      }\n      if (p.action !== 'access_result') return;\n      if (this.activeEventId === p.event_id) return;\n      this.activeEventId = p.event_id;\n      this.deviceOnline = true;\n      this.lastUid = p.uid || '';\n      this.status = p.result;\n      this.message = p.reason_text || '';\n      this.userName = p.user ? p.user.name : '';\n      this.balanceAfter = p.user ? p.user.balance_after : null;\n      if (p.result === 'PAID') this.alert('success', 'Pembayaran Berhasil', `Saldo tersisa ${this.rupiah(this.balanceAfter)}`);\n      else this.alert('error', 'Pembayaran Ditolak', p.reason_text || 'Kartu tidak dapat diproses');\n    }\n  }\n}\n</script>\n<style>\n.toll-shell {\n  font-family:Inter,Arial,sans-serif;\n  max-width:1180px;\n  margin:auto;\n  color:#10213b\n}\n.toll-shell .student-header,.toll-shell .hero,.toll-shell .status-card,.toll-shell .detail-grid {\n  display:flex;\n  align-items:center\n}\n.toll-shell .student-header {\n  gap:16px;\n  padding:18px 22px;\n  background:#fff;\n  border:1px solid #dce4ee;\n  border-radius:18px\n}\n.toll-shell .student-photo {\n  width:72px;\n  height:72px;\n  border-radius:50%;\n  object-fit:cover;\n  border:3px solid #2563eb\n}\n.toll-shell .student-header h2,.toll-shell .student-header p,.toll-shell .hero h1,.toll-shell .hero p,.toll-shell .status-card h2,.toll-shell .status-card p {\n  margin:3px 0\n}\n.toll-shell .eyebrow,.toll-shell .fee-card span,.toll-shell .status-card span,.toll-shell .detail-grid span {\n  font-size:11px;\n  letter-spacing:.12em;\n  font-weight:800;\n  color:#64748b\n}\n.toll-shell .device-pill {\n  margin-left:auto;\n  padding:10px 14px;\n  border-radius:99px;\n  background:#f1f5f9;\n  font-size:12px;\n  font-weight:800\n}\n.toll-shell .dot {\n  display:inline-block;\n  width:9px;\n  height:9px;\n  border-radius:50%;\n  margin-right:8px\n}\n.toll-shell .online {\n  background:#22c55e\n}\n.toll-shell .offline {\n  background:#94a3b8\n}\n.toll-shell .hero {\n  justify-content:space-between;\n  margin-top:16px;\n  padding:28px;\n  background:linear-gradient(135deg,#0f274d,#164b91);\n  color:#fff;\n  border-radius:20px\n}\n.toll-shell .hero .eyebrow,.toll-shell .hero p {\n  color:#c9dcff\n}\n.toll-shell .fee-card {\n  min-width:230px;\n  padding:18px 22px;\n  text-align:right;\n  background:#fff;\n  color:#10213b;\n  border-radius:15px\n}\n.toll-shell .fee-card strong {\n  display:block;\n  font-size:30px;\n  margin-top:5px\n}\n.toll-shell .status-card {\n  gap:20px;\n  margin-top:16px;\n  padding:25px;\n  border-radius:18px;\n  border-left:8px solid #eab308;\n  background:#fff;\n  border-top:1px solid #e2e8f0;\n  border-right:1px solid #e2e8f0;\n  border-bottom:1px solid #e2e8f0\n}\n.toll-shell .status-card.paid {\n  border-left-color:#22c55e;\n  background:#f0fdf4\n}\n.toll-shell .status-card.denied {\n  border-left-color:#ef4444;\n  background:#fef2f2\n}\n.toll-shell .status-icon {\n  display:grid;\n  place-items:center;\n  width:58px;\n  height:58px;\n  border-radius:50%;\n  background:#f1f5f9;\n  font-size:32px;\n  font-weight:900\n}\n.toll-shell .paid .status-icon {\n  background:#dcfce7;\n  color:#15803d\n}\n.toll-shell .denied .status-icon {\n  background:#fee2e2;\n  color:#b91c1c\n}\n.toll-shell .detail-grid {\n  gap:14px;\n  margin-top:16px\n}\n.toll-shell .detail-grid>div {\n  flex:1;\n  padding:18px;\n  background:#fff;\n  border:1px solid #e2e8f0;\n  border-radius:14px\n}\n.toll-shell .detail-grid strong {\n  display:block;\n  margin-top:8px;\n  font-size:17px\n}\n@media(max-width:700px) {\n  .toll-shell .student-header,.toll-shell .hero,.toll-shell .detail-grid {\n    align-items:stretch;\n    flex-direction:column\n  }\n  .toll-shell .device-pill {\n    margin-left:0\n  }\n  .toll-shell .fee-card {\n    text-align:left;\n    min-width:0\n  }\n  .toll-shell .detail-grid {\n    gap:8px\n  }\n}\n.toll-shell {\n  width: 100%;\n  max-width: none;\n  box-sizing: border-box;\n  padding: clamp(12px, 2vw, 28px);\n}\n.toll-shell > * {\n  min-width: 0;\n}\n.toll-shell .identity-heading {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  gap: 16px;\n  margin-bottom: 16px;\n}\n.toll-shell .student-header {\n  display: block;\n}\n.toll-shell .student-list {\n  display: grid;\n  grid-template-columns: repeat(2, minmax(0, 1fr));\n  gap: 16px;\n}\n.toll-shell .student-person {\n  display: flex;\n  gap: 14px;\n  align-items: center;\n  min-width: 0;\n  padding: 14px;\n  background: #f8fafc;\n  border-radius: 12px;\n}\n.toll-shell .student-person h2 {\n  font-size: 18px;\n  overflow-wrap: anywhere;\n}\n.toll-shell .student-person p {\n  font-size: 14px;\n}\n.toll-shell .student-photo {\n  flex-shrink: 0;\n}\n.toll-shell .hero > div:first-child {\n  min-width: 0;\n}\n.toll-shell .hero h1 {\n  line-height: 1.2;\n}\n.toll-shell .fee-card {\n  flex: 0 0 auto;\n}\n.toll-shell .detail-grid > div {\n  min-width: 0;\n}\n.toll-shell .detail-grid strong {\n  overflow-wrap: anywhere;\n}\n@media (max-width: 850px) {\n  .toll-shell .student-list {\n    grid-template-columns: 1fr;\n  }\n  .toll-shell .hero {\n    gap: 20px;\n  }\n}\n@media (max-width: 700px) {\n  .toll-shell .hero, .toll-shell .detail-grid {\n    flex-direction: column;\n    align-items: stretch;\n  }\n  .toll-shell .identity-heading {\n    flex-wrap: wrap;\n  }\n  .toll-shell .device-pill {\n    margin-left: 0;\n  }\n  .toll-shell .fee-card {\n    width: 100%;\n    min-width: 0;\n    text-align: left;\n  }\n  .toll-shell .status-card {\n    align-items: flex-start;\n  }\n}\n</style>\n",
-        "storeOutMessages": false,
-        "passthru": false,
-        "resendOnRefresh": false,
-        "templateScope": "local",
-        "className": "",
-        "x": 2460,
-        "y": 430,
-        "wires": [
-            [
-                "d4ed1b714eec57f2"
-            ]
-        ]
-    },
-    {
-        "id": "b1d7d131b4b7ee76",
-        "type": "ui-template",
-        "z": "97115755fcb80f56",
-        "group": "1d434d868efead9d",
-        "page": "",
-        "ui": "",
-        "name": "Admin Kartu dan Transaksi",
-        "order": 1,
-        "width": "12",
-        "height": "0",
-        "head": "",
-        "format": "<template>\n<div class=\"admin-shell\">\n <div v-if=\"!loggedIn\" class=\"login-card\"><div class=\"lock\">🔒</div><h2>Login Administrator</h2><p>Akses pendaftaran kartu dan riwayat transaksi.</p><input v-model.trim=\"login.username\" placeholder=\"Username\"><input v-model=\"login.password\" type=\"password\" placeholder=\"Password\" @keyup.enter=\"doLogin\"><button @click=\"doLogin\">MASUK</button><small>{{loginMessage}}</small></div>\n <div v-else>\n  <header class=\"admin-header\"><div><span>RFID TOLL MANAGEMENT</span><h2>Administrasi Kartu</h2></div><button class=\"ghost\" @click=\"logout\">Keluar</button></header>\n  <p role=\"status\">{{operationMessage}}</p><section class=\"panel table-panel\"><h3>Biaya Sekali Tap</h3><label>Tarif dalam rupiah (0 untuk gratis)</label><input v-model.number=\"fee\" type=\"number\" min=\"0\" max=\"1000000000\" step=\"1000\"><button :disabled=\"busy\" @click=\"saveFee\">SIMPAN BIAYA</button><p>Berlaku untuk transaksi berikutnya.</p></section><div class=\"admin-grid\">\n   <section class=\"panel\"><h3>Pendaftaran Kartu</h3><label>UID hasil scan</label><input v-model=\"register.uid\" readonly placeholder=\"Tahan tombol 3 detik, lalu tap kartu\"><label>Nama pengguna</label><input v-model.trim=\"register.name\" placeholder=\"Nama pemilik kartu\"><label>Saldo awal</label><input v-model.number=\"register.balance\" type=\"number\" min=\"0\" step=\"1000\"><button :disabled=\"busy\" @click=\"registerUser\">DAFTARKAN KARTU</button></section>\n   <section class=\"panel\"><h3>Isi Saldo</h3><label>Pilih kartu</label><select v-model=\"topup.uid\"><option value=\"\">Pilih pengguna</option><option v-for=\"u in users\" :key=\"u.uid\" :value=\"u.uid\">{{u.name}} — {{u.uid}}</option></select><label>Nominal isi saldo</label><input v-model.number=\"topup.amount\" type=\"number\" min=\"1000\" step=\"1000\"><button :disabled=\"busy\" @click=\"topupBalance\">ISI SALDO</button></section>\n  </div>\n  <section class=\"panel table-panel\"><div class=\"panel-title\"><h3>Daftar Pengguna</h3><button class=\"small\" @click=\"refresh\">Refresh</button></div><div class=\"table-wrap\"><table><thead><tr><th>Nama</th><th>UID</th><th>Saldo</th><th>Diperbarui</th></tr></thead><tbody><tr v-for=\"u in users\" :key=\"u.id\"><td>{{u.name}}</td><td class=\"mono\">{{u.uid}}</td><td>{{rupiah(u.balance)}}</td><td>{{u.updated_at}}</td></tr><tr v-if=\"!users.length\"><td colspan=\"4\">Belum ada kartu terdaftar.</td></tr></tbody></table></div></section>\n  <section class=\"panel table-panel\"><h3>Riwayat Transaksi</h3><div class=\"table-wrap\"><table><thead><tr><th>Waktu</th><th>Nama</th><th>UID</th><th>Status</th><th>Biaya</th><th>Saldo Akhir</th><th>Keterangan</th></tr></thead><tbody><tr v-for=\"t in pagedHistory\" :key=\"t.id\"><td>{{t.created_at}}</td><td>{{t.name}}</td><td class=\"mono\">{{t.uid}}</td><td><span :class=\"['badge',t.status.toLowerCase()]\">{{t.status}}</span></td><td>{{rupiah(t.amount)}}</td><td>{{t.balance_after===null?'-':rupiah(t.balance_after)}}</td><td>{{reasonText(t.reason)}}</td></tr><tr v-if=\"!history.length\"><td colspan=\"7\">Belum ada transaksi.</td></tr></tbody></table></div>\n    <nav class=\"history-pagination\" aria-label=\"Halaman riwayat transaksi\" v-if=\"historyPages > 1\">\n      <span>Menampilkan {{historyStart}}–{{historyEnd}} dari {{history.length}} transaksi terakhir</span>\n      <div class=\"pagination-buttons\">\n        <button class=\"small\" :disabled=\"historyPage === 1\" @click=\"historyPage--\">Sebelumnya</button>\n        <span>Halaman {{historyPage}} / {{historyPages}}</span>\n        <button class=\"small\" :disabled=\"historyPage === historyPages\" @click=\"historyPage++\">Berikutnya</button>\n      </div>\n    </nav>\n  </section>\n </div>\n</div>\n</template>\n<script>\nexport default {\n  data() {\n    return {\n      fee: 5000,\n      busy: false,\n      operationMessage: '',\n      loggedIn: false,\n      token: '',\n      login: {\n        username: '',\n        password: ''\n      },\n      loginMessage: '',\n      register: {\n        uid: '',\n        name: '',\n        balance: 50000\n      },\n      topup: {\n        uid: '',\n        amount: 20000\n      },\n      users: [],\n      history: [],\n      historyPage: 1,\n      historyPageSize: 10\n    }\n  },\n  computed: {\n    historyPages() {\n      return Math.max(1, Math.ceil(this.history.length / this.historyPageSize))\n    },\n    historyStart() {\n      return this.history.length ? (this.historyPage - 1) * this.historyPageSize + 1 : 0\n    },\n    historyEnd() {\n      return Math.min(this.history.length, this.historyPage * this.historyPageSize)\n    },\n    pagedHistory() {\n      const start = (this.historyPage - 1) * this.historyPageSize;\n      return this.history.slice(start, start + this.historyPageSize)\n    }\n  },\n  watch: {\n    msg: {\n      deep: true,\n      handler(v) {\n        if (v && v.payload) this.handle(v.payload)\n      }\n    }\n  },\n  mounted() {\n    this.loadSwal()\n  },\n  methods: {\n    sendAction(action, data = {}) {\n      this.send({\n        payload: {\n          action,\n          token: this.token,\n          ...data\n        }\n      })\n    },\n    doLogin() {\n      this.send({\n        payload: {\n          action: 'admin_login',\n          username: this.login.username,\n          password: this.login.password\n        }\n      })\n    },\n    logout() {\n      this.sendAction('admin_logout')\n    },\n    refresh() {\n      if (!this.loggedIn) return;\n      this.sendAction('get_users');\n      this.sendAction('get_history');\n      this.sendAction('get_settings')\n    },\n    saveFee() {\n      if (this.busy) return;\n      this.busy = true;\n      this.operationMessage = 'Menyimpan biaya...';\n      this.sendAction('set_fee', {\n        fee: this.fee\n      })\n    },\n    registerUser() {\n      if (this.busy) return;\n      this.busy = true;\n      this.operationMessage = 'Memproses pendaftaran...';\n      this.sendAction('register_user', this.register)\n    },\n    topupBalance() {\n      if (this.busy) return;\n      this.busy = true;\n      this.operationMessage = 'Memproses isi saldo...';\n      this.sendAction('topup_balance', this.topup)\n    },\n    rupiah(v) {\n      return new Intl.NumberFormat('id-ID', {\n        style: 'currency',\n        currency: 'IDR',\n        maximumFractionDigits: 0\n      }).format(Number(v || 0))\n    },\n    reasonText(v) {\n      return {\n        PAYMENT_SUCCESS: 'Pembayaran berhasil',\n        INSUFFICIENT_BALANCE: 'Saldo tidak cukup',\n        UID_NOT_REGISTERED: 'UID tidak terdaftar'\n      } [v] || v\n    },\n    loadSwal() {\n      if (window.Swal) return;\n      const s = document.createElement('script');\n      s.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';\n      document.head.appendChild(s)\n    },\n    notify(icon, title, text) {\n      this.operationMessage = text;\n      if (window.Swal) window.Swal.fire({\n        icon,\n        title,\n        text,\n        showConfirmButton: true,\n        confirmButtonText: 'OK',\n        allowOutsideClick: false,\n        allowEscapeKey: false,\n        position: 'center'\n      });\n      else window.alert(title + '\\n' + text)\n    },\n    handle(p) {\n      if (p.action === 'history_changed') {\n        if (this.loggedIn) {\n          this.sendAction('get_history');\n          this.sendAction('get_users')\n        }\n        return\n      }\n      if (p.action === 'fee_updated') {\n        this.fee = Number(p.fee);\n        return\n      }\n      if (p.action === 'registration_uid') {\n        if (this.loggedIn && !this.busy) {\n          this.register.uid = p.uid || '';\n          this.notify('info', 'Kartu Terdeteksi', 'UID: ' + this.register.uid + '. Silakan isi nama dan saldo awal.');\n        }\n        return;\n      }\n      if (p.action === 'login_result') {\n        this.loginMessage = p.message || '';\n        if (p.success) {\n          this.loggedIn = true;\n          this.token = p.token;\n          this.login.password = '';\n          this.refresh()\n        }\n        return\n      }\n      if (p.action === 'session_expired' || p.action === 'logout_result') {\n        this.busy = false;\n        this.loggedIn = false;\n        this.token = '';\n        this.users = [];\n        this.history = [];\n        this.historyPage = 1;\n        this.loginMessage = p.message || '';\n        return\n      }\n      if (p.action === 'users_data') {\n        this.users = p.users || [];\n        return\n      }\n      if (p.action === 'history_data') {\n        this.history = p.history || [];\n        this.historyPage = Math.min(this.historyPage, this.historyPages);\n        return\n      }\n      if (p.action === 'operation_result') {\n        this.busy = false;\n        this.notify(p.success ? 'success' : 'error', p.success ? 'Berhasil' : 'Gagal', p.message || '');\n        if (p.success) {\n          if (p.operation === 'register') {\n            this.register.name = '';\n            this.register.uid = '';\n          }\n          this.refresh()\n        }\n        return\n      }\n    }\n  }\n}\n</script>\n<style>\n.admin-shell {\n  font-family:Inter,Arial,sans-serif;\n  max-width:1200px;\n  margin:auto;\n  color:#13233c\n}\n.admin-shell .login-card {\n  max-width:390px;\n  margin:60px auto;\n  padding:30px;\n  background:#fff;\n  border:1px solid #dbe3ee;\n  border-radius:20px;\n  text-align:center;\n  box-shadow:0 15px 40px #0f172a14\n}\n.admin-shell .lock {\n  font-size:35px\n}\n.admin-shell .login-card p {\n  color:#64748b\n}\n.admin-shell .login-card input,.admin-shell .panel input,.admin-shell .panel select {\n  box-sizing:border-box;\n  width:100%;\n  margin:6px 0 12px;\n  padding:12px;\n  border:1px solid #cbd5e1;\n  border-radius:10px;\n  background:#fff\n}\n.admin-shell .login-card button,.admin-shell .panel button,.admin-shell .admin-header button {\n  padding:12px 18px;\n  border:0;\n  border-radius:10px;\n  background:#1558b0;\n  color:#fff;\n  font-weight:800;\n  cursor:pointer\n}\n.admin-shell .login-card button {\n  width:100%\n}\n.admin-shell .login-card small {\n  display:block;\n  min-height:20px;\n  margin-top:12px;\n  color:#dc2626\n}\n.admin-shell .admin-header {\n  display:flex;\n  justify-content:space-between;\n  align-items:center;\n  padding:20px 24px;\n  background:#102c55;\n  color:#fff;\n  border-radius:18px\n}\n.admin-shell .admin-header span {\n  font-size:11px;\n  letter-spacing:.12em\n}\n.admin-shell .admin-header h2 {\n  margin:4px 0\n}\n.admin-shell .admin-header .ghost {\n  background:#ffffff20\n}\n.admin-shell .admin-grid {\n  display:grid;\n  grid-template-columns:1fr 1fr;\n  gap:16px;\n  margin-top:16px\n}\n.admin-shell .panel {\n  padding:20px;\n  background:#fff;\n  border:1px solid #dbe3ee;\n  border-radius:16px\n}\n.admin-shell .panel h3 {\n  margin-top:0\n}\n.admin-shell .panel label {\n  font-size:12px;\n  font-weight:800;\n  color:#475569\n}\n.admin-shell .table-panel {\n  margin-top:16px\n}\n.admin-shell .panel-title {\n  display:flex;\n  justify-content:space-between\n}\n.admin-shell .panel .small {\n  padding:8px 13px\n}\n.admin-shell .table-wrap {\n  overflow:auto\n}\n.admin-shell table {\n  width:100%;\n  border-collapse:collapse;\n  font-size:13px\n}\n.admin-shell th,.admin-shell td {\n  padding:11px;\n  border-bottom:1px solid #e2e8f0;\n  text-align:left;\n  white-space:nowrap\n}\n.admin-shell th {\n  background:#f8fafc;\n  color:#475569\n}\n.admin-shell .mono {\n  font-family:Consolas,monospace\n}\n.admin-shell .badge {\n  padding:5px 9px;\n  border-radius:99px;\n  font-weight:800\n}\n.admin-shell .badge.paid {\n  color:#15803d;\n  background:#dcfce7\n}\n.admin-shell .badge.denied {\n  color:#b91c1c;\n  background:#fee2e2\n}\n@media(max-width:760px) {\n  .admin-shell .admin-grid {\n    grid-template-columns:1fr\n  }\n  .admin-shell .admin-header {\n    align-items:flex-start;\n    gap:12px\n  }\n}\n.admin-shell {\n  width: 100%;\n  max-width: none;\n  box-sizing: border-box;\n  padding: clamp(12px, 2vw, 28px);\n}\n.admin-shell > div, .admin-shell .panel, .admin-shell .admin-grid > section {\n  min-width: 0;\n}\n.admin-shell .admin-header {\n  gap: 20px;\n}\n.admin-shell .admin-header h2 {\n  line-height: 1.2;\n}\n.admin-shell p[role=\"status\"] {\n  min-height: 1.5em;\n  margin: 16px 2px;\n}\n.admin-shell .admin-grid {\n  grid-template-columns: repeat(2, minmax(0, 1fr));\n  gap: 20px;\n  margin-top: 20px;\n}\n.admin-shell .panel {\n  padding: clamp(18px, 2vw, 26px);\n}\n.admin-shell .panel label {\n  display: block;\n  margin-top: 8px;\n  line-height: 1.4;\n}\n.admin-shell .panel input, .admin-shell .panel select {\n  margin-top: 8px;\n  margin-bottom: 18px;\n}\n.admin-shell .panel button {\n  margin-top: 4px;\n}\n.admin-shell .panel-title {\n  align-items: center;\n  gap: 12px;\n  flex-wrap: wrap;\n  margin-bottom: 8px;\n}\n.admin-shell .panel-title h3 {\n  margin-bottom: 0;\n}\n.admin-shell .table-panel {\n  margin-top: 20px;\n}\n.admin-shell .table-wrap {\n  width: 100%;\n  overflow-x: auto;\n  margin-top: 14px;\n}\n.admin-shell th, .admin-shell td {\n  padding: 12px 14px;\n}\n.admin-shell .history-pagination {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  gap: 14px;\n  flex-wrap: wrap;\n  margin-top: 16px;\n  color: #475569;\n  font-size: 13px;\n}\n.admin-shell .pagination-buttons {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n  flex-wrap: wrap;\n}\n.admin-shell button:disabled {\n  opacity: .55;\n  cursor: not-allowed;\n}\n@media (max-width: 800px) {\n  .admin-shell .admin-grid {\n    grid-template-columns: 1fr;\n  }\n  .admin-shell .admin-header {\n    align-items: flex-start;\n    flex-wrap: wrap;\n  }\n}\n</style>\n",
-        "storeOutMessages": false,
-        "passthru": false,
-        "resendOnRefresh": false,
-        "templateScope": "local",
-        "className": "",
-        "x": 180,
-        "y": 760,
-        "wires": [
-            [
-                "c92f72ac6c7f2769"
-            ]
-        ]
-    },
-    {
-        "id": "e153b39982864f4e",
-        "type": "catch",
-        "z": "97115755fcb80f56",
-        "name": "Tangkap Error",
-        "scope": null,
-        "uncaught": false,
-        "x": 180,
-        "y": 1130,
-        "wires": [
-            [
-                "99c7b67e5ddd6ced",
-                "4e36d55a53b0385f"
-            ]
-        ]
-    },
-    {
-        "id": "99c7b67e5ddd6ced",
-        "type": "debug",
-        "z": "97115755fcb80f56",
-        "name": "Error Sistem Tol",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 470,
-        "y": 1080,
-        "wires": []
-    },
-    {
-        "id": "3ffe56f7aaa66dec",
-        "type": "comment",
-        "z": "97115755fcb80f56",
-        "name": "Ganti identitas 2 mahasiswa pada data().students. Admin: admin / admin123. Ganti sandi di Admin Login dan Router.",
-        "info": "Setelah import, pasang @flowfuse/node-red-dashboard dan node-red-node-sqlite. Ubah kredensial admin pada Function 'Admin Login dan Router'.",
-        "x": 450,
-        "y": 1300,
-        "wires": []
-    },
-    {
-        "id": "40f05999c4088b29",
-        "type": "function",
-        "z": "97115755fcb80f56",
-        "name": "Database siap",
-        "func": "flow.set(\"toll_db_ready\", true);\nnode.status({\n  fill: \"green\",\n  shape: \"dot\",\n  text: \"Database siap\"\n});\nmsg.params = {};\nreturn msg;\n",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1080,
-        "y": 100,
-        "wires": [
-            [
-                "31b1b58760bfc04e"
-            ]
-        ]
-    },
-    {
-        "id": "8ac959f908b035f0",
-        "type": "sqlite",
-        "z": "97115755fcb80f56",
-        "mydb": "toll_sqlite_db",
-        "sqlquery": "prepared",
-        "sql": "INSERT INTO users(uid,name,balance) VALUES($uid,$name,$balance) ON CONFLICT(uid) DO NOTHING RETURNING id,uid,name,balance",
-        "name": "Daftar kartu - parameter",
-        "x": 800,
-        "y": 650,
-        "wires": [
-            [
-                "7be8673399f00440"
-            ]
-        ]
-    },
-    {
-        "id": "c9121dc033ff890b",
-        "type": "sqlite",
-        "z": "97115755fcb80f56",
-        "mydb": "toll_sqlite_db",
-        "sqlquery": "prepared",
-        "sql": "UPDATE users SET balance=balance+$amount,updated_at=datetime('now','localtime') WHERE uid=$uid AND balance <= 9007199254740991-$amount RETURNING id,uid,name,balance",
-        "name": "Isi saldo - parameter",
-        "x": 800,
-        "y": 710,
-        "wires": [
-            [
-                "7be8673399f00440"
-            ]
-        ]
-    },
-    {
-        "id": "38e1f003697b286f",
-        "type": "function",
-        "z": "97115755fcb80f56",
-        "name": "Baca hasil tersimpan",
-        "func": "msg.params = {\n  $event_id: msg._event.event_id\n};\nreturn msg;\n",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1350,
-        "y": 300,
-        "wires": [
-            [
-                "4466de93b04e0b56"
-            ]
-        ]
-    },
-    {
-        "id": "4466de93b04e0b56",
-        "type": "sqlite",
-        "z": "97115755fcb80f56",
-        "mydb": "toll_sqlite_db",
-        "sqlquery": "prepared",
-        "sql": "SELECT t.*,u.name FROM transactions t LEFT JOIN users u ON u.id=t.user_id WHERE t.event_id=$event_id",
-        "name": "Hasil transaksi",
-        "x": 1630,
-        "y": 300,
-        "wires": [
-            [
-                "710c60246c503a39"
-            ]
-        ]
-    },
-    {
-        "id": "4e36d55a53b0385f",
-        "type": "function",
-        "z": "97115755fcb80f56",
-        "name": "Error ke admin",
-        "func": "if (!msg._client) return null;\nreturn {\n  _client: msg._client,\n  payload: {\n    action: 'operation_result',\n    success: false,\n    message: 'Operasi database gagal. Periksa Debug Error Sistem Tol.'\n  }\n};\n",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 470,
-        "y": 1170,
-        "wires": [
-            [
-                "08d542fbc4875a8c"
-            ]
-        ]
-    },
-    {
-        "id": "00fa328c76d7b674",
-        "type": "sqlite",
-        "z": "97115755fcb80f56",
-        "mydb": "toll_sqlite_db",
-        "sqlquery": "prepared",
-        "sql": "SELECT fee FROM settings WHERE id=1",
-        "name": "Baca biaya tersimpan",
-        "x": 800,
-        "y": 880,
-        "wires": [
-            [
-                "d78849d5cc1e85dc"
-            ]
-        ]
-    },
-    {
-        "id": "fc8b8f3643a860d4",
-        "type": "sqlite",
-        "z": "97115755fcb80f56",
-        "mydb": "toll_sqlite_db",
-        "sqlquery": "prepared",
-        "sql": "UPDATE settings SET fee=$fee WHERE id=1 RETURNING fee",
-        "name": "Simpan biaya",
-        "x": 780,
-        "y": 960,
-        "wires": [
-            [
-                "d78849d5cc1e85dc"
-            ]
-        ]
-    },
-    {
-        "id": "d78849d5cc1e85dc",
-        "type": "function",
-        "z": "97115755fcb80f56",
-        "name": "Respons biaya",
-        "func": "const row = Array.isArray(msg.payload) ? msg.payload[0] : null;\nif (!row) {\n  node.error('Biaya belum tersedia', msg);\n  return null;\n}\nconst fee = Number(row.fee);\nconst setting = {\n  payload: {\n    action: 'fee_updated',\n    fee\n  }\n};\nif (msg._admin_action === 'fee_update') return [setting, {\n  _client: msg._client,\n  payload: {\n    action: 'operation_result',\n    operation: 'fee_update',\n    success: true,\n    message: 'Biaya sekali tap berhasil diperbarui',\n    fee\n  }\n}];\nif (msg._client) {\n  setting._client = msg._client;\n  return msg._public_request ? [setting, null] : [null, setting];\n}\nreturn [setting, null];\n",
-        "outputs": 2,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1040,
-        "y": 920,
-        "wires": [
-            [
-                "38b4e65ba82d1615"
-            ],
-            [
-                "b127982b137adf3f"
-            ]
-        ]
-    },
-    {
-        "id": "2a2769826cd083d4",
-        "type": "function",
-        "z": "97115755fcb80f56",
-        "name": "Minta biaya halaman publik",
-        "func": "if (msg.payload?.action !== 'get_public_settings') return null;\nmsg._public_request = true;\nmsg.params = {};\nreturn msg;\n",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 2470,
-        "y": 570,
-        "wires": [
-            [
-                "368fdc782d3c2113"
-            ]
-        ]
-    },
-    {
-        "id": "32da48a5908d40c9",
-        "type": "link in",
-        "z": "97115755fcb80f56",
-        "name": "Masuk: Query Admin",
-        "links": [
-            "d621f354e352f4ac",
-            "382b801afff6f305"
-        ],
-        "x": 610,
-        "y": 920,
-        "wires": [
-            [
-                "8677f60ff46e6a46"
-            ]
-        ]
-    },
-    {
-        "id": "d621f354e352f4ac",
-        "type": "link out",
-        "z": "97115755fcb80f56",
-        "name": "Ke: Query Admin",
-        "mode": "link",
-        "links": [
-            "32da48a5908d40c9"
-        ],
-        "x": 630,
-        "y": 940,
-        "wires": []
-    },
-    {
-        "id": "223f7da28c359dab",
-        "type": "link in",
-        "z": "97115755fcb80f56",
-        "name": "Masuk: Baca biaya tersimpan",
-        "links": [
-            "368fdc782d3c2113",
-            "31b1b58760bfc04e",
-            "caf8f8faca9d9542"
-        ],
-        "x": 610,
-        "y": 1010,
-        "wires": [
-            [
-                "00fa328c76d7b674"
-            ]
-        ]
-    },
-    {
-        "id": "368fdc782d3c2113",
-        "type": "link out",
-        "z": "97115755fcb80f56",
-        "name": "Ke: Baca biaya tersimpan",
-        "mode": "link",
-        "links": [
-            "223f7da28c359dab"
-        ],
-        "x": 2630,
-        "y": 645,
-        "wires": []
-    },
-    {
-        "id": "3a15ddd481e1273f",
-        "type": "link in",
-        "z": "97115755fcb80f56",
-        "name": "Masuk: Admin Kartu dan Transaksi",
-        "links": [
-            "08d542fbc4875a8c",
-            "1c5429e735937e60",
-            "d165b3183e896adc",
-            "b127982b137adf3f",
-            "059b4dca79b2c4fa"
-        ],
-        "x": 75,
-        "y": 860,
-        "wires": [
-            [
-                "b1d7d131b4b7ee76"
-            ]
-        ]
-    },
-    {
-        "id": "08d542fbc4875a8c",
-        "type": "link out",
-        "z": "97115755fcb80f56",
-        "name": "Ke: Admin Kartu dan Transaksi",
-        "mode": "link",
-        "links": [
-            "3a15ddd481e1273f"
-        ],
-        "x": 630,
-        "y": 1245,
-        "wires": []
-    },
-    {
-        "id": "b0c116210b8e0e8f",
-        "type": "link in",
-        "z": "97115755fcb80f56",
-        "name": "Masuk: Dashboard Pembayaran Tol",
-        "links": [
-            "5b735c078479e055",
-            "38b4e65ba82d1615",
-            "ec45e4d89b76cb84"
-        ],
-        "x": 2270,
-        "y": 560,
-        "wires": [
-            [
-                "b3e776dc4366b1a7"
-            ]
-        ]
-    },
-    {
-        "id": "5b735c078479e055",
-        "type": "link out",
-        "z": "97115755fcb80f56",
-        "name": "Ke: Dashboard Pembayaran Tol",
-        "mode": "link",
-        "links": [
-            "b0c116210b8e0e8f"
-        ],
-        "x": 2070,
-        "y": 445,
-        "wires": []
-    },
-    {
-        "id": "382b801afff6f305",
-        "type": "link out",
-        "z": "97115755fcb80f56",
-        "name": "Ke: Query Admin",
-        "mode": "link",
-        "links": [
-            "32da48a5908d40c9"
-        ],
-        "x": 630,
-        "y": 975,
-        "wires": []
-    },
-    {
-        "id": "ad9f0a88f4113e56",
-        "type": "link in",
-        "z": "97115755fcb80f56",
-        "name": "Masuk: Simpan biaya",
-        "links": [
-            "710ca3a034c11c91"
-        ],
-        "x": 610,
-        "y": 1090,
-        "wires": [
-            [
-                "fc8b8f3643a860d4"
-            ]
-        ]
-    },
-    {
-        "id": "710ca3a034c11c91",
-        "type": "link out",
-        "z": "97115755fcb80f56",
-        "name": "Ke: Simpan biaya",
-        "mode": "link",
-        "links": [
-            "ad9f0a88f4113e56"
-        ],
-        "x": 630,
-        "y": 1045,
-        "wires": []
-    },
-    {
-        "id": "38b4e65ba82d1615",
-        "type": "link out",
-        "z": "97115755fcb80f56",
-        "name": "Ke: Dashboard Pembayaran Tol",
-        "mode": "link",
-        "links": [
-            "b0c116210b8e0e8f"
-        ],
-        "x": 1290,
-        "y": 1005,
-        "wires": []
-    },
-    {
-        "id": "1c5429e735937e60",
-        "type": "link out",
-        "z": "97115755fcb80f56",
-        "name": "Ke: Admin Kartu dan Transaksi",
-        "mode": "link",
-        "links": [
-            "3a15ddd481e1273f"
-        ],
-        "x": 1290,
-        "y": 855,
-        "wires": []
-    },
-    {
-        "id": "31b1b58760bfc04e",
-        "type": "link out",
-        "z": "97115755fcb80f56",
-        "name": "Ke: Baca biaya tersimpan",
-        "mode": "link",
-        "links": [
-            "223f7da28c359dab"
-        ],
-        "x": 1240,
-        "y": 175,
-        "wires": []
-    },
-    {
-        "id": "ec45e4d89b76cb84",
-        "type": "link out",
-        "z": "97115755fcb80f56",
-        "name": "Ke: Dashboard Pembayaran Tol",
-        "mode": "link",
-        "links": [
-            "b0c116210b8e0e8f"
-        ],
-        "x": 920,
-        "y": 555,
-        "wires": []
-    },
-    {
-        "id": "d165b3183e896adc",
-        "type": "link out",
-        "z": "97115755fcb80f56",
-        "name": "Ke: Admin Kartu dan Transaksi",
-        "mode": "link",
-        "links": [
-            "3a15ddd481e1273f"
-        ],
-        "x": 920,
-        "y": 410,
-        "wires": []
-    },
-    {
-        "id": "caf8f8faca9d9542",
-        "type": "link out",
-        "z": "97115755fcb80f56",
-        "name": "Ke: Baca biaya tersimpan",
-        "mode": "link",
-        "links": [
-            "223f7da28c359dab"
-        ],
-        "x": 630,
-        "y": 1010,
-        "wires": []
-    },
-    {
-        "id": "230526096b12ab91",
-        "type": "link in",
-        "z": "97115755fcb80f56",
-        "name": "Masuk: Daftar kartu - parameter",
-        "links": [
-            "624e196bca1799f1"
-        ],
-        "x": 610,
-        "y": 780,
-        "wires": [
-            [
-                "8ac959f908b035f0"
-            ]
-        ]
-    },
-    {
-        "id": "624e196bca1799f1",
-        "type": "link out",
-        "z": "97115755fcb80f56",
-        "name": "Ke: Daftar kartu - parameter",
-        "mode": "link",
-        "links": [
-            "230526096b12ab91"
-        ],
-        "x": 630,
-        "y": 870,
-        "wires": []
-    },
-    {
-        "id": "b127982b137adf3f",
-        "type": "link out",
-        "z": "97115755fcb80f56",
-        "name": "Ke: Admin Kartu dan Transaksi",
-        "mode": "link",
-        "links": [
-            "3a15ddd481e1273f"
-        ],
-        "x": 1290,
-        "y": 1040,
-        "wires": []
-    },
-    {
-        "id": "059b4dca79b2c4fa",
-        "type": "link out",
-        "z": "97115755fcb80f56",
-        "name": "Ke: Admin Kartu dan Transaksi",
-        "mode": "link",
-        "links": [
-            "3a15ddd481e1273f"
-        ],
-        "x": 630,
-        "y": 835,
-        "wires": []
-    },
-    {
-        "id": "28a64e91ae0338b8",
-        "type": "link in",
-        "z": "97115755fcb80f56",
-        "name": "Masuk: Isi saldo - parameter",
-        "links": [
-            "b4c893e9460acb8d"
-        ],
-        "x": 610,
-        "y": 840,
-        "wires": [
-            [
-                "c9121dc033ff890b"
-            ]
-        ]
-    },
-    {
-        "id": "b4c893e9460acb8d",
-        "type": "link out",
-        "z": "97115755fcb80f56",
-        "name": "Ke: Isi saldo - parameter",
-        "mode": "link",
-        "links": [
-            "28a64e91ae0338b8"
-        ],
-        "x": 630,
-        "y": 905,
-        "wires": []
-    },
-    {
-        "id": "c3558e578f704fba",
-        "type": "link in",
-        "z": "97115755fcb80f56",
-        "name": "Masuk: Minta biaya halaman publik",
-        "links": [
-            "d4ed1b714eec57f2"
-        ],
-        "x": 2280,
-        "y": 700,
-        "wires": [
-            [
-                "2a2769826cd083d4"
-            ]
-        ]
-    },
-    {
-        "id": "d4ed1b714eec57f2",
-        "type": "link out",
-        "z": "97115755fcb80f56",
-        "name": "Ke: Minta biaya halaman publik",
-        "mode": "link",
-        "links": [
-            "c3558e578f704fba"
-        ],
-        "x": 2620,
-        "y": 505,
-        "wires": []
-    },
-    {
-        "id": "0f569eafe8b5db8a",
-        "type": "comment",
-        "z": "97115755fcb80f56",
-        "name": "01 | DATABASE",
-        "info": "",
-        "x": 140,
-        "y": 40,
-        "wires": []
-    },
-    {
-        "id": "59f505bfd9fd4431",
-        "type": "comment",
-        "z": "97115755fcb80f56",
-        "name": "02 | RFID DAN PEMBAYARAN",
-        "info": "",
-        "x": 190,
-        "y": 220,
-        "wires": []
-    },
-    {
-        "id": "ae8979afc0599d99",
-        "type": "comment",
-        "z": "97115755fcb80f56",
-        "name": "03 | FEEDBACK PERANGKAT",
-        "info": "",
-        "x": 210,
-        "y": 420,
-        "wires": []
-    },
-    {
-        "id": "129575d3227a5afe",
-        "type": "comment",
-        "z": "97115755fcb80f56",
-        "name": "04 | DASHBOARD DAN ADMIN",
-        "info": "",
-        "x": 230,
-        "y": 620,
-        "wires": []
-    },
-    {
-        "id": "370bca20b0286c1d",
-        "type": "comment",
-        "z": "97115755fcb80f56",
-        "name": "05 | DIAGNOSTIK",
-        "info": "",
-        "x": 190,
-        "y": 1060,
-        "wires": []
-    },
-    {
-        "id": "toll_mqtt_broker",
-        "type": "mqtt-broker",
-        "name": "EMQX Public Toll",
-        "broker": "broker.emqx.io",
-        "port": "1883",
-        "clientid": "",
-        "autoConnect": true,
-        "usetls": false,
-        "protocolVersion": "4",
-        "keepalive": "60",
-        "cleansession": true,
-        "autoUnsubscribe": true,
-        "birthTopic": "",
-        "birthQos": "0",
-        "birthPayload": "",
-        "birthMsg": {},
-        "closeTopic": "",
-        "closeQos": "0",
-        "closePayload": "",
-        "closeMsg": {},
-        "willTopic": "",
-        "willQos": "0",
-        "willPayload": "",
-        "willMsg": {}
-    },
-    {
-        "id": "toll_sqlite_db",
-        "type": "sqlitedb",
-        "db": "toll_rfid.db",
-        "mode": "RWC"
-    },
-    {
-        "id": "e262be15dbf1e1c9",
-        "type": "ui-group",
-        "name": "Pembayaran",
-        "page": "58ad2fa8d9d0a861",
-        "width": "12",
-        "height": "1",
-        "order": 1,
-        "showTitle": false,
-        "className": "",
-        "visible": "true",
-        "disabled": "false",
-        "groupType": "default"
-    },
-    {
-        "id": "1d434d868efead9d",
-        "type": "ui-group",
-        "name": "Administrasi",
-        "page": "7067dfc457ae75ac",
-        "width": "12",
-        "height": "1",
-        "order": 1,
-        "showTitle": false,
-        "className": "",
-        "visible": "true",
-        "disabled": "false",
-        "groupType": "default"
-    },
-    {
-        "id": "58ad2fa8d9d0a861",
-        "type": "ui-page",
-        "name": "Pembayaran Tol",
-        "ui": "0df8b8a20bb13f1b",
-        "path": "/payment",
-        "icon": "contactless-payment-circle",
-        "layout": "grid",
-        "theme": "toll_ui_theme",
-        "breakpoints": [
-            {
-                "name": "Default",
-                "px": "0",
-                "cols": "3"
-            },
-            {
-                "name": "Tablet",
-                "px": "576",
-                "cols": "6"
-            },
-            {
-                "name": "Small Desktop",
-                "px": "768",
-                "cols": "9"
-            },
-            {
-                "name": "Desktop",
-                "px": "1024",
-                "cols": "12"
-            }
-        ],
-        "tabs": [],
-        "order": 18,
-        "className": "",
-        "visible": "true",
-        "disabled": "false"
-    },
-    {
-        "id": "7067dfc457ae75ac",
-        "type": "ui-page",
-        "name": "Admin Pembayaran Tol",
-        "ui": "0df8b8a20bb13f1b",
-        "path": "/admin",
-        "icon": "security",
-        "layout": "grid",
-        "theme": "toll_ui_theme",
-        "breakpoints": [
-            {
-                "name": "Default",
-                "px": "0",
-                "cols": "3"
-            },
-            {
-                "name": "Tablet",
-                "px": "576",
-                "cols": "6"
-            },
-            {
-                "name": "Small Desktop",
-                "px": "768",
-                "cols": "9"
-            },
-            {
-                "name": "Desktop",
-                "px": "1024",
-                "cols": "12"
-            }
-        ],
-        "tabs": [],
-        "order": 2,
-        "className": "",
-        "visible": "true",
-        "disabled": "false"
-    },
-    {
-        "id": "0df8b8a20bb13f1b",
-        "type": "ui-base",
-        "name": "My Dashboard",
-        "path": "/dashboard",
-        "appIcon": "",
-        "includeClientData": true,
-        "acceptsClientConfig": [
-            "ui-notification",
-            "ui-control"
-        ],
-        "showPathInSidebar": false,
-        "headerContent": "page",
-        "navigationStyle": "default",
-        "titleBarStyle": "default",
-        "showReconnectNotification": true,
-        "notificationDisplayTime": 1,
-        "showDisconnectNotification": true,
-        "allowInstall": true
-    },
-    {
-        "id": "toll_ui_theme",
-        "type": "ui-theme",
-        "name": "Toll Light",
-        "colors": {
-            "surface": "#ffffff",
-            "primary": "#1558b0",
-            "bgPage": "#eef3f8",
-            "groupBg": "#eef3f8",
-            "groupOutline": "#eef3f8"
-        },
-        "sizes": {
-            "density": "default",
-            "pagePadding": "12px",
-            "groupGap": "12px",
-            "groupBorderRadius": "16px",
-            "widgetGap": "12px"
-        }
-    },
-    {
-        "id": "c87be189de277734",
-        "type": "global-config",
-        "env": [],
-        "modules": {
-            "node-red-node-sqlite": "2.0.1",
-            "@flowfuse/node-red-dashboard": "1.33.0"
-        }
+  {
+    "id": "916314cc65df36ac",
+    "type": "tab",
+    "label": "RFID Toll Payment",
+    "disabled": false,
+    "info": "Perbaikan flow tol RFID - MFRC522v2 firmware tetap.\n\n1. Ganti flow lama, jangan jalankan dua flow pembayaran terhadap database yang sama. Pertahankan path database lama pada konfigurasi SQLite.\n2. Dependensi: @flowfuse/node-red-dashboard dan node-red-node-sqlite.\n3. Login awal admin / admin123. Ganti pada Function Admin Login dan Router. Login ini pembatas aplikasi praktikum; untuk akses internet gunakan autentikasi/HTTPS pada server.\n4. Dua identitas: edit data().students di Dashboard Pembayaran Tol. Foto: /images/student-1.jpg dan /images/student-2.jpg, tersedia fallback bila foto belum ada.\n5. Halaman admin: Biaya Sekali Tap > SIMPAN BIAYA. Default 5000 hanya untuk database baru. Tabel settings menyimpan tarif, users dan transactions tetap tabel utama berelasi.\n6. Pendaftaran menggunakan prepared statement. Notifikasi operasi admin memiliki tombol OK tanpa timer.\n7. Pembayaran: INSERT transaksi + trigger debit dalam satu statement atomik. event_id unik mencegah debit ulang. Respons PAID dikirim setelah query selesai. Jangan melakukan UPDATE debit manual pada flow lain.\n8. Standby menunggu EXECUTION_COMPLETE dengan event_id yang sama.\n9. Tarif 0 berarti gratis untuk kartu terdaftar. Nilai rupiah harus bilangan bulat.\n10. Diuji: sintaks JS/JSON, referensi node, binding parameter, sesi per socket, pendaftaran/UID duplikat, topup, pembayaran/duplikat, saldo kurang, UID tidak dikenal, persistensi tarif, rollback. Belum diuji end-to-end dengan perangkat fisik pada revisi ini.\n"
+  },
+  {
+    "id": "ebe1051a7383da89",
+    "type": "inject",
+    "z": "916314cc65df36ac",
+    "name": "1x Inisialisasi Database",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": true,
+    "onceDelay": 1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 180,
+    "y": 100,
+    "wires": [
+      [
+        "ddf3f10dbf258508"
+      ]
+    ]
+  },
+  {
+    "id": "ddf3f10dbf258508",
+    "type": "function",
+    "z": "916314cc65df36ac",
+    "name": "Buat Tabel SQLite",
+    "func": "flow.set(\"toll_db_ready\", false);\nmsg.topic = \"PRAGMA foreign_keys = ON;\\n\\nCREATE TABLE IF NOT EXISTS users (\\n    id INTEGER PRIMARY KEY AUTOINCREMENT,\\n    uid TEXT NOT NULL UNIQUE,\\n    name TEXT NOT NULL,\\n    balance INTEGER NOT NULL DEFAULT 0 CHECK(balance >= 0),\\n    created_at TEXT NOT NULL DEFAULT (datetime('now','localtime')),\\n    updated_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))\\n);\\n\\nCREATE TABLE IF NOT EXISTS transactions (\\n    id INTEGER PRIMARY KEY AUTOINCREMENT,\\n    event_id TEXT NOT NULL UNIQUE,\\n    user_id INTEGER,\\n    uid TEXT NOT NULL,\\n    amount INTEGER NOT NULL DEFAULT 0,\\n    balance_before INTEGER,\\n    balance_after INTEGER,\\n    status TEXT NOT NULL CHECK(status IN ('PAID','DENIED')),\\n    reason TEXT NOT NULL,\\n    created_at TEXT NOT NULL DEFAULT (datetime('now','localtime')),\\n    FOREIGN KEY(user_id) REFERENCES users(id)\\n        ON UPDATE CASCADE\\n        ON DELETE SET NULL\\n);\\n\\nCREATE INDEX IF NOT EXISTS idx_transactions_time\\nON transactions(created_at);\\n\\nCREATE INDEX IF NOT EXISTS idx_transactions_uid\\nON transactions(uid);\\n\\nCREATE TRIGGER IF NOT EXISTS toll_debit_after_insert\\nAFTER INSERT ON transactions WHEN NEW.status = 'PAID'\\nBEGIN\\n UPDATE users SET balance=balance-NEW.amount, updated_at=datetime('now','localtime')\\n WHERE id=NEW.user_id AND balance>=NEW.amount;\\n SELECT CASE WHEN changes()!=1 THEN RAISE(ABORT,'DEBIT_FAILED') END;\\nEND;\\n\\nCREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY CHECK(id=1),fee INTEGER NOT NULL CHECK(fee>=0 AND fee<=1000000000));\\nINSERT OR IGNORE INTO settings(id,fee) VALUES(1,5000);\\n\";\nreturn msg;\n",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "flow.set(\"toll_db_ready\",false);",
+    "finalize": "",
+    "libs": [],
+    "x": 470,
+    "y": 100,
+    "wires": [
+      [
+        "16a3e63822adfe68"
+      ]
+    ]
+  },
+  {
+    "id": "65e006509bdaf25d",
+    "type": "mqtt in",
+    "z": "916314cc65df36ac",
+    "name": "RFID Event",
+    "topic": "toll/kelompok-00/rfid/event",
+    "qos": "0",
+    "datatype": "auto",
+    "broker": "toll_mqtt_broker",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "inputs": 0,
+    "x": 140,
+    "y": 300,
+    "wires": [
+      [
+        "a9333c043e348d52"
+      ]
+    ]
+  },
+  {
+    "id": "a9333c043e348d52",
+    "type": "json",
+    "z": "916314cc65df36ac",
+    "name": "Parse RFID JSON",
+    "property": "payload",
+    "action": "obj",
+    "pretty": false,
+    "x": 470,
+    "y": 300,
+    "wires": [
+      [
+        "7d50ff97df7978c1"
+      ]
+    ]
+  },
+  {
+    "id": "7d50ff97df7978c1",
+    "type": "function",
+    "z": "916314cc65df36ac",
+    "name": "Validasi dan Route Mode",
+    "func": "const p = msg.payload;\nif (!p || p.group_id !== 'kelompok-00' || msg.retain) return null;\nconst uid = String(p.uid || '').trim().toUpperCase();\nif (!/^(?:[0-9A-F]{8}|[0-9A-F]{14}|[0-9A-F]{20})$/.test(uid) || !p.node_id || typeof p.event_id !== 'string' || !p.event_id || p.event_id.length > 160) {\n  node.warn('Event RFID tidak valid');\n  return null;\n}\nif (!flow.get('toll_db_ready')) {\n  node.error('Database belum siap', msg);\n  return null;\n}\nmsg._event = {\n  ...p,\n  uid\n};\nif (p.mode === 'REGISTER') return [null, {\n  payload: {\n    action: 'registration_uid',\n    uid,\n    event_id: p.event_id,\n    node_id: p.node_id\n  }\n}];\nif (p.mode !== 'PAYMENT') return null;\nmsg.params = {\n  $event_id: p.event_id,\n  $uid: uid\n};\nreturn [msg, null];\n",
+    "outputs": 2,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 760,
+    "y": 300,
+    "wires": [
+      [
+        "28786f98ae508671"
+      ],
+      [
+        "1c96590d8dd0d864"
+      ]
+    ]
+  },
+  {
+    "id": "28786f98ae508671",
+    "type": "sqlite",
+    "z": "916314cc65df36ac",
+    "mydb": "toll_sqlite_db",
+    "sqlquery": "prepared",
+    "sql": "INSERT INTO transactions(event_id,user_id,uid,amount,balance_before,balance_after,status,reason)\nSELECT $event_id,u.id,$uid,\n CASE WHEN u.balance >= (SELECT fee FROM settings WHERE id=1) THEN (SELECT fee FROM settings WHERE id=1) ELSE 0 END,u.balance,\n CASE WHEN u.balance >= (SELECT fee FROM settings WHERE id=1) THEN u.balance-(SELECT fee FROM settings WHERE id=1) ELSE u.balance END,\n CASE WHEN u.balance >= (SELECT fee FROM settings WHERE id=1) THEN 'PAID' ELSE 'DENIED' END,\n CASE WHEN u.id IS NULL THEN 'UID_NOT_REGISTERED' WHEN u.balance >= (SELECT fee FROM settings WHERE id=1) THEN 'PAYMENT_SUCCESS' ELSE 'INSUFFICIENT_BALANCE' END\nFROM (SELECT 1) AS seed LEFT JOIN users u ON u.uid=$uid\nWHERE 1 ON CONFLICT(event_id) DO NOTHING",
+    "name": "Pembayaran atomik",
+    "x": 1060,
+    "y": 300,
+    "wires": [
+      [
+        "af2e079995416c94"
+      ]
+    ]
+  },
+  {
+    "id": "b9e914219819dddf",
+    "type": "function",
+    "z": "916314cc65df36ac",
+    "name": "Hasil pembayaran tersimpan",
+    "func": "const e = msg._event;\nconst t = Array.isArray(msg.payload) ? msg.payload[0] : null;\nif (!t || t.uid !== e.uid) {\n  node.error('Hasil transaksi tidak cocok', msg);\n  return null;\n}\nconst reasonText = {\n  PAYMENT_SUCCESS: 'Pembayaran berhasil',\n  UID_NOT_REGISTERED: 'UID kartu tidak terdaftar',\n  INSUFFICIENT_BALANCE: 'Saldo tidak cukup'\n} [t.reason] || t.reason;\nconst mqtt = {\n  topic: `toll/${e.group_id}/esp32/command`,\n  payload: {\n    command: 'ACCESS_RESULT',\n    event_id: e.event_id,\n    result: t.status,\n    reason: reasonText\n  },\n  qos: 0,\n  retain: false\n};\nlet seen = context.get('seen') || {};\nconst now = Date.now();\nfor (const k of Object.keys(seen))\n  if (now - seen[k] > 300000) delete seen[k];\nconst duplicate = Boolean(seen[e.event_id]);\nseen[e.event_id] = now;\ncontext.set('seen', seen);\nconst ui = {\n  payload: {\n    action: 'access_result',\n    event_id: e.event_id,\n    uid: e.uid,\n    result: t.status,\n    reason: t.reason,\n    reason_text: reasonText,\n    user: t.user_id ? {\n      name: t.name,\n      balance_before: t.balance_before,\n      balance_after: t.balance_after\n    } : null\n  }\n};\nreturn [duplicate ? null : {\n  payload: {\n    action: 'history_changed'\n  }\n}, mqtt, duplicate ? null : ui];\n",
+    "outputs": 3,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 1910,
+    "y": 300,
+    "wires": [
+      [
+        "0c52515adabf5f13"
+      ],
+      [
+        "32bf5c19d285418a"
+      ],
+      [
+        "a32922c3acf7c0e1"
+      ]
+    ]
+  },
+  {
+    "id": "32bf5c19d285418a",
+    "type": "json",
+    "z": "916314cc65df36ac",
+    "name": "Command ke JSON",
+    "property": "payload",
+    "action": "str",
+    "pretty": false,
+    "x": 2200,
+    "y": 280,
+    "wires": [
+      [
+        "0d29d5ec885df385"
+      ]
+    ]
+  },
+  {
+    "id": "0d29d5ec885df385",
+    "type": "mqtt out",
+    "z": "916314cc65df36ac",
+    "name": "Perintah ESP32",
+    "topic": "",
+    "qos": "",
+    "retain": "",
+    "respTopic": "",
+    "contentType": "",
+    "userProps": "",
+    "correl": "",
+    "expiry": "",
+    "broker": "toll_mqtt_broker",
+    "x": 2460,
+    "y": 280,
+    "wires": []
+  },
+  {
+    "id": "72a12f5d39e9826a",
+    "type": "mqtt in",
+    "z": "916314cc65df36ac",
+    "name": "Feedback ESP32",
+    "topic": "toll/kelompok-00/esp32/status",
+    "qos": "0",
+    "datatype": "auto",
+    "broker": "toll_mqtt_broker",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "inputs": 0,
+    "x": 180,
+    "y": 480,
+    "wires": [
+      [
+        "8032865f97645dec"
+      ]
+    ]
+  },
+  {
+    "id": "8032865f97645dec",
+    "type": "json",
+    "z": "916314cc65df36ac",
+    "name": "Parse Feedback",
+    "property": "payload",
+    "action": "obj",
+    "pretty": false,
+    "x": 470,
+    "y": 480,
+    "wires": [
+      [
+        "bbd0647305b4abf1"
+      ]
+    ]
+  },
+  {
+    "id": "bbd0647305b4abf1",
+    "type": "function",
+    "z": "916314cc65df36ac",
+    "name": "Feedback ke Dashboard",
+    "func": "const p = msg.payload || {};\nif (p.group_id !== 'kelompok-00') return null;\nif (p.status === 'EXECUTION_COMPLETE') {\n  return {\n    payload: {\n      action: 'standby',\n      message: 'Silakan tap kartu',\n      last_result: p.result,\n      event_id: p.event_id\n    }\n  };\n}\nif (p.status === 'ONLINE') {\n  return {\n    payload: {\n      action: 'device_online',\n      message: 'Perangkat terhubung'\n    }\n  };\n}\nreturn null;\n",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 760,
+    "y": 480,
+    "wires": [
+      [
+        "91220dd457725883"
+      ]
+    ]
+  },
+  {
+    "id": "df7ea4c237b4fb46",
+    "type": "function",
+    "z": "916314cc65df36ac",
+    "name": "Admin Login dan Router",
+    "func": "const ADMIN_USERNAME = 'admin';\nconst ADMIN_PASSWORD = 'admin123';\nconst SESSION_MS = 30 * 60 * 1000;\nconst p = msg.payload || {};\nconst action = String(p.action || '');\nlet sessions = flow.get('toll_admin_sessions') || {};\nconst now = Date.now();\nfor (const key of Object.keys(sessions)) {\n  if (sessions[key].expires < now) delete sessions[key];\n}\n\nfunction direct(payload) {\n  return [{\n    payload,\n    _client: msg._client\n  }, null, null, null, null, null, null];\n}\nconst socketId = msg._client && msg._client.socketId;\nif (!socketId) return null;\n\nfunction cleanUid(value) {\n  return String(value || '').trim().toUpperCase();\n}\nif (action === 'admin_login') {\n  if (p.username === ADMIN_USERNAME && p.password === ADMIN_PASSWORD) {\n    const token = `${now}-${Math.random().toString(36).slice(2,14)}`;\n    sessions[token] = {\n      expires: now + SESSION_MS,\n      socketId\n    };\n    flow.set('toll_admin_sessions', sessions);\n    return direct({\n      action: 'login_result',\n      success: true,\n      token,\n      message: 'Login berhasil'\n    });\n  }\n  return direct({\n    action: 'login_result',\n    success: false,\n    message: 'Username atau password salah'\n  });\n}\nconst token = String(p.token || '');\nif (!token || !sessions[token] || sessions[token].expires < now || sessions[token].socketId !== socketId) {\n  return direct({\n    action: 'session_expired',\n    message: 'Sesi berakhir, silakan login kembali'\n  });\n}\nsessions[token] = {\n  expires: now + SESSION_MS,\n  socketId\n};\nflow.set('toll_admin_sessions', sessions);\nif (action === 'admin_logout') {\n  delete sessions[token];\n  flow.set('toll_admin_sessions', sessions);\n  return direct({\n    action: 'logout_result'\n  });\n}\nif (!flow.get('toll_db_ready')) return direct({\n  action: 'operation_result',\n  success: false,\n  message: 'Database belum siap. Periksa Debug.'\n});\nif (action === 'get_settings') {\n  msg.params = {};\n  return [null, null, null, null, null, msg, null];\n}\nif (action === 'set_fee') {\n  const fee = Number(p.fee);\n  if (p.fee === '' || p.fee == null || !Number.isSafeInteger(fee) || fee < 0 || fee > 1000000000) return direct({\n    action: 'operation_result',\n    success: false,\n    message: 'Biaya harus berupa rupiah bulat antara 0 sampai 1 miliar'\n  });\n  msg.params = {\n    $fee: fee\n  };\n  msg._admin_action = 'fee_update';\n  return [null, null, null, null, null, null, msg];\n}\nif (action === 'register_user') {\n  const uid = cleanUid(p.uid);\n  const name = String(p.name || '').trim();\n  const balance = Number(p.balance);\n  if (!/^(?:[0-9A-F]{8}|[0-9A-F]{14}|[0-9A-F]{20})$/.test(uid) || !name || name.length > 100 || p.balance === '' || p.balance == null || !Number.isSafeInteger(balance) || balance < 0) {\n    return direct({\n      action: 'operation_result',\n      success: false,\n      message: 'Data pendaftaran tidak valid'\n    });\n  }\n  msg.topic = 'INSERT INTO users (uid,name,balance) VALUES (?,?,?) ON CONFLICT(uid) DO NOTHING RETURNING id,uid,name,balance';\n  msg.params = {\n    $uid: uid,\n    $name: name,\n    $balance: balance\n  };\n  msg._admin_action = 'register';\n  return [null, msg, null, null, null];\n}\nif (action === 'topup_balance') {\n  const uid = cleanUid(p.uid);\n  const amount = Number(p.amount);\n  if (!/^(?:[0-9A-F]{8}|[0-9A-F]{14}|[0-9A-F]{20})$/.test(uid) || !Number.isSafeInteger(amount) || amount <= 0) {\n    return direct({\n      action: 'operation_result',\n      success: false,\n      message: 'UID atau nominal isi saldo tidak valid'\n    });\n  }\n  msg.topic = 'UPDATE users SET balance = balance + ?, updated_at = datetime(\\'now\\',\\'localtime\\') WHERE uid = ? RETURNING id,uid,name,balance';\n  msg.params = {\n    $amount: amount,\n    $uid: uid\n  };\n  msg._admin_action = 'topup';\n  return [null, null, msg, null, null];\n}\nif (action === 'update_user') {\n  const id = Number(p.id);\n  const name = String(p.name || '').trim();\n  const balance = Number(p.balance);\n  if (!Number.isSafeInteger(id) || id <= 0 || !name || name.length > 100 ||\n      p.balance === '' || p.balance == null || !Number.isSafeInteger(balance) || balance < 0) {\n    return direct({action:'operation_result',success:false,message:'Nama atau saldo tidak valid'});\n  }\n  msg.params = {$id:id,$name:name,$balance:balance};\n  msg._admin_action = 'update_user';\n  return [null,null,null,null,null,null,null,msg,null];\n}\nif (action === 'delete_user') {\n  const id = Number(p.id);\n  if (!Number.isSafeInteger(id) || id <= 0) {\n    return direct({action:'operation_result',success:false,message:'Pengguna tidak valid'});\n  }\n  msg.params = {$id:id};\n  msg._admin_action = 'delete_user';\n  return [null,null,null,null,null,null,null,null,msg];\n}\nif (action === 'get_users') {\n  msg.topic = 'SELECT id,uid,name,balance,created_at,updated_at FROM users ORDER BY name';\n  msg.payload = [];\n  msg._admin_action = 'users';\n  return [null, null, null, msg, null];\n}\nif (action === 'get_history') {\n  msg.topic = `SELECT t.id,t.created_at,t.uid,COALESCE(u.name,'Tidak terdaftar') AS name,t.amount,t.balance_before,t.balance_after,t.status,t.reason FROM transactions t LEFT JOIN users u ON u.id=t.user_id ORDER BY t.id DESC LIMIT 200`;\n  msg.payload = [];\n  msg._admin_action = 'history';\n  return [null, null, null, null, msg];\n}\nreturn direct({\n  action: 'operation_result',\n  success: false,\n  message: 'Perintah admin tidak dikenali'\n});\n",
+    "outputs": 9,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 470,
+    "y": 760,
+    "wires": [
+      [
+        "ffcb416eabd94971"
+      ],
+      [
+        "6128f54f33ec4108"
+      ],
+      [
+        "2ecd61deab059c51"
+      ],
+      [
+        "a99bb4aa2f062d78"
+      ],
+      [
+        "9f64c594d943d11b"
+      ],
+      [
+        "5344cb1c446c0c5e"
+      ],
+      [
+        "c689dfcb82d2e5fc"
+      ],
+      [
+        "8189860ba7f143c7"
+      ],
+      [
+        "89b77979dda04383"
+      ]
+    ]
+  },
+  {
+    "id": "c86a921216150be5",
+    "type": "sqlite",
+    "z": "916314cc65df36ac",
+    "mydb": "toll_sqlite_db",
+    "sqlquery": "msg.topic",
+    "sql": "",
+    "name": "Query Admin",
+    "x": 770,
+    "y": 800,
+    "wires": [
+      [
+        "941af95556d9c411"
+      ]
+    ]
+  },
+  {
+    "id": "941af95556d9c411",
+    "type": "function",
+    "z": "916314cc65df36ac",
+    "name": "Format Respons Admin",
+    "func": "const rows = Array.isArray(msg.payload) ? msg.payload : [];\nlet payload;\nswitch (msg._admin_action) {\n  case 'register':\n    payload = rows.length ? {\n      action: 'operation_result',\n      success: true,\n      message: 'Kartu berhasil didaftarkan'\n    } : {\n      action: 'operation_result',\n      success: false,\n      message: 'UID sudah terdaftar'\n    };\n    break;\n  case 'topup':\n    payload = rows.length ? {\n      action: 'operation_result',\n      success: true,\n      message: `Isi saldo berhasil. Saldo baru Rp ${Number(rows[0].balance).toLocaleString('id-ID')}`\n    } : {\n      action: 'operation_result',\n      success: false,\n      message: 'UID tidak ditemukan'\n    };\n    break;\n  case 'update_user':\n    payload = rows.length\n      ? {action:'operation_result',operation:'update_user',success:true,message:'Nama dan saldo berhasil diperbarui'}\n      : {action:'operation_result',operation:'update_user',success:false,message:'Pengguna tidak ditemukan'};\n    break;\n  case 'delete_user':\n    payload = rows.length\n      ? {action:'operation_result',operation:'delete_user',success:true,message:'Pengguna berhasil dihapus. Riwayat transaksi tetap tersimpan.'}\n      : {action:'operation_result',operation:'delete_user',success:false,message:'Pengguna tidak ditemukan'};\n    break;\n  case 'users':\n    payload = {\n      action: 'users_data',\n      users: rows\n    };\n    break;\n  case 'history':\n    payload = {\n      action: 'history_data',\n      history: rows\n    };\n    break;\n  default:\n    return null;\n}\npayload.operation = msg._admin_action;\nreturn {\n  payload,\n  _client: msg._client\n};\n",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 1070,
+    "y": 780,
+    "wires": [
+      [
+        "d888784d2c698e3e"
+      ]
+    ]
+  },
+  {
+    "id": "16a3e63822adfe68",
+    "type": "sqlite",
+    "z": "916314cc65df36ac",
+    "mydb": "toll_sqlite_db",
+    "sqlquery": "batch",
+    "sql": "",
+    "name": "Inisialisasi skema dan trigger",
+    "x": 780,
+    "y": 100,
+    "wires": [
+      [
+        "398c29bf11c1bc96"
+      ]
+    ]
+  },
+  {
+    "id": "8cdc3d59fee335b3",
+    "type": "debug",
+    "z": "916314cc65df36ac",
+    "name": "SQLite Result",
+    "active": false,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 770,
+    "y": 1130,
+    "wires": []
+  },
+  {
+    "id": "144977f3ed325661",
+    "type": "ui-template",
+    "z": "916314cc65df36ac",
+    "group": "baa8cc3c57271c12",
+    "page": "",
+    "ui": "",
+    "name": "Dashboard Pembayaran Tol",
+    "order": 1,
+    "width": "12",
+    "height": "0",
+    "head": "",
+    "format": "<template>\n<div class=\"toll-shell\">\n  <header class=\"student-header\">\n    <div class=\"identity-heading\"><div class=\"eyebrow\">Sistem Pembayaran Tol dengan RFID</div><div class=\"device-pill\"><span :class=\"['dot',deviceOnline?'online':'offline']\"></span>{{deviceOnline?'ESP32 TERDETEKSI':'MENUNGGU ESP32'}}</div></div>\n    <div class=\"student-list\"><article class=\"student-person\" v-for=\"(student,index) in students\" :key=\"index\"><img :src=\"student.photo\" @error=\"photoError\" class=\"student-photo\"><div><h2>{{student.name}}</h2><p>{{student.nim}}</p><p>{{student.className}}</p></div></article></div>\n  </header>\n  <section class=\"hero\">\n    <div><div class=\"eyebrow\">RFID TOLL PAYMENT</div><h1>Akses Pembayaran Tol</h1><p>Tempelkan kartu RFID pada reader untuk melakukan transaksi.</p></div>\n    <div class=\"fee-card\"><span>BIAYA SEKALI TAP</span><strong>{{rupiah(fee)}}</strong></div>\n  </section>\n  <section :class=\"['status-card',status.toLowerCase()]\">\n    <div class=\"status-icon\">{{statusIcon}}</div>\n    <div><span>STATUS TRANSAKSI</span><h2>{{status}}</h2><p>{{message}}</p></div>\n  </section>\n  <section class=\"detail-grid\">\n    <div><span>UID TERAKHIR</span><strong>{{lastUid || '-'}}</strong></div>\n    <div><span>NAMA PENGGUNA</span><strong>{{userName || '-'}}</strong></div>\n    <div><span>SALDO AKHIR</span><strong>{{balanceAfter === null ? '-' : rupiah(balanceAfter)}}</strong></div>\n  </section>\n</div>\n</template>\n<script>\nexport default {\n  data() {\n    return {\n      students: [{\n        name: 'Nama Mahasiswa 1',\n        nim: 'NIM Mahasiswa 1',\n        className: 'Kelas 1',\n        photo: '/images/student-1.jpg'\n      }, {\n        name: 'Nama Mahasiswa 2',\n        nim: 'NIM Mahasiswa 2',\n        className: 'Kelas 2',\n        photo: '/images/student-2.jpg'\n      }],\n      activeEventId: '',\n      fee: 5000,\n      status: 'STANDBY',\n      message: 'Silakan tap kartu',\n      lastUid: '',\n      userName: '',\n      balanceAfter: null,\n      deviceOnline: false\n    }\n  },\n  computed: {\n    statusIcon() {\n      return this.status === 'PAID' ? '✓' : this.status === 'DENIED' ? '×' : '⌁'\n    }\n  },\n  watch: {\n    msg: {\n      deep: true,\n      handler(v) {\n        if (v && v.payload) this.handle(v.payload)\n      }\n    }\n  },\n  mounted() {\n    this.loadSwal();\n    this.send({\n      payload: {\n        action: 'get_public_settings'\n      }\n    })\n  },\n  methods: {\n    rupiah(v) {\n      return new Intl.NumberFormat('id-ID', {\n        style: 'currency',\n        currency: 'IDR',\n        maximumFractionDigits: 0\n      }).format(Number(v || 0))\n    },\n    photoError(e) {\n      e.target.src = 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'120\\' height=\\'120\\' viewBox=\\'0 0 120 120\\'%3E%3Crect width=\\'120\\' height=\\'120\\' fill=\\'%23e5e7eb\\'/%3E%3Ccircle cx=\\'60\\' cy=\\'43\\' r=\\'22\\' fill=\\'%239ca3af\\'/%3E%3Cpath d=\\'M20 110c5-28 21-40 40-40s35 12 40 40\\' fill=\\'%239ca3af\\'/%3E%3C/svg%3E'\n    },\n    loadSwal() {\n      if (window.Swal) return;\n      const s = document.createElement('script');\n      s.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';\n      document.head.appendChild(s)\n    },\n    alert(icon, title, text) {\n      if (window.Swal) window.Swal.fire({\n        icon,\n        title,\n        text,\n        timer: 5000,\n        timerProgressBar: true,\n        showConfirmButton: false,\n        position: 'center'\n      })\n    },\n    handle(p) {\n      if (p.action === 'fee_updated') {\n        this.fee = Number(p.fee);\n        return\n      }\n      if (p.action === 'device_online') {\n        this.deviceOnline = true;\n        return\n      }\n      if (p.action === 'standby') {\n        if (!this.activeEventId || p.event_id !== this.activeEventId) return;\n        this.activeEventId = '';\n        this.status = 'STANDBY';\n        this.message = 'Silakan tap kartu';\n        this.lastUid = '';\n        this.userName = '';\n        this.balanceAfter = null;\n        return\n      }\n      if (p.action !== 'access_result') return;\n      if (this.activeEventId === p.event_id) return;\n      this.activeEventId = p.event_id;\n      this.deviceOnline = true;\n      this.lastUid = p.uid || '';\n      this.status = p.result;\n      this.message = p.reason_text || '';\n      this.userName = p.user ? p.user.name : '';\n      this.balanceAfter = p.user ? p.user.balance_after : null;\n      if (p.result === 'PAID') this.alert('success', 'Pembayaran Berhasil', `Saldo tersisa ${this.rupiah(this.balanceAfter)}`);\n      else this.alert('error', 'Pembayaran Ditolak', p.reason_text || 'Kartu tidak dapat diproses');\n    }\n  }\n}\n</script>\n<style>\n.toll-shell {\n  font-family:Inter,Arial,sans-serif;\n  max-width:1180px;\n  margin:auto;\n  color:#10213b\n}\n.toll-shell .student-header,.toll-shell .hero,.toll-shell .status-card,.toll-shell .detail-grid {\n  display:flex;\n  align-items:center\n}\n.toll-shell .student-header {\n  gap:16px;\n  padding:18px 22px;\n  background:#fff;\n  border:1px solid #dce4ee;\n  border-radius:18px\n}\n.toll-shell .student-photo {\n  width:72px;\n  height:72px;\n  border-radius:50%;\n  object-fit:cover;\n  border:3px solid #2563eb\n}\n.toll-shell .student-header h2,.toll-shell .student-header p,.toll-shell .hero h1,.toll-shell .hero p,.toll-shell .status-card h2,.toll-shell .status-card p {\n  margin:3px 0\n}\n.toll-shell .eyebrow,.toll-shell .fee-card span,.toll-shell .status-card span,.toll-shell .detail-grid span {\n  font-size:11px;\n  letter-spacing:.12em;\n  font-weight:800;\n  color:#64748b\n}\n.toll-shell .device-pill {\n  margin-left:auto;\n  padding:10px 14px;\n  border-radius:99px;\n  background:#f1f5f9;\n  font-size:12px;\n  font-weight:800\n}\n.toll-shell .dot {\n  display:inline-block;\n  width:9px;\n  height:9px;\n  border-radius:50%;\n  margin-right:8px\n}\n.toll-shell .online {\n  background:#22c55e\n}\n.toll-shell .offline {\n  background:#94a3b8\n}\n.toll-shell .hero {\n  justify-content:space-between;\n  margin-top:16px;\n  padding:28px;\n  background:linear-gradient(135deg,#0f274d,#164b91);\n  color:#fff;\n  border-radius:20px\n}\n.toll-shell .hero .eyebrow,.toll-shell .hero p {\n  color:#c9dcff\n}\n.toll-shell .fee-card {\n  min-width:230px;\n  padding:18px 22px;\n  text-align:right;\n  background:#fff;\n  color:#10213b;\n  border-radius:15px\n}\n.toll-shell .fee-card strong {\n  display:block;\n  font-size:30px;\n  margin-top:5px\n}\n.toll-shell .status-card {\n  gap:20px;\n  margin-top:16px;\n  padding:25px;\n  border-radius:18px;\n  border-left:8px solid #eab308;\n  background:#fff;\n  border-top:1px solid #e2e8f0;\n  border-right:1px solid #e2e8f0;\n  border-bottom:1px solid #e2e8f0\n}\n.toll-shell .status-card.paid {\n  border-left-color:#22c55e;\n  background:#f0fdf4\n}\n.toll-shell .status-card.denied {\n  border-left-color:#ef4444;\n  background:#fef2f2\n}\n.toll-shell .status-icon {\n  display:grid;\n  place-items:center;\n  width:58px;\n  height:58px;\n  border-radius:50%;\n  background:#f1f5f9;\n  font-size:32px;\n  font-weight:900\n}\n.toll-shell .paid .status-icon {\n  background:#dcfce7;\n  color:#15803d\n}\n.toll-shell .denied .status-icon {\n  background:#fee2e2;\n  color:#b91c1c\n}\n.toll-shell .detail-grid {\n  gap:14px;\n  margin-top:16px\n}\n.toll-shell .detail-grid>div {\n  flex:1;\n  padding:18px;\n  background:#fff;\n  border:1px solid #e2e8f0;\n  border-radius:14px\n}\n.toll-shell .detail-grid strong {\n  display:block;\n  margin-top:8px;\n  font-size:17px\n}\n@media(max-width:700px) {\n  .toll-shell .student-header,.toll-shell .hero,.toll-shell .detail-grid {\n    align-items:stretch;\n    flex-direction:column\n  }\n  .toll-shell .device-pill {\n    margin-left:0\n  }\n  .toll-shell .fee-card {\n    text-align:left;\n    min-width:0\n  }\n  .toll-shell .detail-grid {\n    gap:8px\n  }\n}\n.toll-shell {\n  width: 100%;\n  max-width: none;\n  box-sizing: border-box;\n  padding: clamp(12px, 2vw, 28px);\n}\n.toll-shell > * {\n  min-width: 0;\n}\n.toll-shell .identity-heading {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  gap: 16px;\n  margin-bottom: 16px;\n}\n.toll-shell .student-header {\n  display: block;\n}\n.toll-shell .student-list {\n  display: grid;\n  grid-template-columns: repeat(2, minmax(0, 1fr));\n  gap: 16px;\n}\n.toll-shell .student-person {\n  display: flex;\n  gap: 14px;\n  align-items: center;\n  min-width: 0;\n  padding: 14px;\n  background: #f8fafc;\n  border-radius: 12px;\n}\n.toll-shell .student-person h2 {\n  font-size: 18px;\n  overflow-wrap: anywhere;\n}\n.toll-shell .student-person p {\n  font-size: 14px;\n}\n.toll-shell .student-photo {\n  flex-shrink: 0;\n}\n.toll-shell .hero > div:first-child {\n  min-width: 0;\n}\n.toll-shell .hero h1 {\n  line-height: 1.2;\n}\n.toll-shell .fee-card {\n  flex: 0 0 auto;\n}\n.toll-shell .detail-grid > div {\n  min-width: 0;\n}\n.toll-shell .detail-grid strong {\n  overflow-wrap: anywhere;\n}\n@media (max-width: 850px) {\n  .toll-shell .student-list {\n    grid-template-columns: 1fr;\n  }\n  .toll-shell .hero {\n    gap: 20px;\n  }\n}\n@media (max-width: 700px) {\n  .toll-shell .hero, .toll-shell .detail-grid {\n    flex-direction: column;\n    align-items: stretch;\n  }\n  .toll-shell .identity-heading {\n    flex-wrap: wrap;\n  }\n  .toll-shell .device-pill {\n    margin-left: 0;\n  }\n  .toll-shell .fee-card {\n    width: 100%;\n    min-width: 0;\n    text-align: left;\n  }\n  .toll-shell .status-card {\n    align-items: flex-start;\n  }\n}\n</style>\n",
+    "storeOutMessages": false,
+    "passthru": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "className": "",
+    "x": 2460,
+    "y": 430,
+    "wires": [
+      [
+        "a98350b134d995de"
+      ]
+    ]
+  },
+  {
+    "id": "0c52515adabf5f13",
+    "type": "ui-template",
+    "z": "916314cc65df36ac",
+    "group": "9a384bbf668e6a7a",
+    "page": "",
+    "ui": "",
+    "name": "Admin Kartu dan Transaksi",
+    "order": 1,
+    "width": "12",
+    "height": "0",
+    "head": "",
+    "format": "<template>\n<div class=\"admin-shell\">\n <div v-if=\"!loggedIn\" class=\"login-card\"><div class=\"lock\">🔒</div><h2>Login Administrator</h2><p>Akses pendaftaran kartu dan riwayat transaksi.</p><input v-model.trim=\"login.username\" placeholder=\"Username\"><input v-model=\"login.password\" type=\"password\" placeholder=\"Password\" @keyup.enter=\"doLogin\"><button @click=\"doLogin\">MASUK</button><small>{{loginMessage}}</small></div>\n <div v-else>\n  <header class=\"admin-header\"><div><span>RFID TOLL MANAGEMENT</span><h2>Administrasi Kartu</h2></div><button class=\"ghost\" @click=\"logout\">Keluar</button></header>\n  <p role=\"status\">{{operationMessage}}</p><section class=\"panel table-panel\"><h3>Biaya Sekali Tap</h3><label>Tarif dalam rupiah (0 untuk gratis)</label><input v-model.number=\"fee\" type=\"number\" min=\"0\" max=\"1000000000\" step=\"1000\"><button :disabled=\"busy\" @click=\"saveFee\">SIMPAN BIAYA</button><p>Berlaku untuk transaksi berikutnya.</p></section><div class=\"admin-grid\">\n   <section class=\"panel\"><h3>Pendaftaran Kartu</h3><label>UID hasil scan</label><input v-model=\"register.uid\" readonly placeholder=\"Tahan tombol 3 detik, lalu tap kartu\"><label>Nama pengguna</label><input v-model.trim=\"register.name\" placeholder=\"Nama pemilik kartu\"><label>Saldo awal</label><input v-model.number=\"register.balance\" type=\"number\" min=\"0\" step=\"1000\"><button :disabled=\"busy\" @click=\"registerUser\">DAFTARKAN KARTU</button></section>\n   <section class=\"panel\"><h3>Isi Saldo</h3><label>Pilih kartu</label><select v-model=\"topup.uid\"><option value=\"\">Pilih pengguna</option><option v-for=\"u in users\" :key=\"u.uid\" :value=\"u.uid\">{{u.name}} — {{u.uid}}</option></select><label>Nominal isi saldo</label><input v-model.number=\"topup.amount\" type=\"number\" min=\"1000\" step=\"1000\"><button :disabled=\"busy\" @click=\"topupBalance\">ISI SALDO</button></section>\n  </div>\n  <section class=\"panel table-panel\"><div class=\"panel-title\"><h3>Daftar Pengguna</h3><button class=\"small\" @click=\"refresh\">Refresh</button></div><div class=\"table-wrap\"><table><thead><tr><th>Nama</th><th>UID</th><th>Saldo</th><th>Diperbarui</th><th>Aksi</th></tr></thead><tbody><tr v-for=\"u in users\" :key=\"u.id\"><td>{{u.name}}</td><td class=\"mono\">{{u.uid}}</td><td>{{rupiah(u.balance)}}</td><td>{{u.updated_at}}</td><td class=\"user-actions\">\n        <button class=\"small\" :disabled=\"busy\" @click=\"openEdit(u)\">Edit</button>\n        <button class=\"small delete-button\" :disabled=\"busy\" @click=\"openDelete(u)\">Hapus</button>\n      </td></tr><tr v-if=\"!users.length\"><td colspan=\"5\">Belum ada kartu terdaftar.</td></tr></tbody></table></div></section>\n  <section class=\"panel table-panel\"><h3>Riwayat Transaksi</h3><div class=\"table-wrap\"><table><thead><tr><th>Waktu</th><th>Nama</th><th>UID</th><th>Status</th><th>Biaya</th><th>Saldo Akhir</th><th>Keterangan</th></tr></thead><tbody><tr v-for=\"t in pagedHistory\" :key=\"t.id\"><td>{{t.created_at}}</td><td>{{t.name}}</td><td class=\"mono\">{{t.uid}}</td><td><span :class=\"['badge',t.status.toLowerCase()]\">{{t.status}}</span></td><td>{{rupiah(t.amount)}}</td><td>{{t.balance_after===null?'-':rupiah(t.balance_after)}}</td><td>{{reasonText(t.reason)}}</td></tr><tr v-if=\"!history.length\"><td colspan=\"7\">Belum ada transaksi.</td></tr></tbody></table></div>\n    <nav class=\"history-pagination\" aria-label=\"Halaman riwayat transaksi\" v-if=\"historyPages > 1\">\n      <span>Menampilkan {{historyStart}}–{{historyEnd}} dari {{history.length}} transaksi terakhir</span>\n      <div class=\"pagination-buttons\">\n        <button class=\"small\" :disabled=\"historyPage === 1\" @click=\"historyPage--\">Sebelumnya</button>\n        <span>Halaman {{historyPage}} / {{historyPages}}</span>\n        <button class=\"small\" :disabled=\"historyPage === historyPages\" @click=\"historyPage++\">Berikutnya</button>\n      </div>\n    </nav>\n  </section>\n  <div v-if=\"modal.kind\" class=\"modal-backdrop\" @click.self=\"closeModal\">\n    <section class=\"user-modal\" role=\"dialog\" aria-modal=\"true\" :aria-label=\"modal.kind === 'edit' ? 'Edit pengguna' : 'Hapus pengguna'\">\n      <h3>{{modal.kind === 'edit' ? 'Edit Pengguna' : 'Hapus Pengguna'}}</h3>\n      <p class=\"modal-uid\">UID: {{modal.uid}}</p>\n      <form v-if=\"modal.kind === 'edit'\" @submit.prevent=\"submitModal\">\n        <label>Nama pengguna<input v-model.trim=\"modal.name\" maxlength=\"100\" required></label>\n        <label>Saldo (Rp)<input v-model.number=\"modal.balance\" type=\"number\" min=\"0\" step=\"1\" required></label>\n        <div class=\"modal-buttons\">\n          <button type=\"button\" class=\"modal-cancel\" :disabled=\"busy\" @click=\"closeModal\">Batal</button>\n          <button type=\"submit\" :disabled=\"busy\">{{busy ? 'Menyimpan...' : 'Simpan'}}</button>\n        </div>\n      </form>\n      <div v-else>\n        <p>Hapus <strong>{{modal.name}}</strong> dari daftar pengguna? Riwayat transaksi tetap tersimpan.</p>\n        <div class=\"modal-buttons\">\n          <button type=\"button\" class=\"modal-cancel\" :disabled=\"busy\" @click=\"closeModal\">Batal</button>\n          <button type=\"button\" class=\"modal-delete\" :disabled=\"busy\" @click=\"submitModal\">{{busy ? 'Menghapus...' : 'Hapus Pengguna'}}</button>\n        </div>\n      </div>\n    </section>\n  </div>\n </div>\n</div>\n</template>\n<script>\nexport default {\n  data() {\n    return {\n      fee: 5000,\n      busy: false,\n      operationMessage: '',\n      loggedIn: false,\n      token: '',\n      login: {\n        username: '',\n        password: ''\n      },\n      loginMessage: '',\n      register: {\n        uid: '',\n        name: '',\n        balance: 50000\n      },\n      topup: {\n        uid: '',\n        amount: 20000\n      },\n      users: [],\n      history: [],\n      historyPage: 1,\n      historyPageSize: 10,\n      modal: {kind:'',id:null,uid:'',name:'',balance:0}\n    }\n  },\n  computed: {\n    historyPages() {\n      return Math.max(1, Math.ceil(this.history.length / this.historyPageSize))\n    },\n    historyStart() {\n      return this.history.length ? (this.historyPage - 1) * this.historyPageSize + 1 : 0\n    },\n    historyEnd() {\n      return Math.min(this.history.length, this.historyPage * this.historyPageSize)\n    },\n    pagedHistory() {\n      const start = (this.historyPage - 1) * this.historyPageSize;\n      return this.history.slice(start, start + this.historyPageSize)\n    }\n  },\n  watch: {\n    msg: {\n      deep: true,\n      handler(v) {\n        if (v && v.payload) this.handle(v.payload)\n      }\n    }\n  },\n  mounted() {\n    this.loadSwal()\n  },\n  methods: {\n    sendAction(action, data = {}) {\n      this.send({\n        payload: {\n          action,\n          token: this.token,\n          ...data\n        }\n      })\n    },\n    doLogin() {\n      this.send({\n        payload: {\n          action: 'admin_login',\n          username: this.login.username,\n          password: this.login.password\n        }\n      })\n    },\n    logout() {\n      this.sendAction('admin_logout')\n    },\n    refresh() {\n      if (!this.loggedIn) return;\n      this.sendAction('get_users');\n      this.sendAction('get_history');\n      this.sendAction('get_settings')\n    },\n    saveFee() {\n      if (this.busy) return;\n      this.busy = true;\n      this.operationMessage = 'Menyimpan biaya...';\n      this.sendAction('set_fee', {\n        fee: this.fee\n      })\n    },\n    registerUser() {\n      if (this.busy) return;\n      this.busy = true;\n      this.operationMessage = 'Memproses pendaftaran...';\n      this.sendAction('register_user', this.register)\n    },\n    topupBalance() {\n      if (this.busy) return;\n      this.busy = true;\n      this.operationMessage = 'Memproses isi saldo...';\n      this.sendAction('topup_balance', this.topup)\n    },\n    openEdit(user) {\n      if (this.busy) return;\n      this.modal = {kind:'edit',id:user.id,uid:user.uid,name:user.name,balance:Number(user.balance)};\n    },\n    openDelete(user) {\n      if (this.busy) return;\n      this.modal = {kind:'delete',id:user.id,uid:user.uid,name:user.name,balance:0};\n    },\n    closeModal() {\n      if (this.busy) return;\n      this.modal = {kind:'',id:null,uid:'',name:'',balance:0};\n    },\n    submitModal() {\n      if (this.busy || !this.loggedIn) return;\n      if (this.modal.kind === 'edit') {\n        const name = this.modal.name.trim();\n        const balance = Number(this.modal.balance);\n        if (!name || name.length > 100 || this.modal.balance === '' ||\n            !Number.isSafeInteger(balance) || balance < 0) {\n          this.notify('error','Data tidak valid','Nama dan saldo harus valid.');\n          return;\n        }\n        this.busy = true;\n        this.sendAction('update_user',{id:this.modal.id,name,balance});\n      } else if (this.modal.kind === 'delete') {\n        this.busy = true;\n        this.sendAction('delete_user',{id:this.modal.id});\n      }\n    },\n    rupiah(v) {\n      return new Intl.NumberFormat('id-ID', {\n        style: 'currency',\n        currency: 'IDR',\n        maximumFractionDigits: 0\n      }).format(Number(v || 0))\n    },\n    reasonText(v) {\n      return {\n        PAYMENT_SUCCESS: 'Pembayaran berhasil',\n        INSUFFICIENT_BALANCE: 'Saldo tidak cukup',\n        UID_NOT_REGISTERED: 'UID tidak terdaftar'\n      } [v] || v\n    },\n    loadSwal() {\n      if (window.Swal) return;\n      const s = document.createElement('script');\n      s.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';\n      document.head.appendChild(s)\n    },\n    notify(icon, title, text) {\n      this.operationMessage = text;\n      if (window.Swal) window.Swal.fire({\n        icon,\n        title,\n        text,\n        showConfirmButton: true,\n        confirmButtonText: 'OK',\n        allowOutsideClick: false,\n        allowEscapeKey: false,\n        position: 'center'\n      });\n      else window.alert(title + '\\n' + text)\n    },\n    handle(p) {\n      if (p.action === 'history_changed') {\n        if (this.loggedIn) {\n          this.sendAction('get_history');\n          this.sendAction('get_users')\n        }\n        return\n      }\n      if (p.action === 'fee_updated') {\n        this.fee = Number(p.fee);\n        return\n      }\n      if (p.action === 'registration_uid') {\n        if (this.loggedIn && !this.busy) {\n          this.register.uid = p.uid || '';\n          this.notify('info', 'Kartu Terdeteksi', 'UID: ' + this.register.uid + '. Silakan isi nama dan saldo awal.');\n        }\n        return;\n      }\n      if (p.action === 'login_result') {\n        this.loginMessage = p.message || '';\n        if (p.success) {\n          this.loggedIn = true;\n          this.token = p.token;\n          this.login.password = '';\n          this.refresh()\n        }\n        return\n      }\n      if (p.action === 'session_expired' || p.action === 'logout_result') {\n        this.busy = false;\n        this.loggedIn = false;\n        this.token = '';\n        this.users = [];\n        this.history = [];\n        this.historyPage = 1;\n        this.modal = {kind:'',id:null,uid:'',name:'',balance:0};\n        this.loginMessage = p.message || '';\n        return\n      }\n      if (p.action === 'users_data') {\n        this.users = p.users || [];\n        return\n      }\n      if (p.action === 'history_data') {\n        this.history = p.history || [];\n        this.historyPage = Math.min(this.historyPage, this.historyPages);\n        return\n      }\n      if (p.action === 'operation_result') {\n        this.busy = false;\n        if (p.success && (p.operation === 'update_user' || p.operation === 'delete_user')) {\n          this.closeModal();\n        }\n        this.notify(p.success ? 'success' : 'error', p.success ? 'Berhasil' : 'Gagal', p.message || '');\n        if (p.success) {\n          if (p.operation === 'register') {\n            this.register.name = '';\n            this.register.uid = '';\n          }\n          this.refresh()\n        }\n        return\n      }\n    }\n  }\n}\n</script>\n<style>\n.admin-shell {\n  font-family:Inter,Arial,sans-serif;\n  max-width:1200px;\n  margin:auto;\n  color:#13233c\n}\n.admin-shell .login-card {\n  max-width:390px;\n  margin:60px auto;\n  padding:30px;\n  background:#fff;\n  border:1px solid #dbe3ee;\n  border-radius:20px;\n  text-align:center;\n  box-shadow:0 15px 40px #0f172a14\n}\n.admin-shell .lock {\n  font-size:35px\n}\n.admin-shell .login-card p {\n  color:#64748b\n}\n.admin-shell .login-card input,.admin-shell .panel input,.admin-shell .panel select {\n  box-sizing:border-box;\n  width:100%;\n  margin:6px 0 12px;\n  padding:12px;\n  border:1px solid #cbd5e1;\n  border-radius:10px;\n  background:#fff\n}\n.admin-shell .login-card button,.admin-shell .panel button,.admin-shell .admin-header button {\n  padding:12px 18px;\n  border:0;\n  border-radius:10px;\n  background:#1558b0;\n  color:#fff;\n  font-weight:800;\n  cursor:pointer\n}\n.admin-shell .login-card button {\n  width:100%\n}\n.admin-shell .login-card small {\n  display:block;\n  min-height:20px;\n  margin-top:12px;\n  color:#dc2626\n}\n.admin-shell .admin-header {\n  display:flex;\n  justify-content:space-between;\n  align-items:center;\n  padding:20px 24px;\n  background:#102c55;\n  color:#fff;\n  border-radius:18px\n}\n.admin-shell .admin-header span {\n  font-size:11px;\n  letter-spacing:.12em\n}\n.admin-shell .admin-header h2 {\n  margin:4px 0\n}\n.admin-shell .admin-header .ghost {\n  background:#ffffff20\n}\n.admin-shell .admin-grid {\n  display:grid;\n  grid-template-columns:1fr 1fr;\n  gap:16px;\n  margin-top:16px\n}\n.admin-shell .panel {\n  padding:20px;\n  background:#fff;\n  border:1px solid #dbe3ee;\n  border-radius:16px\n}\n.admin-shell .panel h3 {\n  margin-top:0\n}\n.admin-shell .panel label {\n  font-size:12px;\n  font-weight:800;\n  color:#475569\n}\n.admin-shell .table-panel {\n  margin-top:16px\n}\n.admin-shell .panel-title {\n  display:flex;\n  justify-content:space-between\n}\n.admin-shell .panel .small {\n  padding:8px 13px\n}\n.admin-shell .table-wrap {\n  overflow:auto\n}\n.admin-shell table {\n  width:100%;\n  border-collapse:collapse;\n  font-size:13px\n}\n.admin-shell th,.admin-shell td {\n  padding:11px;\n  border-bottom:1px solid #e2e8f0;\n  text-align:left;\n  white-space:nowrap\n}\n.admin-shell th {\n  background:#f8fafc;\n  color:#475569\n}\n.admin-shell .mono {\n  font-family:Consolas,monospace\n}\n.admin-shell .badge {\n  padding:5px 9px;\n  border-radius:99px;\n  font-weight:800\n}\n.admin-shell .badge.paid {\n  color:#15803d;\n  background:#dcfce7\n}\n.admin-shell .badge.denied {\n  color:#b91c1c;\n  background:#fee2e2\n}\n@media(max-width:760px) {\n  .admin-shell .admin-grid {\n    grid-template-columns:1fr\n  }\n  .admin-shell .admin-header {\n    align-items:flex-start;\n    gap:12px\n  }\n}\n.admin-shell {\n  width: 100%;\n  max-width: none;\n  box-sizing: border-box;\n  padding: clamp(12px, 2vw, 28px);\n}\n.admin-shell > div, .admin-shell .panel, .admin-shell .admin-grid > section {\n  min-width: 0;\n}\n.admin-shell .admin-header {\n  gap: 20px;\n}\n.admin-shell .admin-header h2 {\n  line-height: 1.2;\n}\n.admin-shell p[role=\"status\"] {\n  min-height: 1.5em;\n  margin: 16px 2px;\n}\n.admin-shell .admin-grid {\n  grid-template-columns: repeat(2, minmax(0, 1fr));\n  gap: 20px;\n  margin-top: 20px;\n}\n.admin-shell .panel {\n  padding: clamp(18px, 2vw, 26px);\n}\n.admin-shell .panel label {\n  display: block;\n  margin-top: 8px;\n  line-height: 1.4;\n}\n.admin-shell .panel input, .admin-shell .panel select {\n  margin-top: 8px;\n  margin-bottom: 18px;\n}\n.admin-shell .panel button {\n  margin-top: 4px;\n}\n.admin-shell .panel-title {\n  align-items: center;\n  gap: 12px;\n  flex-wrap: wrap;\n  margin-bottom: 8px;\n}\n.admin-shell .panel-title h3 {\n  margin-bottom: 0;\n}\n.admin-shell .table-panel {\n  margin-top: 20px;\n}\n.admin-shell .table-wrap {\n  width: 100%;\n  overflow-x: auto;\n  margin-top: 14px;\n}\n.admin-shell th, .admin-shell td {\n  padding: 12px 14px;\n}\n.admin-shell .history-pagination {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  gap: 14px;\n  flex-wrap: wrap;\n  margin-top: 16px;\n  color: #475569;\n  font-size: 13px;\n}\n.admin-shell .pagination-buttons {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n  flex-wrap: wrap;\n}\n.admin-shell button:disabled {\n  opacity: .55;\n  cursor: not-allowed;\n}\n@media (max-width: 800px) {\n  .admin-shell .admin-grid {\n    grid-template-columns: 1fr;\n  }\n  .admin-shell .admin-header {\n    align-items: flex-start;\n    flex-wrap: wrap;\n  }\n}\n\n.admin-shell .user-actions {display:flex;gap:8px;align-items:center;}\n.admin-shell .user-actions .small {margin:0;white-space:nowrap;}\n.admin-shell .panel .delete-button, .admin-shell .modal-delete {background:#b91c1c;}\n.admin-shell .modal-backdrop {position:fixed;inset:0;z-index:2100;background:#0f172a99;display:grid;place-items:center;padding:16px;}\n.admin-shell .user-modal {width:min(100%,440px);max-height:calc(100dvh - 32px);overflow:auto;box-sizing:border-box;padding:24px;background:#fff;border-radius:16px;box-shadow:0 20px 65px #0f172a55;}\n.admin-shell .user-modal h3 {margin:0 0 8px;}\n.admin-shell .modal-uid {color:#475569;overflow-wrap:anywhere;}\n.admin-shell .user-modal label {display:block;margin-top:16px;font-weight:700;}\n.admin-shell .user-modal input {display:block;box-sizing:border-box;width:100%;margin-top:8px;padding:11px;border:1px solid #cbd5e1;border-radius:9px;}\n.admin-shell .modal-buttons {display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:24px;}\n.admin-shell .modal-buttons button {padding:10px 15px;border:0;border-radius:9px;background:#1558b0;color:#fff;font-weight:700;cursor:pointer;}\n.admin-shell .modal-buttons .modal-cancel {background:#e2e8f0;color:#1e293b;}\n.admin-shell .modal-buttons .modal-delete {background:#b91c1c;}\n.admin-shell .modal-buttons button:disabled {opacity:.55;cursor:wait;}\n</style>\n",
+    "storeOutMessages": false,
+    "passthru": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "className": "",
+    "x": 180,
+    "y": 760,
+    "wires": [
+      [
+        "df7ea4c237b4fb46"
+      ]
+    ]
+  },
+  {
+    "id": "727d51943507a165",
+    "type": "catch",
+    "z": "916314cc65df36ac",
+    "name": "Tangkap Error",
+    "scope": null,
+    "uncaught": false,
+    "x": 180,
+    "y": 1130,
+    "wires": [
+      [
+        "cd323b6c6fd155c8",
+        "1987cc59b04fdefd"
+      ]
+    ]
+  },
+  {
+    "id": "cd323b6c6fd155c8",
+    "type": "debug",
+    "z": "916314cc65df36ac",
+    "name": "Error Sistem Tol",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "true",
+    "targetType": "full",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 470,
+    "y": 1080,
+    "wires": []
+  },
+  {
+    "id": "45af93003a0b6af7",
+    "type": "comment",
+    "z": "916314cc65df36ac",
+    "name": "Ganti identitas 2 mahasiswa pada data().students. Admin: admin / admin123. Ganti sandi di Admin Login dan Router.",
+    "info": "Setelah import, pasang @flowfuse/node-red-dashboard dan node-red-node-sqlite. Ubah kredensial admin pada Function 'Admin Login dan Router'.",
+    "x": 450,
+    "y": 1300,
+    "wires": []
+  },
+  {
+    "id": "398c29bf11c1bc96",
+    "type": "function",
+    "z": "916314cc65df36ac",
+    "name": "Database siap",
+    "func": "flow.set(\"toll_db_ready\", true);\nnode.status({\n  fill: \"green\",\n  shape: \"dot\",\n  text: \"Database siap\"\n});\nmsg.params = {};\nreturn msg;\n",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 1080,
+    "y": 100,
+    "wires": [
+      [
+        "252e0a39e3bc5136"
+      ]
+    ]
+  },
+  {
+    "id": "79fe14e1bd423bd1",
+    "type": "sqlite",
+    "z": "916314cc65df36ac",
+    "mydb": "toll_sqlite_db",
+    "sqlquery": "prepared",
+    "sql": "INSERT INTO users(uid,name,balance) VALUES($uid,$name,$balance) ON CONFLICT(uid) DO NOTHING RETURNING id,uid,name,balance",
+    "name": "Daftar kartu - parameter",
+    "x": 800,
+    "y": 650,
+    "wires": [
+      [
+        "941af95556d9c411"
+      ]
+    ]
+  },
+  {
+    "id": "38ff3c67073de9c8",
+    "type": "sqlite",
+    "z": "916314cc65df36ac",
+    "mydb": "toll_sqlite_db",
+    "sqlquery": "prepared",
+    "sql": "UPDATE users SET balance=balance+$amount,updated_at=datetime('now','localtime') WHERE uid=$uid AND balance <= 9007199254740991-$amount RETURNING id,uid,name,balance",
+    "name": "Isi saldo - parameter",
+    "x": 800,
+    "y": 710,
+    "wires": [
+      [
+        "941af95556d9c411"
+      ]
+    ]
+  },
+  {
+    "id": "af2e079995416c94",
+    "type": "function",
+    "z": "916314cc65df36ac",
+    "name": "Baca hasil tersimpan",
+    "func": "msg.params = {\n  $event_id: msg._event.event_id\n};\nreturn msg;\n",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 1350,
+    "y": 300,
+    "wires": [
+      [
+        "853af3e9005e8005"
+      ]
+    ]
+  },
+  {
+    "id": "853af3e9005e8005",
+    "type": "sqlite",
+    "z": "916314cc65df36ac",
+    "mydb": "toll_sqlite_db",
+    "sqlquery": "prepared",
+    "sql": "SELECT t.*,u.name FROM transactions t LEFT JOIN users u ON u.id=t.user_id WHERE t.event_id=$event_id",
+    "name": "Hasil transaksi",
+    "x": 1630,
+    "y": 300,
+    "wires": [
+      [
+        "b9e914219819dddf"
+      ]
+    ]
+  },
+  {
+    "id": "1987cc59b04fdefd",
+    "type": "function",
+    "z": "916314cc65df36ac",
+    "name": "Error ke admin",
+    "func": "if (!msg._client) return null;\nreturn {\n  _client: msg._client,\n  payload: {\n    action: 'operation_result',\n    success: false,\n    message: 'Operasi database gagal. Periksa Debug Error Sistem Tol.'\n  }\n};\n",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 470,
+    "y": 1170,
+    "wires": [
+      [
+        "b34d76b9280e10e4"
+      ]
+    ]
+  },
+  {
+    "id": "3539b5543b9e9a84",
+    "type": "sqlite",
+    "z": "916314cc65df36ac",
+    "mydb": "toll_sqlite_db",
+    "sqlquery": "prepared",
+    "sql": "SELECT fee FROM settings WHERE id=1",
+    "name": "Baca biaya tersimpan",
+    "x": 800,
+    "y": 880,
+    "wires": [
+      [
+        "b64a53efa0e79c4c"
+      ]
+    ]
+  },
+  {
+    "id": "539664a8f5b83f49",
+    "type": "sqlite",
+    "z": "916314cc65df36ac",
+    "mydb": "toll_sqlite_db",
+    "sqlquery": "prepared",
+    "sql": "UPDATE settings SET fee=$fee WHERE id=1 RETURNING fee",
+    "name": "Simpan biaya",
+    "x": 780,
+    "y": 960,
+    "wires": [
+      [
+        "b64a53efa0e79c4c"
+      ]
+    ]
+  },
+  {
+    "id": "b64a53efa0e79c4c",
+    "type": "function",
+    "z": "916314cc65df36ac",
+    "name": "Respons biaya",
+    "func": "const row = Array.isArray(msg.payload) ? msg.payload[0] : null;\nif (!row) {\n  node.error('Biaya belum tersedia', msg);\n  return null;\n}\nconst fee = Number(row.fee);\nconst setting = {\n  payload: {\n    action: 'fee_updated',\n    fee\n  }\n};\nif (msg._admin_action === 'fee_update') return [setting, {\n  _client: msg._client,\n  payload: {\n    action: 'operation_result',\n    operation: 'fee_update',\n    success: true,\n    message: 'Biaya sekali tap berhasil diperbarui',\n    fee\n  }\n}];\nif (msg._client) {\n  setting._client = msg._client;\n  return msg._public_request ? [setting, null] : [null, setting];\n}\nreturn [setting, null];\n",
+    "outputs": 2,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 1040,
+    "y": 920,
+    "wires": [
+      [
+        "ce198df3305cad1c"
+      ],
+      [
+        "0312748eb4ce66ac"
+      ]
+    ]
+  },
+  {
+    "id": "3c4350f8540dda89",
+    "type": "function",
+    "z": "916314cc65df36ac",
+    "name": "Minta biaya halaman publik",
+    "func": "if (msg.payload?.action !== 'get_public_settings') return null;\nmsg._public_request = true;\nmsg.params = {};\nreturn msg;\n",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 2470,
+    "y": 570,
+    "wires": [
+      [
+        "b0bbaf385ab27f18"
+      ]
+    ]
+  },
+  {
+    "id": "b85474a3855dd547",
+    "type": "link in",
+    "z": "916314cc65df36ac",
+    "name": "Masuk: Query Admin",
+    "links": [
+      "a99bb4aa2f062d78",
+      "9f64c594d943d11b"
+    ],
+    "x": 610,
+    "y": 920,
+    "wires": [
+      [
+        "c86a921216150be5"
+      ]
+    ]
+  },
+  {
+    "id": "a99bb4aa2f062d78",
+    "type": "link out",
+    "z": "916314cc65df36ac",
+    "name": "Ke: Query Admin",
+    "mode": "link",
+    "links": [
+      "b85474a3855dd547"
+    ],
+    "x": 630,
+    "y": 940,
+    "wires": []
+  },
+  {
+    "id": "b423d890bb6fa254",
+    "type": "link in",
+    "z": "916314cc65df36ac",
+    "name": "Masuk: Baca biaya tersimpan",
+    "links": [
+      "b0bbaf385ab27f18",
+      "252e0a39e3bc5136",
+      "5344cb1c446c0c5e"
+    ],
+    "x": 610,
+    "y": 1010,
+    "wires": [
+      [
+        "3539b5543b9e9a84"
+      ]
+    ]
+  },
+  {
+    "id": "b0bbaf385ab27f18",
+    "type": "link out",
+    "z": "916314cc65df36ac",
+    "name": "Ke: Baca biaya tersimpan",
+    "mode": "link",
+    "links": [
+      "b423d890bb6fa254"
+    ],
+    "x": 2630,
+    "y": 645,
+    "wires": []
+  },
+  {
+    "id": "f70563fe13f078ec",
+    "type": "link in",
+    "z": "916314cc65df36ac",
+    "name": "Masuk: Admin Kartu dan Transaksi",
+    "links": [
+      "b34d76b9280e10e4",
+      "d888784d2c698e3e",
+      "1c96590d8dd0d864",
+      "0312748eb4ce66ac",
+      "ffcb416eabd94971"
+    ],
+    "x": 75,
+    "y": 860,
+    "wires": [
+      [
+        "0c52515adabf5f13"
+      ]
+    ]
+  },
+  {
+    "id": "b34d76b9280e10e4",
+    "type": "link out",
+    "z": "916314cc65df36ac",
+    "name": "Ke: Admin Kartu dan Transaksi",
+    "mode": "link",
+    "links": [
+      "f70563fe13f078ec"
+    ],
+    "x": 630,
+    "y": 1245,
+    "wires": []
+  },
+  {
+    "id": "82cc68e114587c5e",
+    "type": "link in",
+    "z": "916314cc65df36ac",
+    "name": "Masuk: Dashboard Pembayaran Tol",
+    "links": [
+      "a32922c3acf7c0e1",
+      "ce198df3305cad1c",
+      "91220dd457725883"
+    ],
+    "x": 2270,
+    "y": 560,
+    "wires": [
+      [
+        "144977f3ed325661"
+      ]
+    ]
+  },
+  {
+    "id": "a32922c3acf7c0e1",
+    "type": "link out",
+    "z": "916314cc65df36ac",
+    "name": "Ke: Dashboard Pembayaran Tol",
+    "mode": "link",
+    "links": [
+      "82cc68e114587c5e"
+    ],
+    "x": 2070,
+    "y": 445,
+    "wires": []
+  },
+  {
+    "id": "9f64c594d943d11b",
+    "type": "link out",
+    "z": "916314cc65df36ac",
+    "name": "Ke: Query Admin",
+    "mode": "link",
+    "links": [
+      "b85474a3855dd547"
+    ],
+    "x": 630,
+    "y": 975,
+    "wires": []
+  },
+  {
+    "id": "24dc3d2813c68f1c",
+    "type": "link in",
+    "z": "916314cc65df36ac",
+    "name": "Masuk: Simpan biaya",
+    "links": [
+      "c689dfcb82d2e5fc"
+    ],
+    "x": 610,
+    "y": 1090,
+    "wires": [
+      [
+        "539664a8f5b83f49"
+      ]
+    ]
+  },
+  {
+    "id": "c689dfcb82d2e5fc",
+    "type": "link out",
+    "z": "916314cc65df36ac",
+    "name": "Ke: Simpan biaya",
+    "mode": "link",
+    "links": [
+      "24dc3d2813c68f1c"
+    ],
+    "x": 630,
+    "y": 1045,
+    "wires": []
+  },
+  {
+    "id": "ce198df3305cad1c",
+    "type": "link out",
+    "z": "916314cc65df36ac",
+    "name": "Ke: Dashboard Pembayaran Tol",
+    "mode": "link",
+    "links": [
+      "82cc68e114587c5e"
+    ],
+    "x": 1290,
+    "y": 1005,
+    "wires": []
+  },
+  {
+    "id": "d888784d2c698e3e",
+    "type": "link out",
+    "z": "916314cc65df36ac",
+    "name": "Ke: Admin Kartu dan Transaksi",
+    "mode": "link",
+    "links": [
+      "f70563fe13f078ec"
+    ],
+    "x": 1290,
+    "y": 855,
+    "wires": []
+  },
+  {
+    "id": "252e0a39e3bc5136",
+    "type": "link out",
+    "z": "916314cc65df36ac",
+    "name": "Ke: Baca biaya tersimpan",
+    "mode": "link",
+    "links": [
+      "b423d890bb6fa254"
+    ],
+    "x": 1240,
+    "y": 175,
+    "wires": []
+  },
+  {
+    "id": "91220dd457725883",
+    "type": "link out",
+    "z": "916314cc65df36ac",
+    "name": "Ke: Dashboard Pembayaran Tol",
+    "mode": "link",
+    "links": [
+      "82cc68e114587c5e"
+    ],
+    "x": 920,
+    "y": 555,
+    "wires": []
+  },
+  {
+    "id": "1c96590d8dd0d864",
+    "type": "link out",
+    "z": "916314cc65df36ac",
+    "name": "Ke: Admin Kartu dan Transaksi",
+    "mode": "link",
+    "links": [
+      "f70563fe13f078ec"
+    ],
+    "x": 920,
+    "y": 410,
+    "wires": []
+  },
+  {
+    "id": "5344cb1c446c0c5e",
+    "type": "link out",
+    "z": "916314cc65df36ac",
+    "name": "Ke: Baca biaya tersimpan",
+    "mode": "link",
+    "links": [
+      "b423d890bb6fa254"
+    ],
+    "x": 630,
+    "y": 1010,
+    "wires": []
+  },
+  {
+    "id": "1ed980e24bd414be",
+    "type": "link in",
+    "z": "916314cc65df36ac",
+    "name": "Masuk: Daftar kartu - parameter",
+    "links": [
+      "6128f54f33ec4108"
+    ],
+    "x": 610,
+    "y": 780,
+    "wires": [
+      [
+        "79fe14e1bd423bd1"
+      ]
+    ]
+  },
+  {
+    "id": "6128f54f33ec4108",
+    "type": "link out",
+    "z": "916314cc65df36ac",
+    "name": "Ke: Daftar kartu - parameter",
+    "mode": "link",
+    "links": [
+      "1ed980e24bd414be"
+    ],
+    "x": 630,
+    "y": 870,
+    "wires": []
+  },
+  {
+    "id": "0312748eb4ce66ac",
+    "type": "link out",
+    "z": "916314cc65df36ac",
+    "name": "Ke: Admin Kartu dan Transaksi",
+    "mode": "link",
+    "links": [
+      "f70563fe13f078ec"
+    ],
+    "x": 1290,
+    "y": 1040,
+    "wires": []
+  },
+  {
+    "id": "ffcb416eabd94971",
+    "type": "link out",
+    "z": "916314cc65df36ac",
+    "name": "Ke: Admin Kartu dan Transaksi",
+    "mode": "link",
+    "links": [
+      "f70563fe13f078ec"
+    ],
+    "x": 630,
+    "y": 835,
+    "wires": []
+  },
+  {
+    "id": "f68fc7fa5509ef99",
+    "type": "link in",
+    "z": "916314cc65df36ac",
+    "name": "Masuk: Isi saldo - parameter",
+    "links": [
+      "2ecd61deab059c51"
+    ],
+    "x": 610,
+    "y": 840,
+    "wires": [
+      [
+        "38ff3c67073de9c8"
+      ]
+    ]
+  },
+  {
+    "id": "2ecd61deab059c51",
+    "type": "link out",
+    "z": "916314cc65df36ac",
+    "name": "Ke: Isi saldo - parameter",
+    "mode": "link",
+    "links": [
+      "f68fc7fa5509ef99"
+    ],
+    "x": 630,
+    "y": 905,
+    "wires": []
+  },
+  {
+    "id": "77664aed38ef3328",
+    "type": "link in",
+    "z": "916314cc65df36ac",
+    "name": "Masuk: Minta biaya halaman publik",
+    "links": [
+      "a98350b134d995de"
+    ],
+    "x": 2280,
+    "y": 700,
+    "wires": [
+      [
+        "3c4350f8540dda89"
+      ]
+    ]
+  },
+  {
+    "id": "a98350b134d995de",
+    "type": "link out",
+    "z": "916314cc65df36ac",
+    "name": "Ke: Minta biaya halaman publik",
+    "mode": "link",
+    "links": [
+      "77664aed38ef3328"
+    ],
+    "x": 2620,
+    "y": 505,
+    "wires": []
+  },
+  {
+    "id": "35667232b122423e",
+    "type": "comment",
+    "z": "916314cc65df36ac",
+    "name": "01 | DATABASE",
+    "info": "",
+    "x": 140,
+    "y": 40,
+    "wires": []
+  },
+  {
+    "id": "6e1656549d56c5fc",
+    "type": "comment",
+    "z": "916314cc65df36ac",
+    "name": "02 | RFID DAN PEMBAYARAN",
+    "info": "",
+    "x": 190,
+    "y": 220,
+    "wires": []
+  },
+  {
+    "id": "c19fbfb8d7e11066",
+    "type": "comment",
+    "z": "916314cc65df36ac",
+    "name": "03 | FEEDBACK PERANGKAT",
+    "info": "",
+    "x": 210,
+    "y": 420,
+    "wires": []
+  },
+  {
+    "id": "7ec0d17710863626",
+    "type": "comment",
+    "z": "916314cc65df36ac",
+    "name": "04 | DASHBOARD DAN ADMIN",
+    "info": "",
+    "x": 230,
+    "y": 620,
+    "wires": []
+  },
+  {
+    "id": "8faee171baaf31d6",
+    "type": "comment",
+    "z": "916314cc65df36ac",
+    "name": "05 | DIAGNOSTIK",
+    "info": "",
+    "x": 190,
+    "y": 1060,
+    "wires": []
+  },
+  {
+    "id": "toll_mqtt_broker",
+    "type": "mqtt-broker",
+    "name": "EMQX Public Toll",
+    "broker": "broker.emqx.io",
+    "port": "1883",
+    "clientid": "",
+    "autoConnect": true,
+    "usetls": false,
+    "protocolVersion": "4",
+    "keepalive": "60",
+    "cleansession": true,
+    "autoUnsubscribe": true,
+    "birthTopic": "",
+    "birthQos": "0",
+    "birthPayload": "",
+    "birthMsg": {},
+    "closeTopic": "",
+    "closeQos": "0",
+    "closePayload": "",
+    "closeMsg": {},
+    "willTopic": "",
+    "willQos": "0",
+    "willPayload": "",
+    "willMsg": {}
+  },
+  {
+    "id": "toll_sqlite_db",
+    "type": "sqlitedb",
+    "db": "toll_rfid.db",
+    "mode": "RWC"
+  },
+  {
+    "id": "baa8cc3c57271c12",
+    "type": "ui-group",
+    "name": "Pembayaran",
+    "page": "a1870b3eb68afc2a",
+    "width": "12",
+    "height": "1",
+    "order": 1,
+    "showTitle": false,
+    "className": "",
+    "visible": "true",
+    "disabled": "false",
+    "groupType": "default"
+  },
+  {
+    "id": "9a384bbf668e6a7a",
+    "type": "ui-group",
+    "name": "Administrasi",
+    "page": "28d138c4df456361",
+    "width": "12",
+    "height": "1",
+    "order": 1,
+    "showTitle": false,
+    "className": "",
+    "visible": "true",
+    "disabled": "false",
+    "groupType": "default"
+  },
+  {
+    "id": "a1870b3eb68afc2a",
+    "type": "ui-page",
+    "name": "Pembayaran Tol",
+    "ui": "0df8b8a20bb13f1b",
+    "path": "/payment",
+    "icon": "contactless-payment-circle",
+    "layout": "grid",
+    "theme": "toll_ui_theme",
+    "breakpoints": [
+      {
+        "name": "Default",
+        "px": "0",
+        "cols": "3"
+      },
+      {
+        "name": "Tablet",
+        "px": "576",
+        "cols": "6"
+      },
+      {
+        "name": "Small Desktop",
+        "px": "768",
+        "cols": "9"
+      },
+      {
+        "name": "Desktop",
+        "px": "1024",
+        "cols": "12"
+      }
+    ],
+    "tabs": [],
+    "order": 18,
+    "className": "",
+    "visible": "true",
+    "disabled": "false"
+  },
+  {
+    "id": "28d138c4df456361",
+    "type": "ui-page",
+    "name": "Admin Pembayaran Tol",
+    "ui": "0df8b8a20bb13f1b",
+    "path": "/admin",
+    "icon": "security",
+    "layout": "grid",
+    "theme": "toll_ui_theme",
+    "breakpoints": [
+      {
+        "name": "Default",
+        "px": "0",
+        "cols": "3"
+      },
+      {
+        "name": "Tablet",
+        "px": "576",
+        "cols": "6"
+      },
+      {
+        "name": "Small Desktop",
+        "px": "768",
+        "cols": "9"
+      },
+      {
+        "name": "Desktop",
+        "px": "1024",
+        "cols": "12"
+      }
+    ],
+    "tabs": [],
+    "order": 2,
+    "className": "",
+    "visible": "true",
+    "disabled": "false"
+  },
+  {
+    "id": "0df8b8a20bb13f1b",
+    "type": "ui-base",
+    "name": "My Dashboard",
+    "path": "/dashboard",
+    "appIcon": "",
+    "includeClientData": true,
+    "acceptsClientConfig": [
+      "ui-notification",
+      "ui-control"
+    ],
+    "showPathInSidebar": false,
+    "headerContent": "page",
+    "navigationStyle": "default",
+    "titleBarStyle": "default",
+    "showReconnectNotification": true,
+    "notificationDisplayTime": 1,
+    "showDisconnectNotification": true,
+    "allowInstall": true
+  },
+  {
+    "id": "toll_ui_theme",
+    "type": "ui-theme",
+    "name": "Toll Light",
+    "colors": {
+      "surface": "#ffffff",
+      "primary": "#1558b0",
+      "bgPage": "#eef3f8",
+      "groupBg": "#eef3f8",
+      "groupOutline": "#eef3f8"
+    },
+    "sizes": {
+      "density": "default",
+      "pagePadding": "12px",
+      "groupGap": "12px",
+      "groupBorderRadius": "16px",
+      "widgetGap": "12px"
     }
+  },
+  {
+    "id": "2ab927d63d880856",
+    "type": "global-config",
+    "env": [],
+    "modules": {
+      "node-red-node-sqlite": "2.0.1",
+      "@flowfuse/node-red-dashboard": "1.33.0"
+    }
+  },
+  {
+    "id": "8189860ba7f143c7",
+    "type": "sqlite",
+    "z": "916314cc65df36ac",
+    "mydb": "toll_sqlite_db",
+    "sqlquery": "prepared",
+    "sql": "UPDATE users SET name=$name,balance=$balance,updated_at=datetime('now','localtime') WHERE id=$id RETURNING id",
+    "name": "Edit nama dan saldo - parameter",
+    "x": 800,
+    "y": 1050,
+    "wires": [
+      [
+        "941af95556d9c411"
+      ]
+    ]
+  },
+  {
+    "id": "89b77979dda04383",
+    "type": "sqlite",
+    "z": "916314cc65df36ac",
+    "mydb": "toll_sqlite_db",
+    "sqlquery": "prepared",
+    "sql": "DELETE FROM users WHERE id=$id RETURNING id",
+    "name": "Hapus pengguna - parameter",
+    "x": 800,
+    "y": 1120,
+    "wires": [
+      [
+        "941af95556d9c411"
+      ]
+    ]
+  }
 ]
