@@ -1,6 +1,6 @@
 [
     {
-        "id": "fcf79fc60c4feb4d",
+        "id": "8529ead17eac2305",
         "type": "tab",
         "label": "RFID WebGIS SQLite - Konfigurasi Terpusat",
         "disabled": false,
@@ -8,9 +8,9 @@
         "env": []
     },
     {
-        "id": "d4c18f35d7d0d769",
+        "id": "5575d077a2034bb1",
         "type": "group",
-        "z": "fcf79fc60c4feb4d",
+        "z": "8529ead17eac2305",
         "name": "01 - Inisialisasi database",
         "style": {
             "label": true,
@@ -18,11 +18,11 @@
             "stroke": "#bac8d3"
         },
         "nodes": [
-            "2b120c5ce0904f36",
-            "74a79f94d77b85a3",
-            "54e5ebdf39bc48aa",
-            "1cf0ef0191040e36",
-            "e6a5087f96a2972c"
+            "252e5c9be646fdf6",
+            "20e2a8c83388bd89",
+            "71ae80265be26d63",
+            "8d2586d934c6eadf",
+            "e07b57fc527177a6"
         ],
         "x": 84,
         "y": 59,
@@ -30,9 +30,9 @@
         "h": 114
     },
     {
-        "id": "507b5f3be02d1a34",
+        "id": "a5d4dab517211a88",
         "type": "group",
-        "z": "fcf79fc60c4feb4d",
+        "z": "8529ead17eac2305",
         "name": "02 - Konfigurasi kelompok dan MQTT",
         "style": {
             "label": true,
@@ -40,22 +40,22 @@
             "stroke": "#bac8d3"
         },
         "nodes": [
-            "aa4baa2032f206ca",
-            "d6be298c353204db",
-            "9ef0bf6f25b5311c",
-            "a2a8523654e0bb9a",
-            "8f3c24973be33b4f",
-            "3b6e9146e224b474",
-            "d13ccd60b0b2ab92",
-            "c5132ae280e54033",
-            "7b9b855d21b505f3",
-            "7b428158707892a3",
-            "64421b6cf842046d",
-            "b3b59f951ed65ddb",
-            "5a2f85c63f8b0b23",
-            "1ce7fadc353f60b6",
-            "71afbacb406dda6c",
-            "6d5deb707c9deb06"
+            "c8f696486c8a1455",
+            "175af3a9d2b61c1e",
+            "802758f196d9f210",
+            "34408f5d1c697532",
+            "56f5b44296a6fef2",
+            "764a7d7554bfc10b",
+            "49a6a6eaaa92d29e",
+            "6a89cbeba2fec232",
+            "90e7a49df41aa526",
+            "53f37525966ec840",
+            "9ddf22e4d0f8dd98",
+            "cc55cffad9af719b",
+            "94a896ec1e3192f0",
+            "b860889326b3e8b1",
+            "b82ef6890999f4a3",
+            "69d19907b160c5e7"
         ],
         "x": 39,
         "y": 234,
@@ -63,9 +63,9 @@
         "h": 399
     },
     {
-        "id": "34df75a4ccc81386",
+        "id": "e8d1e6a97ec35af9",
         "type": "group",
-        "z": "fcf79fc60c4feb4d",
+        "z": "8529ead17eac2305",
         "name": "03 - Validasi dan routing",
         "style": {
             "label": true,
@@ -73,14 +73,14 @@
             "stroke": "#bac8d3"
         },
         "nodes": [
-            "996baaf885b67772",
-            "1cdbed79889ace51",
-            "a2984fef42dc3ce6",
-            "ba4dd82feadb8703",
-            "0e840e1eee85b1b1",
-            "7973546fc0977efe",
-            "6181b5a57d6f7c5e",
-            "03b783f62b65f8ae"
+            "3b40d39657808bda",
+            "ca611babf9479d40",
+            "06f5528133ef0346",
+            "cdd39adc7dfb2fe4",
+            "3014569f5c27e739",
+            "819628c98cdab5fc",
+            "5fcf75a7f3403482",
+            "599f299c8d5ac388"
         ],
         "x": 44,
         "y": 724,
@@ -88,9 +88,9 @@
         "h": 232
     },
     {
-        "id": "6978308525cc2145",
+        "id": "ace49227efc3e065",
         "type": "group",
-        "z": "fcf79fc60c4feb4d",
+        "z": "8529ead17eac2305",
         "name": "04 - Query SQLite",
         "style": {
             "label": true,
@@ -98,29 +98,29 @@
             "stroke": "#bac8d3"
         },
         "nodes": [
-            "985b59ce67c482f5",
-            "5bd738985b5f6087",
-            "89cee63aac52f5e8",
-            "09592827f5c27983",
-            "6dcc6f26090f6040",
-            "c9a34d0af655db9d",
-            "ec774674c03b3d34",
-            "4ac36f97dab8b857",
-            "68fbab65ee86f1eb",
-            "a9d2d111b38fcddd",
-            "964f9109a03fe44b",
-            "ec752ce34e5ad1aa",
-            "b6cad307c3522899",
-            "5c9f2ce98f8d906a",
-            "893204db485a4d95",
-            "5a9f316e5b2ccd9a",
-            "fec39a892b60eaba",
-            "65253e9f71a6d2f8",
-            "4397d3ec2350e318",
-            "43a5245102c49279",
-            "eeb8d176dd637fa0",
-            "ead7e6ef4d884b5f",
-            "89ee7f0e4e6cb283"
+            "3fbcbebac67f9002",
+            "ebf6d1803c9cc998",
+            "2171db51d85e5137",
+            "863f54ad5c667b92",
+            "e9b1d2b4613add94",
+            "3cf2e45a99786be0",
+            "627accf1984103cb",
+            "264af11feff19d36",
+            "ca860386579daede",
+            "9db1e1c088be5a11",
+            "c0d192b9054e87f6",
+            "73555c9167e0dfcb",
+            "6f220d83341904bb",
+            "111f65d8990de15a",
+            "de8b99ba84d19d0e",
+            "87fe7ada02d95098",
+            "4ed5c758036764a4",
+            "57d051aa8a4fa28a",
+            "bc29b6b65d5bf197",
+            "a8e1bf5ddba2d1b9",
+            "896ab52d0727a928",
+            "4133ce9ead24ca42",
+            "55ef429869b3526f"
         ],
         "x": 44,
         "y": 989,
@@ -128,9 +128,9 @@
         "h": 474
     },
     {
-        "id": "f054bbea7eaa857e",
+        "id": "ea54c78ae25f57a0",
         "type": "group",
-        "z": "fcf79fc60c4feb4d",
+        "z": "8529ead17eac2305",
         "name": "05 - Dashboard",
         "style": {
             "label": true,
@@ -138,12 +138,12 @@
             "stroke": "#bac8d3"
         },
         "nodes": [
-            "580ed1080ce70a80",
-            "209c8c3e9398c0fa",
-            "b997841222d574eb",
-            "76843eb2b01c6161",
-            "ea67f101a3a0f74e",
-            "b383aa5e1099733e"
+            "da4950cf6bdc74a1",
+            "a221951f48b96de5",
+            "372d07509da24a1f",
+            "3c19f1c1f8b3de10",
+            "d87e9eac0c0406b3",
+            "797f303edd7f0882"
         ],
         "x": 44,
         "y": 1539,
@@ -151,9 +151,9 @@
         "h": 204
     },
     {
-        "id": "f1f4f778b71e4eb3",
+        "id": "304b074b13783361",
         "type": "group",
-        "z": "fcf79fc60c4feb4d",
+        "z": "8529ead17eac2305",
         "name": "06 - Diagnostik",
         "style": {
             "label": true,
@@ -161,12 +161,12 @@
             "stroke": "#bac8d3"
         },
         "nodes": [
-            "fc96ccd7f7383585",
-            "92262c71eef2b141",
-            "64b24352e42fe138",
-            "3adc32c27e60de8e",
-            "0f08a00b4a1c95ee",
-            "e650e19e647b5a3c"
+            "83ccaf4b4e3915fc",
+            "d82e3392ddb0b4c0",
+            "e78bfeabb26e3e77",
+            "90f9d0c627628fe6",
+            "40a379af75c2a0bd",
+            "1fa618259689c2ac"
         ],
         "x": 44,
         "y": 1819,
@@ -174,15 +174,15 @@
         "h": 172
     },
     {
-        "id": "aa4baa2032f206ca",
+        "id": "c8f696486c8a1455",
         "type": "mqtt in",
-        "z": "fcf79fc60c4feb4d",
-        "g": "507b5f3be02d1a34",
+        "z": "8529ead17eac2305",
+        "g": "a5d4dab517211a88",
         "name": "Scan UID per kelompok",
         "topic": "",
         "qos": "1",
         "datatype": "auto-detect",
-        "broker": "sqg_broker",
+        "broker": "rg_broker",
         "nl": false,
         "rap": true,
         "rh": 0,
@@ -191,15 +191,15 @@
         "y": 380,
         "wires": [
             [
-                "d6be298c353204db"
+                "175af3a9d2b61c1e"
             ]
         ]
     },
     {
-        "id": "d6be298c353204db",
+        "id": "175af3a9d2b61c1e",
         "type": "function",
-        "z": "fcf79fc60c4feb4d",
-        "g": "507b5f3be02d1a34",
+        "z": "8529ead17eac2305",
+        "g": "a5d4dab517211a88",
         "name": "Validasi JSON MQTT",
         "func": "if (msg.retain) return null;\nconst group = flow.get(\"webgis_group\");\nif (!group || msg.topic !== `webgis/${group}/rfid/scan`) return null;\nif (Buffer.isBuffer(msg.payload)) msg.payload = msg.payload.toString(\"utf8\");\nif (typeof msg.payload === \"string\") {\n  if (msg.payload.length > 2048) {\n    node.warn(\"Payload terlalu besar\");\n    return null;\n  }\n  try {\n    msg.payload = JSON.parse(msg.payload);\n  } catch (e) {\n    node.warn(\"Payload bukan JSON valid\");\n    return null;\n  }\n}\nif (!msg.payload || typeof msg.payload !== \"object\" || Array.isArray(msg.payload)) {\n  node.warn(\"Payload harus objek JSON\");\n  return null;\n}\nmsg._kind = \"scan\";\ndelete msg._client;\nreturn msg;\n",
         "outputs": 1,
@@ -212,32 +212,32 @@
         "y": 380,
         "wires": [
             [
-                "d13ccd60b0b2ab92"
+                "49a6a6eaaa92d29e"
             ]
         ]
     },
     {
-        "id": "9ef0bf6f25b5311c",
+        "id": "802758f196d9f210",
         "type": "status",
-        "z": "fcf79fc60c4feb4d",
-        "g": "507b5f3be02d1a34",
+        "z": "8529ead17eac2305",
+        "g": "a5d4dab517211a88",
         "name": "Status broker MQTT",
         "scope": [
-            "aa4baa2032f206ca"
+            "c8f696486c8a1455"
         ],
         "x": 240,
         "y": 470,
         "wires": [
             [
-                "a2a8523654e0bb9a"
+                "34408f5d1c697532"
             ]
         ]
     },
     {
-        "id": "a2a8523654e0bb9a",
+        "id": "34408f5d1c697532",
         "type": "function",
-        "z": "fcf79fc60c4feb4d",
-        "g": "507b5f3be02d1a34",
+        "z": "8529ead17eac2305",
+        "g": "a5d4dab517211a88",
         "name": "Tandai status MQTT",
         "func": "msg._kind = \"mqtt_status\";\nreturn msg;\n",
         "outputs": 1,
@@ -250,15 +250,15 @@
         "y": 470,
         "wires": [
             [
-                "c5132ae280e54033"
+                "6a89cbeba2fec232"
             ]
         ]
     },
     {
-        "id": "64b24352e42fe138",
+        "id": "e78bfeabb26e3e77",
         "type": "debug",
-        "z": "fcf79fc60c4feb4d",
-        "g": "f1f4f778b71e4eb3",
+        "z": "8529ead17eac2305",
+        "g": "304b074b13783361",
         "name": "WebGIS Diagnostics",
         "active": true,
         "tosidebar": true,
@@ -271,11 +271,11 @@
         "wires": []
     },
     {
-        "id": "580ed1080ce70a80",
+        "id": "da4950cf6bdc74a1",
         "type": "ui-template",
-        "z": "fcf79fc60c4feb4d",
-        "g": "f054bbea7eaa857e",
-        "group": "720fa6c999ab0989",
+        "z": "8529ead17eac2305",
+        "g": "ea54c78ae25f57a0",
+        "group": "f13f5393cdd68541",
         "page": "",
         "ui": "",
         "name": "Peta Pemantauan",
@@ -293,16 +293,16 @@
         "y": 1580,
         "wires": [
             [
-                "b997841222d574eb"
+                "372d07509da24a1f"
             ]
         ]
     },
     {
-        "id": "209c8c3e9398c0fa",
+        "id": "a221951f48b96de5",
         "type": "ui-template",
-        "z": "fcf79fc60c4feb4d",
-        "g": "f054bbea7eaa857e",
-        "group": "0f70cd7b451f742f",
+        "z": "8529ead17eac2305",
+        "g": "ea54c78ae25f57a0",
+        "group": "5490dadf5eae7689",
         "page": "",
         "ui": "",
         "name": "Admin UID, Lokasi dan Riwayat",
@@ -310,7 +310,7 @@
         "width": "12",
         "height": "0",
         "head": "",
-        "format": "<template>\n  <iframe\n    ref=\"frame\"\n    :srcdoc=\"frameSource\"\n    sandbox=\"allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation-by-user-activation\"\n    referrerpolicy=\"strict-origin-when-cross-origin\"\n    title=\"RFID WebGIS SQLite\"\n    style=\"display:block;width:100%;height:calc(100dvh - 105px);min-height:580px;border:0;border-radius:12px\"\n  ></iframe>\n</template>\n\n<script>\nexport default {\n  data() {\n    return {\n      frameSource: '',\n      channel: '',\n      frameReady: false\n    };\n  },\n\n  mounted() {\n    this.channel = 'rfid-' + Math.random().toString(36).slice(2) + '-' + Date.now();\n\n    this._listener = (event) => {\n      if (event.source !== this.$refs.frame?.contentWindow ||\n          event.data?.channel !== this.channel) return;\n\n      if (event.data.type === 'ready') {\n        this.frameReady = true;\n        this.send({ payload: { action: 'get_state' } });\n      } else if (event.data.type === 'action' && event.data.payload) {\n        this.send({ payload: event.data.payload });\n      }\n    };\n    window.addEventListener('message', this._listener);\n\n    // Socket listener menjaga pesan berurutan agar tidak digabung oleh watcher Vue.\n    this._incoming = (msg) => {\n      if (msg?.payload) this.forward(msg.payload);\n    };\n    this.$socket.on('msg-input:' + this.id, this._incoming);\n\n    this._reconnect = () => {\n      if (this.frameReady) this.send({ payload: { action: 'get_state' } });\n    };\n    this.$socket.on('connect', this._reconnect);\n\n    // Ubah isi tampilan, CSS, dan kode peta pada blok multiline di bawah.\n    const pageHtml = String.raw`\n<!doctype html>\n<html lang=\"id\">\n<head>\n<meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<link href=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css\" rel=\"stylesheet\">\n<link href=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.css\" rel=\"stylesheet\">\n<style>\n*{box-sizing:border-box}body{margin:0;background:#eef3f6;color:#183247;font:14px system-ui,Arial,sans-serif}\n.shell{padding:clamp(12px,2vw,24px);max-width:1600px;margin:auto}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}\n.top h1{font-size:clamp(22px,2.5vw,30px);margin:0}.top small{color:#607487}.nav-link{color:#0d777b;font-weight:700;text-decoration:none}\n.card{border:1px solid #d9e5eb;border-radius:14px;box-shadow:0 8px 22px #1232}.login{max-width:410px;margin:8vh auto}.form-label{font-weight:650}\n.grid{display:grid;grid-template-columns:minmax(310px,420px) minmax(0,1fr);gap:16px}.stack{display:grid;gap:16px}.map{height:400px;border-radius:9px;z-index:0}\n#editMap{height:260px}.table-wrap{overflow-x:auto}.table{margin:0}.table th,.table td{vertical-align:middle;white-space:nowrap}\n.photo{width:58px;height:58px;object-fit:cover;border-radius:50%;background:#e5ebef}.preview{width:80px;height:80px;object-fit:cover;border-radius:10px;background:#e5ebef}\n.actions{display:flex;gap:6px;white-space:nowrap}.status{font-weight:750}.status.CHECK_IN{color:#15934d}.status.CHECK_OUT{color:#dc4545}\n.pager{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 0}.coords{display:grid;grid-template-columns:1fr 1fr;gap:10px}\n#editModal .modal-dialog {\n  height: calc(100dvh - 32px);\n  margin: 16px auto;\n}\n\n#editModal .modal-content,\n#editModal #editForm {\n  height: 100%;\n  min-height: 0;\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n}\n\n#editModal .modal-body {\n  min-height: 0;\n  flex: 1 1 auto;\n  overflow-y: auto;\n  overscroll-behavior: contain;\n}\n\n#editModal .modal-header,\n#editModal .modal-footer {\n  flex: 0 0 auto;\n}\n.modal{z-index:2100}.modal-backdrop{z-index:2090}.swal2-container{z-index:2500!important}.modal-dialog{max-width:650px}.alert{margin-bottom:0}\n@media(max-width:900px){.grid{grid-template-columns:1fr}.map{height:350px}}@media(max-width:560px){.shell{padding:10px}.table{font-size:12px}.coords{grid-template-columns:1fr}}\n</style>\n</head>\n<body>\n<main class=\"shell\">\n<header class=\"top\"><div><small>RFID · SQLITE · WEBGIS</small><h1>Administrasi UID dan Lokasi</h1></div><a class=\"nav-link\" href=\"/dashboard/rfid-gis-map\" target=\"_top\">← Peta Pemantauan</a></header>\n<section id=\"login\" class=\"card login p-4\"><h2 class=\"h4 mb-3\">Login Admin</h2><form id=\"loginForm\">\n<label class=\"form-label\" for=\"username\">Username</label><input class=\"form-control mb-3\" id=\"username\" autocomplete=\"username\" required>\n<label class=\"form-label\" for=\"password\">Password</label><input class=\"form-control mb-3\" id=\"password\" type=\"password\" autocomplete=\"current-password\" required>\n<button class=\"btn btn-primary w-100\" type=\"submit\">Masuk</button><p id=\"loginError\" class=\"text-danger mt-3 mb-0\" role=\"alert\"></p></form></section>\n<div id=\"admin\" hidden><div class=\"d-flex gap-2 align-items-center justify-content-between mb-3 flex-wrap\"><span id=\"connection\" class=\"badge text-bg-secondary\">SQLite menunggu</span><button class=\"btn btn-outline-secondary btn-sm\" id=\"logout\">Keluar</button></div>\n<div class=\"grid\"><div class=\"stack\"><section class=\"card p-3\"><h2 class=\"h5\">Daftarkan Kartu</h2><form id=\"registerForm\">\n<label class=\"form-label\" for=\"uid\">UID kartu</label><input class=\"form-control mb-2\" id=\"uid\" maxlength=\"20\" placeholder=\"Tap mode REGISTER atau isi UID\" required>\n<label class=\"form-label\" for=\"name\">Nama</label><input class=\"form-control mb-2\" id=\"name\" maxlength=\"100\" required>\n<label class=\"form-label\" for=\"photo\">Foto opsional</label><input class=\"form-control mb-2\" id=\"photo\" type=\"file\" accept=\"image/jpeg,image/png,image/webp\"><img id=\"preview\" class=\"preview mb-2\" alt=\"Pratinjau foto\">\n<div class=\"coords\"><label class=\"form-label\">Latitude<input class=\"form-control\" id=\"lat\" readonly required></label><label class=\"form-label\">Longitude<input class=\"form-control\" id=\"lng\" readonly required></label></div>\n<button class=\"btn btn-primary mt-3\" id=\"registerButton\" type=\"submit\">Daftarkan UID</button></form></section>\n<section class=\"card p-3\"><h2 class=\"h5\">Pilih Lokasi</h2><p class=\"text-secondary\">Klik peta untuk menentukan lokasi saat pendaftaran.</p><div id=\"map\" class=\"map\"></div></section></div>\n<div class=\"stack\"><section class=\"card p-3\"><div class=\"d-flex justify-content-between gap-2 flex-wrap\"><h2 class=\"h5\">Pengguna Terdaftar</h2><button class=\"btn btn-outline-primary btn-sm\" id=\"refresh\">Muat ulang</button></div>\n<div class=\"table-wrap\"><table class=\"table table-hover table-sm\"><thead><tr><th>Foto</th><th>Nama / UID</th><th>Status</th><th>UID Aktif</th><th>Aksi</th></tr></thead><tbody id=\"usersBody\"></tbody></table></div></section>\n<section class=\"card p-3\"><h2 class=\"h5\">Riwayat Check-in / Check-out</h2><p class=\"text-secondary small\">Diperbarui saat reader mengirim scan baru.</p>\n<div class=\"table-wrap\"><table class=\"table table-striped table-sm\"><thead><tr><th>Waktu</th><th>Nama / UID</th><th>Node</th><th>Status</th></tr></thead><tbody id=\"historyBody\"></tbody></table></div>\n<div class=\"pager\"><span id=\"pageInfo\"></span><div class=\"btn-group btn-group-sm\"><button id=\"prev\" class=\"btn btn-outline-primary\">Sebelumnya</button><button id=\"next\" class=\"btn btn-outline-primary\">Berikutnya</button></div></div></section></div></div></div>\n</main>\n<div class=\"modal fade\" id=\"editModal\" tabindex=\"-1\" aria-labelledby=\"editTitle\" aria-hidden=\"true\"><div class=\"modal-dialog modal-dialog-scrollable\"><div class=\"modal-content\"><form id=\"editForm\"><div class=\"modal-header\"><h2 class=\"modal-title h5\" id=\"editTitle\">Edit Pengguna</h2><button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\" aria-label=\"Tutup\"></button></div><div class=\"modal-body\">\n<p id=\"editUid\" class=\"text-secondary\"></p><label class=\"form-label\" for=\"editName\">Nama</label><input id=\"editName\" class=\"form-control mb-2\" maxlength=\"100\" required>\n<label class=\"form-label\" for=\"editPhoto\">Foto (opsional, biarkan kosong untuk mempertahankan)</label><input id=\"editPhoto\" class=\"form-control mb-2\" type=\"file\" accept=\"image/jpeg,image/png,image/webp\"><img id=\"editPreview\" class=\"preview mb-2\" alt=\"Foto pengguna\">\n<label class=\"form-label\" for=\"editStatus\">Status</label><select id=\"editStatus\" class=\"form-select mb-2\"><option value=\"IDLE\">IDLE</option><option value=\"CHECK_IN\">CHECK_IN</option><option value=\"CHECK_OUT\">CHECK_OUT</option></select>\n<div class=\"coords\"><label class=\"form-label\">Latitude<input id=\"editLat\" class=\"form-control\" readonly></label><label class=\"form-label\">Longitude<input id=\"editLng\" class=\"form-control\" readonly></label></div>\n<p class=\"small text-secondary mt-2\">Klik peta untuk mengganti titik lokasi.</p><div id=\"editMap\" class=\"map\"></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-secondary\" data-bs-dismiss=\"modal\">Batal</button><button id=\"editSave\" type=\"submit\" class=\"btn btn-primary\">Simpan Perubahan</button></div></form></div></div></div>\n<div class=\"modal fade\" id=\"deleteModal\" tabindex=\"-1\" aria-labelledby=\"deleteTitle\" aria-hidden=\"true\"><div class=\"modal-dialog\"><div class=\"modal-content\"><div class=\"modal-header\"><h2 class=\"modal-title h5\" id=\"deleteTitle\">Hapus Pengguna</h2><button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\" aria-label=\"Tutup\"></button></div><div class=\"modal-body\"><p id=\"deleteText\"></p><p class=\"text-secondary small mb-0\">Riwayat scan tetap disimpan; UID akan diarsipkan dan hilang dari peta.</p></div><div class=\"modal-footer\"><button class=\"btn btn-secondary\" data-bs-dismiss=\"modal\">Batal</button><button id=\"confirmDelete\" class=\"btn btn-danger\">Hapus Pengguna</button></div></div></div></div>\n<script src=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js\">__SCRIPT_END__\n<script src=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.js\">__SCRIPT_END__\n<script src=\"https://cdn.jsdelivr.net/npm/sweetalert2@11.26.3/dist/sweetalert2.all.min.js\">__SCRIPT_END__\n<script>\nconst CHANNEL=\"__CHANNEL__\";const post=payload=>parent.postMessage({channel:CHANNEL,type:\"action\",payload},\"*\");\nconst $=id=>document.getElementById(id);const store={token:\"\",users:[],history:[],page:1,selected:null,busy:false,photo:\"\",coords:null,editPhoto:\"\",editCoords:null,photoTask:null,editPhotoTask:null,photoError:false,editPhotoError:false};\nconst perPage=10;let map,editMap,marker,editMarker,editDialog,deleteDialog;\nconst fallback=\"data:image/svg+xml,\"+encodeURIComponent('<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"80\"><rect width=\"80\" height=\"80\" fill=\"#dce5ed\"/><circle cx=\"40\" cy=\"28\" r=\"15\" fill=\"#91a8b6\"/><path d=\"M7 80c1-35 65-35 66 0\" fill=\"#91a8b6\"/></svg>');\nfunction notice(title,text,icon=\"info\") {if(window.Swal)Swal.fire({title,text,icon,confirmButtonText:\"OK\"});else alert(title+\"\\n\"+text)}\nfunction loggedIn(value){$(\"login\").hidden=value;$(\"admin\").hidden=!value;if(value){setTimeout(()=>map?.invalidateSize({pan:false}),50);refresh()}}\nfunction send(action,data={}){post({action,token:store.token,...data})}\nfunction refresh(){if(!store.token)return;send(\"admin_users\");send(\"admin_history\");send(\"get_state\")}\nfunction setCoords(which,latlng){const c={latitude:Number(latlng.lat.toFixed(6)),longitude:Number(latlng.lng.toFixed(6))};if(which===\"edit\"){store.editCoords=c;$(\"editLat\").value=c.latitude;$(\"editLng\").value=c.longitude;if(editMarker)editMarker.setLatLng(latlng);else editMarker=L.marker(latlng).addTo(editMap)}else{store.coords=c;$(\"lat\").value=c.latitude;$(\"lng\").value=c.longitude;if(marker)marker.setLatLng(latlng);else marker=L.marker(latlng).addTo(map)}}\nasync function readPhoto(file){if(!file)return null;if(!/^image\\/(jpeg|png|webp)$/.test(file.type)||file.size>5e6)throw Error(\"Foto harus JPG, PNG, atau WebP maksimal 5 MB.\");const url=URL.createObjectURL(file);try{const image=new Image();image.src=url;await image.decode();const scale=Math.min(1,480/Math.max(image.width,image.height));const canvas=document.createElement(\"canvas\");canvas.width=Math.round(image.width*scale);canvas.height=Math.round(image.height*scale);const ctx=canvas.getContext(\"2d\");ctx.fillStyle=\"white\";ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(image,0,0,canvas.width,canvas.height);let quality=.82,data=canvas.toDataURL(\"image/jpeg\",quality);while(data.length>200000&&quality>.4){quality-=.1;data=canvas.toDataURL(\"image/jpeg\",quality)}if(data.length>200000)throw Error(\"Foto terlalu besar.\");return data}finally{URL.revokeObjectURL(url)}}\nfunction cell(row,text){const td=document.createElement(\"td\");td.textContent=text;row.append(td);return td}\nfunction actionButton(text,cls,onClick){const b=document.createElement(\"button\");b.className=\"btn btn-sm \"+cls;b.textContent=text;b.onclick=onClick;return b}\nfunction renderUsers(){const body=$(\"usersBody\");body.replaceChildren();for(const u of store.users){const tr=document.createElement(\"tr\");const photo=document.createElement(\"img\");photo.className=\"photo\";photo.alt=\"Foto \"+u.name;photo.src=u.photo||fallback;photo.onerror=()=>{photo.onerror=null;photo.src=fallback};const t=document.createElement(\"td\");t.append(photo);tr.append(t);cell(tr,u.name+\" · \"+u.uid);const state=cell(tr,u.status);state.className=\"status \"+u.status;cell(tr,u.enabled?\"AKTIF\":\"NONAKTIF\");const buttons=document.createElement(\"td\");buttons.className=\"actions\";buttons.append(actionButton(\"Edit\",\"btn-outline-primary\",()=>openEdit(u)),actionButton(u.enabled?\"Nonaktifkan\":\"Aktifkan\",\"btn-outline-warning\",()=>toggle(u)),actionButton(\"Hapus\",\"btn-outline-danger\",()=>openDelete(u)));tr.append(buttons);body.append(tr)}if(!store.users.length){const tr=document.createElement(\"tr\");cell(tr,\"Belum ada pengguna.\").colSpan=5;body.append(tr)}}\nfunction renderHistory(){const body=$(\"historyBody\");body.replaceChildren();const total=Math.max(1,Math.ceil(store.history.length/perPage));store.page=Math.min(total,store.page);for(const h of store.history.slice((store.page-1)*perPage,store.page*perPage)){const tr=document.createElement(\"tr\");cell(tr,new Date(h.scanned_at).toLocaleString(\"id-ID\"));cell(tr,h.name+\" · \"+h.uid);cell(tr,h.node_id);cell(tr,h.status).className=\"status \"+h.status;body.append(tr)}if(!store.history.length){const tr=document.createElement(\"tr\");cell(tr,\"Belum ada scan.\").colSpan=4;body.append(tr)}$(\"pageInfo\").textContent=\"Halaman \"+store.page+\" / \"+total+\" · \"+store.history.length+\" scan terbaru\";$(\"prev\").disabled=store.page===1;$(\"next\").disabled=store.page===total}\nfunction openEdit(u){store.selected=u;store.editPhoto=u.photo||\"\";store.editPhotoTask=null;store.editPhotoError=false;store.editCoords={latitude:u.latitude,longitude:u.longitude};$(\"editUid\").textContent=\"UID: \"+u.uid;$(\"editName\").value=u.name;$(\"editStatus\").value=u.status;$(\"editLat\").value=u.latitude;$(\"editLng\").value=u.longitude;$(\"editPhoto\").value=\"\";$(\"editPreview\").src=u.photo||fallback;editDialog.show()}\nfunction openDelete(u){store.selected=u;$(\"deleteText\").textContent=\"Hapus \"+u.name+\" (\"+u.uid+\") dari daftar pengguna aktif?\";deleteDialog.show()}\nfunction toggle(u){send(\"admin_toggle\",{uid:u.uid,enabled:!Boolean(u.enabled)})}\nfunction handle(p){\n if(p.action===\"login_result\"){if(p.success){store.token=p.token;$(\"password\").value=\"\";$(\"loginError\").textContent=\"\";loggedIn(true)}else $(\"loginError\").textContent=p.message||\"Login gagal\";return}\n if(p.action===\"logout_result\"||p.action===\"session_expired\"){store.token=\"\";store.users=[];store.history=[];loggedIn(false);$(\"loginError\").textContent=p.message||\"\";return}\n if(p.action===\"connection\"){$(\"connection\").textContent=\"SQLite: \"+(p.sqlite?\"terhubung\":\"belum siap\")+\" · MQTT: \"+(p.mqtt?\"terhubung\":\"terputus\");$(\"connection\").className=\"badge \"+(p.sqlite?\"text-bg-success\":\"text-bg-danger\");return}\n if(!store.token)return;\n if(p.action===\"admin_users\"){store.users=p.users||[];renderUsers();return}\n if(p.action===\"admin_history\"){store.history=p.history||[];renderHistory();return}\n if(p.action===\"scan_result\"&&p.success){send(\"admin_history\");send(\"admin_users\");return}\n if(p.action===\"registration_uid\"){if(!store.busy){$(\"uid\").value=p.uid||\"\";notice(\"UID terdeteksi\",\"Lengkapi nama dan lokasi.\")};return}\n if(p.action===\"operation_result\"){store.busy=false;$(\"registerButton\").disabled=false;$(\"editSave\").disabled=false;if(p.success){editDialog.hide();deleteDialog.hide();if(p.operation===\"register\"){$(\"registerForm\").reset();store.coords=null;store.photo=\"\";store.photoTask=null;store.photoError=false;$(\"preview\").src=fallback;if(marker){marker.remove();marker=null}}refresh()}notice(p.success?\"Berhasil\":\"Gagal\",p.message||\"Operasi selesai\",p.success?\"success\":\"error\")}\n}\nwindow.addEventListener(\"message\",e=>{if(e.source!==parent||e.data?.channel!==CHANNEL||e.data.type!==\"data\")return;handle(e.data.payload||{})});\n$(\"loginForm\").onsubmit=e=>{e.preventDefault();post({action:\"admin_login\",username:$(\"username\").value.trim(),password:$(\"password\").value})};\n$(\"logout\").onclick=()=>{send(\"admin_logout\");store.token=\"\";loggedIn(false)};\n$(\"refresh\").onclick=refresh;\n$(\"prev\").onclick=()=>{store.page--;renderHistory()};$(\"next\").onclick=()=>{store.page++;renderHistory()};\n$(\"photo\").onchange=e=>{store.photoError=false;store.photoTask=readPhoto(e.target.files[0]).then(v=>{store.photo=v||\"\";$(\"preview\").src=store.photo||fallback}).catch(err=>{store.photo=\"\";store.photoError=true;notice(\"Foto tidak valid\",err.message,\"error\")})};\n$(\"editPhoto\").onchange=e=>{store.editPhotoError=false;store.editPhotoTask=readPhoto(e.target.files[0]).then(v=>{if(v){store.editPhoto=v;$(\"editPreview\").src=v}}).catch(err=>{store.editPhotoError=true;notice(\"Foto tidak valid\",err.message,\"error\")})};\n$(\"registerForm\").onsubmit=async e=>{e.preventDefault();if(store.busy)return;if(store.photoTask)await store.photoTask;if(store.photoError)return;const uid=$(\"uid\").value.trim().toUpperCase();if(!store.coords){notice(\"Lokasi belum dipilih\",\"Klik peta untuk menentukan lokasi.\");return}store.busy=true;$(\"registerButton\").disabled=true;send(\"register\",{uid,name:$(\"name\").value.trim(),photo:store.photo,...store.coords,request_id:Date.now().toString()})};\n$(\"editForm\").onsubmit=async e=>{e.preventDefault();if(store.busy||!store.selected||!store.editCoords)return;if(store.editPhotoTask)await store.editPhotoTask;if(store.editPhotoError)return;store.busy=true;$(\"editSave\").disabled=true;send(\"admin_update\",{uid:store.selected.uid,name:$(\"editName\").value.trim(),photo:store.editPhoto,status:$(\"editStatus\").value,...store.editCoords,request_id:Date.now().toString()})};\n$(\"confirmDelete\").onclick=()=>{if(!store.busy&&store.selected){store.busy=true;send(\"admin_delete\",{uid:store.selected.uid,request_id:Date.now().toString()})}};\n$(\"preview\").src=fallback;$(\"editPreview\").src=fallback;\nif(window.L){map=L.map(\"map\").setView([-3.3186,114.5944],13);L.tileLayer(\"https://tile.openstreetmap.org/{z}/{x}/{y}.png\",{maxZoom:19,attribution:'&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a>'}).addTo(map);map.on(\"click\",e=>setCoords(\"register\",e.latlng));editMap=L.map(\"editMap\").setView([-3.3186,114.5944],13);L.tileLayer(\"https://tile.openstreetmap.org/{z}/{x}/{y}.png\",{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(editMap);editMap.on(\"click\",e=>setCoords(\"edit\",e.latlng))}\nif(window.bootstrap){editDialog=new bootstrap.Modal($(\"editModal\"));deleteDialog=new bootstrap.Modal($(\"deleteModal\"));$(\"editModal\").addEventListener(\"shown.bs.modal\",()=>{editMap?.invalidateSize({pan:false});if(store.editCoords){const point=[store.editCoords.latitude,store.editCoords.longitude];editMap.setView(point,15,{animate:false});if(editMarker)editMarker.setLatLng(point);else editMarker=L.marker(point).addTo(editMap)}})}\nparent.postMessage({channel:CHANNEL,type:\"ready\"},\"*\");\n__SCRIPT_END__\n</body></html>\n`;\n\n    this.frameSource = pageHtml\n      .replaceAll('__CHANNEL__', this.channel)\n      .replaceAll('__SCRIPT_END__', '</' + 'script>');\n  },\n\n  unmounted() {\n    window.removeEventListener('message', this._listener);\n    this.$socket.off('msg-input:' + this.id, this._incoming);\n    this.$socket.off('connect', this._reconnect);\n    this.frameReady = false;\n  },\n\n  methods: {\n    forward(payload) {\n      if (!this.frameReady) return;\n      const plainPayload = JSON.parse(JSON.stringify(payload));\n      this.$refs.frame?.contentWindow?.postMessage({\n        channel: this.channel,\n        type: 'data',\n        payload: plainPayload\n      }, window.location.origin);\n    }\n  }\n};\n</script>\n",
+        "format": "<template>\n  <iframe\n    ref=\"frame\"\n    :srcdoc=\"frameSource\"\n    sandbox=\"allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation-by-user-activation\"\n    referrerpolicy=\"strict-origin-when-cross-origin\"\n    title=\"RFID WebGIS SQLite\"\n    style=\"display:block;width:100%;height:calc(100dvh - 105px);min-height:580px;border:0;border-radius:12px\"\n  ></iframe>\n</template>\n\n<script>\nexport default {\n  data() {\n    return {\n      frameSource: '',\n      channel: '',\n      frameReady: false\n    };\n  },\n\n  mounted() {\n    this.channel = 'rfid-' + Math.random().toString(36).slice(2) + '-' + Date.now();\n\n    this._listener = (event) => {\n      if (event.source !== this.$refs.frame?.contentWindow ||\n          event.data?.channel !== this.channel) return;\n\n      if (event.data.type === 'ready') {\n        this.frameReady = true;\n        this.send({ payload: { action: 'get_state' } });\n      } else if (event.data.type === 'action' && event.data.payload) {\n        this.send({ payload: event.data.payload });\n      }\n    };\n    window.addEventListener('message', this._listener);\n\n    // Socket listener menjaga pesan berurutan agar tidak digabung oleh watcher Vue.\n    this._incoming = (msg) => {\n      if (msg?.payload) this.forward(msg.payload);\n    };\n    this.$socket.on('msg-input:' + this.id, this._incoming);\n\n    this._reconnect = () => {\n      if (this.frameReady) this.send({ payload: { action: 'get_state' } });\n    };\n    this.$socket.on('connect', this._reconnect);\n\n    // Ubah isi tampilan, CSS, dan kode peta pada blok multiline di bawah.\n    const pageHtml = String.raw`\n<!doctype html>\n<html lang=\"id\">\n<head>\n<meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<link href=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css\" rel=\"stylesheet\">\n<link href=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.css\" rel=\"stylesheet\">\n<style>\n*{box-sizing:border-box}body{margin:0;background:#eef3f6;color:#183247;font:14px system-ui,Arial,sans-serif}\n.shell{padding:clamp(12px,2vw,24px);max-width:1600px;margin:auto}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}\n.top h1{font-size:clamp(22px,2.5vw,30px);margin:0}.top small{color:#607487}.nav-link{color:#0d777b;font-weight:700;text-decoration:none}\n.card{border:1px solid #d9e5eb;border-radius:14px;box-shadow:0 8px 22px #1232}.login{max-width:410px;margin:8vh auto}.form-label{font-weight:650}\n.grid{display:grid;grid-template-columns:minmax(310px,420px) minmax(0,1fr);gap:16px}.stack{display:grid;gap:16px}.map{height:400px;border-radius:9px;z-index:0}\n#editMap{height:260px}.table-wrap{overflow-x:auto}.table{margin:0}.table th,.table td{vertical-align:middle;white-space:nowrap}\n.photo{width:58px;height:58px;object-fit:cover;border-radius:50%;background:#e5ebef}.preview{width:80px;height:80px;object-fit:cover;border-radius:10px;background:#e5ebef}\n.actions{display:flex;gap:6px;white-space:nowrap}.status{font-weight:750}.status.CHECK_IN{color:#15934d}.status.CHECK_OUT{color:#dc4545}\n.pager{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 0}.coords{display:grid;grid-template-columns:1fr 1fr;gap:10px}\n#editModal .modal-dialog{height:calc(100dvh - 32px);max-height:calc(100dvh - 32px);margin:16px auto}\n#editModal .modal-content{max-height:100%;display:flex;flex-direction:column;overflow:hidden}\n#editModal .modal-body{min-height:0;flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain}\n#editModal .modal-footer{flex:0 0 auto;background:white}\n.modal{z-index:2100}.modal-backdrop{z-index:2090}.swal2-container{z-index:2500!important}.modal-dialog{max-width:650px}.alert{margin-bottom:0}\n@media(max-width:900px){.grid{grid-template-columns:1fr}.map{height:350px}}@media(max-width:560px){.shell{padding:10px}.table{font-size:12px}.coords{grid-template-columns:1fr}}\n</style>\n</head>\n<body>\n<main class=\"shell\">\n<header class=\"top\"><div><small>RFID · SQLITE · WEBGIS</small><h1>Administrasi UID dan Lokasi</h1></div><a class=\"nav-link\" href=\"/dashboard/rfid-gis-map\" target=\"_top\">← Peta Pemantauan</a></header>\n<section id=\"login\" class=\"card login p-4\"><h2 class=\"h4 mb-3\">Login Admin</h2><form id=\"loginForm\">\n<label class=\"form-label\" for=\"username\">Username</label><input class=\"form-control mb-3\" id=\"username\" autocomplete=\"username\" required>\n<label class=\"form-label\" for=\"password\">Password</label><input class=\"form-control mb-3\" id=\"password\" type=\"password\" autocomplete=\"current-password\" required>\n<button class=\"btn btn-primary w-100\" type=\"submit\">Masuk</button><p id=\"loginError\" class=\"text-danger mt-3 mb-0\" role=\"alert\"></p></form></section>\n<div id=\"admin\" hidden><div class=\"d-flex gap-2 align-items-center justify-content-between mb-3 flex-wrap\"><span id=\"connection\" class=\"badge text-bg-secondary\">SQLite menunggu</span><button class=\"btn btn-outline-secondary btn-sm\" id=\"logout\">Keluar</button></div>\n<div class=\"grid\"><div class=\"stack\"><section class=\"card p-3\"><h2 class=\"h5\">Daftarkan Kartu</h2><form id=\"registerForm\">\n<label class=\"form-label\" for=\"uid\">UID kartu</label><input class=\"form-control mb-2\" id=\"uid\" maxlength=\"20\" placeholder=\"Tap mode REGISTER atau isi UID\" required>\n<label class=\"form-label\" for=\"name\">Nama</label><input class=\"form-control mb-2\" id=\"name\" maxlength=\"100\" required>\n<label class=\"form-label\" for=\"photo\">Foto opsional</label><input class=\"form-control mb-2\" id=\"photo\" type=\"file\" accept=\"image/jpeg,image/png,image/webp\"><img id=\"preview\" class=\"preview mb-2\" alt=\"Pratinjau foto\">\n<div class=\"coords\"><label class=\"form-label\">Latitude<input class=\"form-control\" id=\"lat\" readonly required></label><label class=\"form-label\">Longitude<input class=\"form-control\" id=\"lng\" readonly required></label></div>\n<button class=\"btn btn-primary mt-3\" id=\"registerButton\" type=\"submit\">Daftarkan UID</button></form></section>\n<section class=\"card p-3\"><h2 class=\"h5\">Pilih Lokasi</h2><p class=\"text-secondary\">Klik peta untuk menentukan lokasi saat pendaftaran.</p><div id=\"map\" class=\"map\"></div></section></div>\n<div class=\"stack\"><section class=\"card p-3\"><div class=\"d-flex justify-content-between gap-2 flex-wrap\"><h2 class=\"h5\">Pengguna Terdaftar</h2><button class=\"btn btn-outline-primary btn-sm\" id=\"refresh\">Muat ulang</button></div>\n<div class=\"table-wrap\"><table class=\"table table-hover table-sm\"><thead><tr><th>Foto</th><th>Nama / UID</th><th>Status</th><th>UID Aktif</th><th>Aksi</th></tr></thead><tbody id=\"usersBody\"></tbody></table></div></section>\n<section class=\"card p-3\"><h2 class=\"h5\">Riwayat Check-in / Check-out</h2><p class=\"text-secondary small\">Diperbarui saat reader mengirim scan baru.</p>\n<div class=\"table-wrap\"><table class=\"table table-striped table-sm\"><thead><tr><th>Waktu</th><th>Nama / UID</th><th>Node</th><th>Status</th></tr></thead><tbody id=\"historyBody\"></tbody></table></div>\n<div class=\"pager\"><span id=\"pageInfo\"></span><div class=\"btn-group btn-group-sm\"><button id=\"prev\" class=\"btn btn-outline-primary\">Sebelumnya</button><button id=\"next\" class=\"btn btn-outline-primary\">Berikutnya</button></div></div></section></div></div></div>\n</main>\n<div class=\"modal fade\" id=\"editModal\" tabindex=\"-1\" aria-labelledby=\"editTitle\" aria-hidden=\"true\"><div class=\"modal-dialog modal-dialog-scrollable\"><div class=\"modal-content\"><form id=\"editForm\"><div class=\"modal-header\"><h2 class=\"modal-title h5\" id=\"editTitle\">Edit Pengguna</h2><button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\" aria-label=\"Tutup\"></button></div><div class=\"modal-body\">\n<p id=\"editUid\" class=\"text-secondary\"></p><label class=\"form-label\" for=\"editName\">Nama</label><input id=\"editName\" class=\"form-control mb-2\" maxlength=\"100\" required>\n<label class=\"form-label\" for=\"editPhoto\">Foto (opsional, biarkan kosong untuk mempertahankan)</label><input id=\"editPhoto\" class=\"form-control mb-2\" type=\"file\" accept=\"image/jpeg,image/png,image/webp\"><img id=\"editPreview\" class=\"preview mb-2\" alt=\"Foto pengguna\">\n<label class=\"form-label\" for=\"editStatus\">Status</label><select id=\"editStatus\" class=\"form-select mb-2\"><option value=\"IDLE\">IDLE</option><option value=\"CHECK_IN\">CHECK_IN</option><option value=\"CHECK_OUT\">CHECK_OUT</option></select>\n<div class=\"coords\"><label class=\"form-label\">Latitude<input id=\"editLat\" class=\"form-control\" readonly></label><label class=\"form-label\">Longitude<input id=\"editLng\" class=\"form-control\" readonly></label></div>\n<p class=\"small text-secondary mt-2\">Klik peta untuk mengganti titik lokasi.</p><div id=\"editMap\" class=\"map\"></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-secondary\" data-bs-dismiss=\"modal\">Batal</button><button id=\"editSave\" type=\"submit\" class=\"btn btn-primary\">Simpan Perubahan</button></div></form></div></div></div>\n<div class=\"modal fade\" id=\"deleteModal\" tabindex=\"-1\" aria-labelledby=\"deleteTitle\" aria-hidden=\"true\"><div class=\"modal-dialog\"><div class=\"modal-content\"><div class=\"modal-header\"><h2 class=\"modal-title h5\" id=\"deleteTitle\">Hapus Pengguna</h2><button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\" aria-label=\"Tutup\"></button></div><div class=\"modal-body\"><p id=\"deleteText\"></p><p class=\"text-secondary small mb-0\">Riwayat scan tetap disimpan; UID akan diarsipkan dan hilang dari peta.</p></div><div class=\"modal-footer\"><button class=\"btn btn-secondary\" data-bs-dismiss=\"modal\">Batal</button><button id=\"confirmDelete\" class=\"btn btn-danger\">Hapus Pengguna</button></div></div></div></div>\n<script src=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js\">__SCRIPT_END__\n<script src=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.js\">__SCRIPT_END__\n<script src=\"https://cdn.jsdelivr.net/npm/sweetalert2@11.26.3/dist/sweetalert2.all.min.js\">__SCRIPT_END__\n<script>\nconst CHANNEL=\"__CHANNEL__\";const post=payload=>parent.postMessage({channel:CHANNEL,type:\"action\",payload},\"*\");\nconst $=id=>document.getElementById(id);const store={token:\"\",users:[],history:[],page:1,selected:null,busy:false,photo:\"\",coords:null,editPhoto:\"\",editCoords:null,photoTask:null,editPhotoTask:null,photoError:false,editPhotoError:false};\nconst perPage=10;let map,editMap,marker,editMarker,editDialog,deleteDialog;\nconst fallback=\"data:image/svg+xml,\"+encodeURIComponent('<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"80\"><rect width=\"80\" height=\"80\" fill=\"#dce5ed\"/><circle cx=\"40\" cy=\"28\" r=\"15\" fill=\"#91a8b6\"/><path d=\"M7 80c1-35 65-35 66 0\" fill=\"#91a8b6\"/></svg>');\nfunction notice(title,text,icon=\"info\") {if(window.Swal)Swal.fire({title,text,icon,confirmButtonText:\"OK\"});else alert(title+\"\\n\"+text)}\nfunction loggedIn(value){$(\"login\").hidden=value;$(\"admin\").hidden=!value;if(value){setTimeout(()=>map?.invalidateSize({pan:false}),50);refresh()}}\nfunction send(action,data={}){post({action,token:store.token,...data})}\nfunction refresh(){if(!store.token)return;send(\"admin_users\");send(\"admin_history\");send(\"get_state\")}\nfunction setCoords(which,latlng){const c={latitude:Number(latlng.lat.toFixed(6)),longitude:Number(latlng.lng.toFixed(6))};if(which===\"edit\"){store.editCoords=c;$(\"editLat\").value=c.latitude;$(\"editLng\").value=c.longitude;if(editMarker)editMarker.setLatLng(latlng);else editMarker=L.marker(latlng).addTo(editMap)}else{store.coords=c;$(\"lat\").value=c.latitude;$(\"lng\").value=c.longitude;if(marker)marker.setLatLng(latlng);else marker=L.marker(latlng).addTo(map)}}\nasync function readPhoto(file){if(!file)return null;if(!/^image\\/(jpeg|png|webp)$/.test(file.type)||file.size>5e6)throw Error(\"Foto harus JPG, PNG, atau WebP maksimal 5 MB.\");const url=URL.createObjectURL(file);try{const image=new Image();image.src=url;await image.decode();const scale=Math.min(1,480/Math.max(image.width,image.height));const canvas=document.createElement(\"canvas\");canvas.width=Math.round(image.width*scale);canvas.height=Math.round(image.height*scale);const ctx=canvas.getContext(\"2d\");ctx.fillStyle=\"white\";ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(image,0,0,canvas.width,canvas.height);let quality=.82,data=canvas.toDataURL(\"image/jpeg\",quality);while(data.length>200000&&quality>.4){quality-=.1;data=canvas.toDataURL(\"image/jpeg\",quality)}if(data.length>200000)throw Error(\"Foto terlalu besar.\");return data}finally{URL.revokeObjectURL(url)}}\nfunction cell(row,text){const td=document.createElement(\"td\");td.textContent=text;row.append(td);return td}\nfunction actionButton(text,cls,onClick){const b=document.createElement(\"button\");b.className=\"btn btn-sm \"+cls;b.textContent=text;b.onclick=onClick;return b}\nfunction renderUsers(){const body=$(\"usersBody\");body.replaceChildren();for(const u of store.users){const tr=document.createElement(\"tr\");const photo=document.createElement(\"img\");photo.className=\"photo\";photo.alt=\"Foto \"+u.name;photo.src=u.photo||fallback;photo.onerror=()=>{photo.onerror=null;photo.src=fallback};const t=document.createElement(\"td\");t.append(photo);tr.append(t);cell(tr,u.name+\" · \"+u.uid);const state=cell(tr,u.status);state.className=\"status \"+u.status;cell(tr,u.enabled?\"AKTIF\":\"NONAKTIF\");const buttons=document.createElement(\"td\");buttons.className=\"actions\";buttons.append(actionButton(\"Edit\",\"btn-outline-primary\",()=>openEdit(u)),actionButton(u.enabled?\"Nonaktifkan\":\"Aktifkan\",\"btn-outline-warning\",()=>toggle(u)),actionButton(\"Hapus\",\"btn-outline-danger\",()=>openDelete(u)));tr.append(buttons);body.append(tr)}if(!store.users.length){const tr=document.createElement(\"tr\");cell(tr,\"Belum ada pengguna.\").colSpan=5;body.append(tr)}}\nfunction renderHistory(){const body=$(\"historyBody\");body.replaceChildren();const total=Math.max(1,Math.ceil(store.history.length/perPage));store.page=Math.min(total,store.page);for(const h of store.history.slice((store.page-1)*perPage,store.page*perPage)){const tr=document.createElement(\"tr\");cell(tr,new Date(h.scanned_at).toLocaleString(\"id-ID\"));cell(tr,h.name+\" · \"+h.uid);cell(tr,h.node_id);cell(tr,h.status).className=\"status \"+h.status;body.append(tr)}if(!store.history.length){const tr=document.createElement(\"tr\");cell(tr,\"Belum ada scan.\").colSpan=4;body.append(tr)}$(\"pageInfo\").textContent=\"Halaman \"+store.page+\" / \"+total+\" · \"+store.history.length+\" scan terbaru\";$(\"prev\").disabled=store.page===1;$(\"next\").disabled=store.page===total}\nfunction openEdit(u){store.selected=u;store.editPhoto=u.photo||\"\";store.editPhotoTask=null;store.editPhotoError=false;store.editCoords={latitude:u.latitude,longitude:u.longitude};$(\"editUid\").textContent=\"UID: \"+u.uid;$(\"editName\").value=u.name;$(\"editStatus\").value=u.status;$(\"editLat\").value=u.latitude;$(\"editLng\").value=u.longitude;$(\"editPhoto\").value=\"\";$(\"editPreview\").src=u.photo||fallback;editDialog.show()}\nfunction openDelete(u){store.selected=u;$(\"deleteText\").textContent=\"Hapus \"+u.name+\" (\"+u.uid+\") dari daftar pengguna aktif?\";deleteDialog.show()}\nfunction toggle(u){send(\"admin_toggle\",{uid:u.uid,enabled:!Boolean(u.enabled)})}\nfunction handle(p){\n if(p.action===\"login_result\"){if(p.success){store.token=p.token;$(\"password\").value=\"\";$(\"loginError\").textContent=\"\";loggedIn(true)}else $(\"loginError\").textContent=p.message||\"Login gagal\";return}\n if(p.action===\"logout_result\"||p.action===\"session_expired\"){store.token=\"\";store.users=[];store.history=[];loggedIn(false);$(\"loginError\").textContent=p.message||\"\";return}\n if(p.action===\"connection\"){$(\"connection\").textContent=\"SQLite: \"+(p.sqlite?\"terhubung\":\"belum siap\")+\" · MQTT: \"+(p.mqtt?\"terhubung\":\"terputus\");$(\"connection\").className=\"badge \"+(p.sqlite?\"text-bg-success\":\"text-bg-danger\");return}\n if(!store.token)return;\n if(p.action===\"admin_users\"){store.users=p.users||[];renderUsers();return}\n if(p.action===\"admin_history\"){store.history=p.history||[];renderHistory();return}\n if(p.action===\"scan_result\"&&p.success){send(\"admin_history\");send(\"admin_users\");return}\n if(p.action===\"registration_uid\"){if(!store.busy){$(\"uid\").value=p.uid||\"\";notice(\"UID terdeteksi\",\"Lengkapi nama dan lokasi.\")};return}\n if(p.action===\"operation_result\"){store.busy=false;$(\"registerButton\").disabled=false;$(\"editSave\").disabled=false;if(p.success){editDialog.hide();deleteDialog.hide();if(p.operation===\"register\"){$(\"registerForm\").reset();store.coords=null;store.photo=\"\";store.photoTask=null;store.photoError=false;$(\"preview\").src=fallback;if(marker){marker.remove();marker=null}}refresh()}notice(p.success?\"Berhasil\":\"Gagal\",p.message||\"Operasi selesai\",p.success?\"success\":\"error\")}\n}\nwindow.addEventListener(\"message\",e=>{if(e.source!==parent||e.data?.channel!==CHANNEL||e.data.type!==\"data\")return;handle(e.data.payload||{})});\n$(\"loginForm\").onsubmit=e=>{e.preventDefault();post({action:\"admin_login\",username:$(\"username\").value.trim(),password:$(\"password\").value})};\n$(\"logout\").onclick=()=>{send(\"admin_logout\");store.token=\"\";loggedIn(false)};\n$(\"refresh\").onclick=refresh;\n$(\"prev\").onclick=()=>{store.page--;renderHistory()};$(\"next\").onclick=()=>{store.page++;renderHistory()};\n$(\"photo\").onchange=e=>{store.photoError=false;store.photoTask=readPhoto(e.target.files[0]).then(v=>{store.photo=v||\"\";$(\"preview\").src=store.photo||fallback}).catch(err=>{store.photo=\"\";store.photoError=true;notice(\"Foto tidak valid\",err.message,\"error\")})};\n$(\"editPhoto\").onchange=e=>{store.editPhotoError=false;store.editPhotoTask=readPhoto(e.target.files[0]).then(v=>{if(v){store.editPhoto=v;$(\"editPreview\").src=v}}).catch(err=>{store.editPhotoError=true;notice(\"Foto tidak valid\",err.message,\"error\")})};\n$(\"registerForm\").onsubmit=async e=>{e.preventDefault();if(store.busy)return;if(store.photoTask)await store.photoTask;if(store.photoError)return;const uid=$(\"uid\").value.trim().toUpperCase();if(!store.coords){notice(\"Lokasi belum dipilih\",\"Klik peta untuk menentukan lokasi.\");return}store.busy=true;$(\"registerButton\").disabled=true;send(\"register\",{uid,name:$(\"name\").value.trim(),photo:store.photo,...store.coords,request_id:Date.now().toString()})};\n$(\"editForm\").onsubmit=async e=>{e.preventDefault();if(store.busy||!store.selected||!store.editCoords)return;if(store.editPhotoTask)await store.editPhotoTask;if(store.editPhotoError)return;store.busy=true;$(\"editSave\").disabled=true;send(\"admin_update\",{uid:store.selected.uid,name:$(\"editName\").value.trim(),photo:store.editPhoto,status:$(\"editStatus\").value,...store.editCoords,request_id:Date.now().toString()})};\n$(\"confirmDelete\").onclick=()=>{if(!store.busy&&store.selected){store.busy=true;send(\"admin_delete\",{uid:store.selected.uid,request_id:Date.now().toString()})}};\n$(\"preview\").src=fallback;$(\"editPreview\").src=fallback;\nif(window.L){map=L.map(\"map\").setView([-3.3186,114.5944],13);L.tileLayer(\"https://tile.openstreetmap.org/{z}/{x}/{y}.png\",{maxZoom:19,attribution:'&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a>'}).addTo(map);map.on(\"click\",e=>setCoords(\"register\",e.latlng));editMap=L.map(\"editMap\").setView([-3.3186,114.5944],13);L.tileLayer(\"https://tile.openstreetmap.org/{z}/{x}/{y}.png\",{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(editMap);editMap.on(\"click\",e=>setCoords(\"edit\",e.latlng))}\nif(window.bootstrap){editDialog=new bootstrap.Modal($(\"editModal\"));deleteDialog=new bootstrap.Modal($(\"deleteModal\"));$(\"editModal\").addEventListener(\"shown.bs.modal\",()=>{editMap?.invalidateSize({pan:false});if(store.editCoords){const point=[store.editCoords.latitude,store.editCoords.longitude];editMap.setView(point,15,{animate:false});if(editMarker)editMarker.setLatLng(point);else editMarker=L.marker(point).addTo(editMap)}})}\nparent.postMessage({channel:CHANNEL,type:\"ready\"},\"*\");\n__SCRIPT_END__\n</body></html>\n`;\n\n    this.frameSource = pageHtml\n      .replaceAll('__CHANNEL__', this.channel)\n      .replaceAll('__SCRIPT_END__', '</' + 'script>');\n  },\n\n  unmounted() {\n    window.removeEventListener('message', this._listener);\n    this.$socket.off('msg-input:' + this.id, this._incoming);\n    this.$socket.off('connect', this._reconnect);\n    this.frameReady = false;\n  },\n\n  methods: {\n    forward(payload) {\n      if (!this.frameReady) return;\n      const plainPayload = JSON.parse(JSON.stringify(payload));\n      this.$refs.frame?.contentWindow?.postMessage({\n        channel: this.channel,\n        type: 'data',\n        payload: plainPayload\n      }, window.location.origin);\n    }\n  }\n};\n</script>\n",
         "storeOutMessages": false,
         "passthru": false,
         "resendOnRefresh": false,
@@ -320,15 +320,15 @@
         "y": 1670,
         "wires": [
             [
-                "76843eb2b01c6161"
+                "3c19f1c1f8b3de10"
             ]
         ]
     },
     {
-        "id": "74a79f94d77b85a3",
+        "id": "20e2a8c83388bd89",
         "type": "function",
-        "z": "fcf79fc60c4feb4d",
-        "g": "d4c18f35d7d0d769",
+        "z": "8529ead17eac2305",
+        "g": "5575d077a2034bb1",
         "name": "Siapkan skema SQLite",
         "func": "flow.set(\"gis_db_ready\", false);\nmsg._op=\"init\";\nmsg.topic=\"PRAGMA foreign_keys=ON;\\nPRAGMA busy_timeout=5000;\\nCREATE TABLE IF NOT EXISTS profiles (\\n group_id TEXT NOT NULL, uid TEXT NOT NULL, name TEXT NOT NULL,\\n photo TEXT NOT NULL DEFAULT '', latitude REAL NOT NULL CHECK(latitude BETWEEN -90 AND 90),\\n longitude REAL NOT NULL CHECK(longitude BETWEEN -180 AND 180), created_at INTEGER NOT NULL,\\n PRIMARY KEY(group_id,uid)\\n);\\nCREATE TABLE IF NOT EXISTS presence (\\n group_id TEXT NOT NULL, uid TEXT NOT NULL, status TEXT NOT NULL CHECK(status IN ('CHECK_IN','CHECK_OUT')),\\n updated_at INTEGER NOT NULL, node_id TEXT NOT NULL, event_id TEXT NOT NULL,\\n PRIMARY KEY(group_id,uid), FOREIGN KEY(group_id,uid) REFERENCES profiles(group_id,uid)\\n);\\nCREATE TABLE IF NOT EXISTS scan_events (\\n group_id TEXT NOT NULL, event_id TEXT NOT NULL, uid TEXT NOT NULL, node_id TEXT NOT NULL,\\n status TEXT NOT NULL CHECK(status IN ('CHECK_IN','CHECK_OUT')), scanned_at INTEGER NOT NULL,\\n PRIMARY KEY(group_id,event_id), FOREIGN KEY(group_id,uid) REFERENCES profiles(group_id,uid)\\n);\\nCREATE TABLE IF NOT EXISTS profile_controls (\\n group_id TEXT NOT NULL, uid TEXT NOT NULL, enabled INTEGER NOT NULL DEFAULT 1 CHECK(enabled IN (0,1)),\\n deleted INTEGER NOT NULL DEFAULT 0 CHECK(deleted IN (0,1)),\\n PRIMARY KEY(group_id,uid), FOREIGN KEY(group_id,uid) REFERENCES profiles(group_id,uid)\\n);\\nCREATE TABLE IF NOT EXISTS admin_updates (\\n id INTEGER PRIMARY KEY AUTOINCREMENT, group_id TEXT NOT NULL, uid TEXT NOT NULL,\\n name TEXT NOT NULL, photo TEXT NOT NULL, latitude REAL NOT NULL, longitude REAL NOT NULL,\\n status TEXT NOT NULL CHECK(status IN ('IDLE','CHECK_IN','CHECK_OUT')), changed_at INTEGER NOT NULL\\n);\\nCREATE TRIGGER IF NOT EXISTS webgis_admin_update AFTER INSERT ON admin_updates BEGIN\\n SELECT CASE WHEN NOT EXISTS (\\n  SELECT 1 FROM profiles p LEFT JOIN profile_controls c ON c.group_id=p.group_id AND c.uid=p.uid\\n  WHERE p.group_id=NEW.group_id AND p.uid=NEW.uid AND COALESCE(c.deleted,0)=0\\n ) THEN RAISE(ABORT,'UID_NOT_FOUND') END;\\n UPDATE profiles SET name=NEW.name,photo=NEW.photo,latitude=NEW.latitude,longitude=NEW.longitude\\n WHERE group_id=NEW.group_id AND uid=NEW.uid;\\n DELETE FROM presence WHERE group_id=NEW.group_id AND uid=NEW.uid AND NEW.status='IDLE';\\n INSERT INTO presence(group_id,uid,status,updated_at,node_id,event_id)\\n SELECT NEW.group_id,NEW.uid,NEW.status,NEW.changed_at,'ADMIN','admin-'||NEW.id\\n WHERE NEW.status IN ('CHECK_IN','CHECK_OUT')\\n ON CONFLICT(group_id,uid) DO UPDATE SET status=excluded.status,updated_at=excluded.updated_at,\\n node_id=excluded.node_id,event_id=excluded.event_id;\\nEND;\\nCREATE TRIGGER IF NOT EXISTS webgis_restore_profile AFTER UPDATE ON profiles\\nWHEN EXISTS (SELECT 1 FROM profile_controls c WHERE c.group_id=NEW.group_id AND c.uid=NEW.uid AND c.deleted=1)\\nBEGIN UPDATE profile_controls SET deleted=0,enabled=1 WHERE group_id=NEW.group_id AND uid=NEW.uid;\\n DELETE FROM presence WHERE group_id=NEW.group_id AND uid=NEW.uid; END;\\nCREATE INDEX IF NOT EXISTS idx_events_uid ON scan_events(group_id,uid,scanned_at);\\nCREATE TRIGGER IF NOT EXISTS apply_webgis_presence\\nAFTER INSERT ON scan_events BEGIN\\n INSERT INTO presence(group_id,uid,status,updated_at,node_id,event_id)\\n VALUES(NEW.group_id,NEW.uid,NEW.status,NEW.scanned_at,NEW.node_id,NEW.event_id)\\n ON CONFLICT(group_id,uid) DO UPDATE SET status=excluded.status,updated_at=excluded.updated_at,node_id=excluded.node_id,event_id=excluded.event_id;\\nEND;\\n\";\nreturn msg;",
         "outputs": 1,
@@ -341,15 +341,15 @@
         "y": 100,
         "wires": [
             [
-                "54e5ebdf39bc48aa"
+                "71ae80265be26d63"
             ]
         ]
     },
     {
-        "id": "2b120c5ce0904f36",
+        "id": "252e5c9be646fdf6",
         "type": "inject",
-        "z": "fcf79fc60c4feb4d",
-        "g": "d4c18f35d7d0d769",
+        "z": "8529ead17eac2305",
+        "g": "5575d077a2034bb1",
         "name": "Inisialisasi 1x saat deploy",
         "props": [
             {
@@ -367,15 +367,15 @@
         "y": 100,
         "wires": [
             [
-                "74a79f94d77b85a3"
+                "20e2a8c83388bd89"
             ]
         ]
     },
     {
-        "id": "54e5ebdf39bc48aa",
+        "id": "71ae80265be26d63",
         "type": "sqlite",
-        "z": "fcf79fc60c4feb4d",
-        "g": "d4c18f35d7d0d769",
+        "z": "8529ead17eac2305",
+        "g": "5575d077a2034bb1",
         "mydb": "sqg_db",
         "sqlquery": "batch",
         "sql": "PRAGMA foreign_keys=ON;\nPRAGMA busy_timeout=5000;\nCREATE TABLE IF NOT EXISTS profiles (\n group_id TEXT NOT NULL, uid TEXT NOT NULL, name TEXT NOT NULL,\n photo TEXT NOT NULL DEFAULT '', latitude REAL NOT NULL CHECK(latitude BETWEEN -90 AND 90),\n longitude REAL NOT NULL CHECK(longitude BETWEEN -180 AND 180), created_at INTEGER NOT NULL,\n PRIMARY KEY(group_id,uid)\n);\nCREATE TABLE IF NOT EXISTS presence (\n group_id TEXT NOT NULL, uid TEXT NOT NULL, status TEXT NOT NULL CHECK(status IN ('CHECK_IN','CHECK_OUT')),\n updated_at INTEGER NOT NULL, node_id TEXT NOT NULL, event_id TEXT NOT NULL,\n PRIMARY KEY(group_id,uid), FOREIGN KEY(group_id,uid) REFERENCES profiles(group_id,uid)\n);\nCREATE TABLE IF NOT EXISTS scan_events (\n group_id TEXT NOT NULL, event_id TEXT NOT NULL, uid TEXT NOT NULL, node_id TEXT NOT NULL,\n status TEXT NOT NULL CHECK(status IN ('CHECK_IN','CHECK_OUT')), scanned_at INTEGER NOT NULL,\n PRIMARY KEY(group_id,event_id), FOREIGN KEY(group_id,uid) REFERENCES profiles(group_id,uid)\n);\nCREATE TABLE IF NOT EXISTS profile_controls (\n group_id TEXT NOT NULL, uid TEXT NOT NULL, enabled INTEGER NOT NULL DEFAULT 1 CHECK(enabled IN (0,1)),\n deleted INTEGER NOT NULL DEFAULT 0 CHECK(deleted IN (0,1)),\n PRIMARY KEY(group_id,uid), FOREIGN KEY(group_id,uid) REFERENCES profiles(group_id,uid)\n);\nCREATE TABLE IF NOT EXISTS admin_updates (\n id INTEGER PRIMARY KEY AUTOINCREMENT, group_id TEXT NOT NULL, uid TEXT NOT NULL,\n name TEXT NOT NULL, photo TEXT NOT NULL, latitude REAL NOT NULL, longitude REAL NOT NULL,\n status TEXT NOT NULL CHECK(status IN ('IDLE','CHECK_IN','CHECK_OUT')), changed_at INTEGER NOT NULL\n);\nCREATE TRIGGER IF NOT EXISTS webgis_admin_update AFTER INSERT ON admin_updates BEGIN\n SELECT CASE WHEN NOT EXISTS (\n  SELECT 1 FROM profiles p LEFT JOIN profile_controls c ON c.group_id=p.group_id AND c.uid=p.uid\n  WHERE p.group_id=NEW.group_id AND p.uid=NEW.uid AND COALESCE(c.deleted,0)=0\n ) THEN RAISE(ABORT,'UID_NOT_FOUND') END;\n UPDATE profiles SET name=NEW.name,photo=NEW.photo,latitude=NEW.latitude,longitude=NEW.longitude\n WHERE group_id=NEW.group_id AND uid=NEW.uid;\n DELETE FROM presence WHERE group_id=NEW.group_id AND uid=NEW.uid AND NEW.status='IDLE';\n INSERT INTO presence(group_id,uid,status,updated_at,node_id,event_id)\n SELECT NEW.group_id,NEW.uid,NEW.status,NEW.changed_at,'ADMIN','admin-'||NEW.id\n WHERE NEW.status IN ('CHECK_IN','CHECK_OUT')\n ON CONFLICT(group_id,uid) DO UPDATE SET status=excluded.status,updated_at=excluded.updated_at,\n node_id=excluded.node_id,event_id=excluded.event_id;\nEND;\nCREATE TRIGGER IF NOT EXISTS webgis_restore_profile AFTER UPDATE ON profiles\nWHEN EXISTS (SELECT 1 FROM profile_controls c WHERE c.group_id=NEW.group_id AND c.uid=NEW.uid AND c.deleted=1)\nBEGIN UPDATE profile_controls SET deleted=0,enabled=1 WHERE group_id=NEW.group_id AND uid=NEW.uid;\n DELETE FROM presence WHERE group_id=NEW.group_id AND uid=NEW.uid; END;\nCREATE INDEX IF NOT EXISTS idx_events_uid ON scan_events(group_id,uid,scanned_at);\nCREATE TRIGGER IF NOT EXISTS apply_webgis_presence\nAFTER INSERT ON scan_events BEGIN\n INSERT INTO presence(group_id,uid,status,updated_at,node_id,event_id)\n VALUES(NEW.group_id,NEW.uid,NEW.status,NEW.scanned_at,NEW.node_id,NEW.event_id)\n ON CONFLICT(group_id,uid) DO UPDATE SET status=excluded.status,updated_at=excluded.updated_at,node_id=excluded.node_id,event_id=excluded.event_id;\nEND;\n",
@@ -384,15 +384,15 @@
         "y": 100,
         "wires": [
             [
-                "1cf0ef0191040e36"
+                "8d2586d934c6eadf"
             ]
         ]
     },
     {
-        "id": "1cf0ef0191040e36",
+        "id": "8d2586d934c6eadf",
         "type": "function",
-        "z": "fcf79fc60c4feb4d",
-        "g": "d4c18f35d7d0d769",
+        "z": "8529ead17eac2305",
+        "g": "5575d077a2034bb1",
         "name": "Database siap",
         "func": "flow.set(\"gis_db_ready\", true);\nflow.set(\"gis_db_error\", \"\");\nmsg.params = { $group: flow.get(\"webgis_group\") };\ndelete msg._client;\nreturn msg;\n",
         "outputs": 1,
@@ -405,17 +405,17 @@
         "y": 100,
         "wires": [
             [
-                "e6a5087f96a2972c"
+                "e07b57fc527177a6"
             ]
         ]
     },
     {
-        "id": "996baaf885b67772",
+        "id": "3b40d39657808bda",
         "type": "function",
-        "z": "fcf79fc60c4feb4d",
-        "g": "34df75a4ccc81386",
+        "z": "8529ead17eac2305",
+        "g": "e8d1e6a97ec35af9",
         "name": "Router WebGIS SQLite",
-        "func": "const group=flow.get(\"webgis_group\");\nconst p=msg.payload||{};\nconst client=msg._client;\nconst reply=(payload)=>{const out=Array(12).fill(null);out[4]={payload,_client:client};return out;};\nconst fail=(message)=>reply({action:\"operation_result\",success:false,request_id:p.request_id||\"\",message});\nconst uid=String(p.uid||\"\").trim().toUpperCase();\nconst uidValid=/^(?:[0-9A-F]{8}|[0-9A-F]{14}|[0-9A-F]{20})$/.test(uid);\nlet sessions=flow.get(\"gis_admin_sessions\")||{};\nconst now=Date.now();\nfor(const key of Object.keys(sessions))if(sessions[key].expires<=now)delete sessions[key];\nconst socket=client?.socketId;\nif(client && p.action===\"admin_login\"){\n  const username=env.get(\"WEBGIS_ADMIN_USER\")||\"admin\";\n  const password=env.get(\"WEBGIS_ADMIN_PASSWORD\")||\"admin123\";\n  if(!socket||p.username!==username||p.password!==password)return reply({action:\"login_result\",success:false,message:\"Username atau password salah\"});\n  const token=now.toString(36)+\"-\"+Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2);\n  sessions[token]={socket,expires:now+1800000};flow.set(\"gis_admin_sessions\",sessions);\n  return reply({action:\"login_result\",success:true,token,message:\"Login berhasil\"});\n}\nconst authorized=()=>{\n  const token=String(p.token||\"\");\n  if(!socket||!token||!sessions[token]||sessions[token].socket!==socket)return false;\n  sessions[token].expires=now+1800000;flow.set(\"gis_admin_sessions\",sessions);return true;\n};\nif(client && p.action===\"admin_logout\"){\n  if(authorized()){delete sessions[String(p.token)];flow.set(\"gis_admin_sessions\",sessions);}\n  return reply({action:\"logout_result\"});\n}\nif(msg._kind===\"mqtt_status\"){\n flow.set(\"gis_mqtt\",msg.status?.fill===\"green\");\n return reply({action:\"connection\",sqlite:!!flow.get(\"gis_db_ready\"),ready:!!flow.get(\"gis_db_ready\"),mqtt:!!flow.get(\"gis_mqtt\"),group_id:group,error:flow.get(\"gis_db_error\")||\"\"});\n}\nif(client && p.action===\"get_state\"){\n if(!flow.get(\"gis_db_ready\"))return reply({action:\"connection\",sqlite:false,ready:false,mqtt:!!flow.get(\"gis_mqtt\"),group_id:group,error:flow.get(\"gis_db_error\")||\"\"});\n msg.params={$group:group};return [msg];\n}\nconst adminActions=[\"register\",\"admin_users\",\"admin_history\",\"admin_update\",\"admin_delete\",\"admin_toggle\"];\nif(client && adminActions.includes(p.action) && !authorized())return reply({action:\"session_expired\",message:\"Sesi admin berakhir. Silakan login kembali.\"});\nif(!flow.get(\"gis_db_ready\"))return client?fail(\"Database belum siap.\"):null;\nif(client && p.action===\"admin_users\"){\n msg.params={$group:group};msg._op=\"admin_users\";return [null,null,null,null,null,null,null,msg];\n}\nif(client && p.action===\"admin_history\"){\n msg.params={$group:group};msg._op=\"admin_history\";return [null,null,null,null,null,null,null,null,msg];\n}\nif(client && p.action===\"get_profile\"){\n if(!uidValid)return fail(\"UID tidak valid\");\n msg.params={$group:group,$uid:uid};return [null,msg];\n}\nconst validateProfile=()=>{\n const name=String(p.name||\"\").trim();const photo=String(p.photo||\"\");\n if(!name||name.length>100)return \"Nama wajib diisi, maksimal 100 karakter.\";\n if(typeof p.latitude!==\"number\"||typeof p.longitude!==\"number\"||\n   !Number.isFinite(p.latitude)||!Number.isFinite(p.longitude)||\n   Math.abs(p.latitude)>90||Math.abs(p.longitude)>180)return \"Koordinat tidak valid.\";\n if(photo&&(!/^data:image\\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(photo)||\n    Buffer.byteLength(photo,\"utf8\")>210000))return \"Foto tidak valid atau terlalu besar.\";\n return \"\";\n};\nif(client && p.action===\"register\"){\n if(!uidValid)return fail(\"UID harus 8, 14, atau 20 karakter heksadesimal.\");\n const error=validateProfile();if(error)return fail(error);\n msg._request={uid,request_id:p.request_id||\"\",group};msg._op=\"register\";\n msg.params={$group:group,$uid:uid,$name:p.name.trim(),$photo:p.photo||\"\",$lat:p.latitude,$lng:p.longitude,$now:now};\n return [null,null,msg];\n}\nif(client && p.action===\"admin_update\"){\n if(!uidValid)return fail(\"UID tidak valid.\");const error=validateProfile();if(error)return fail(error);\n if(![\"IDLE\",\"CHECK_IN\",\"CHECK_OUT\"].includes(p.status))return fail(\"Status tidak valid.\");\n msg._request={uid,request_id:p.request_id||\"\",group};msg._op=\"admin_update\";\n msg.params={$group:group,$uid:uid,$name:p.name.trim(),$photo:p.photo||\"\",$lat:p.latitude,$lng:p.longitude,$status:p.status,$now:now};\n const out=Array(12).fill(null);out[9]=msg;return out;\n}\nif(client && (p.action===\"admin_delete\"||p.action===\"admin_toggle\")){\n if(!uidValid)return fail(\"UID tidak valid.\");\n if(p.action===\"admin_toggle\"&&typeof p.enabled!==\"boolean\")return fail(\"Status UID tidak valid.\");\n msg._request={uid,request_id:p.request_id||\"\",group};msg._op=p.action;\n msg.params={$group:group,$uid:uid,$enabled:p.action===\"admin_toggle\"?(p.enabled?1:0):0};\n const out=Array(12).fill(null);out[p.action===\"admin_delete\"?10:11]=msg;return out;\n}\nif(msg._kind!==\"scan\"||msg.retain)return null;\nif(p.group_id!==group)return null;\nif(!uidValid)return null;\nconst mode=String(p.mode||\"SCAN\").toUpperCase();\nif(mode===\"REGISTER\"){const out=reply({action:\"registration_uid\",uid});if(p.event_id&&p.node_id)out[6]={payload:{node_id:p.node_id,event_id:p.event_id,type:\"scan\",result:\"RECEIVED\"}};return out;}\nif(mode!==\"SCAN\")return null;\nconst nodeId=String(p.node_id||\"mqttx\"),eventId=String(p.event_id||msg._msgid||\"\");\nif(!/^[A-Za-z0-9_-]{1,64}$/.test(nodeId)||!eventId||eventId.length>160)return null;\nmsg._request={uid,group,node_id:nodeId,event_id:eventId};msg._op=\"scan\";\nmsg.params={$group:group,$uid:uid,$event:eventId,$node:nodeId,$now:now};\nreturn [null,null,null,msg];\n\n",
+        "func": "const group=flow.get(\"webgis_group\");\nconst p=msg.payload||{};\nconst client=msg._client;\nconst reply=(payload)=>{const out=Array(12).fill(null);out[4]={payload,_client:client};return out;};\nconst fail=(message)=>reply({action:\"operation_result\",success:false,request_id:p.request_id||\"\",message});\nconst uid=String(p.uid||\"\").trim().toUpperCase();\nconst uidValid=/^(?:[0-9A-F]{8}|[0-9A-F]{14}|[0-9A-F]{20})$/.test(uid);\nlet sessions=flow.get(\"gis_admin_sessions\")||{};\nconst now=Date.now();\nfor(const key of Object.keys(sessions))if(sessions[key].expires<=now)delete sessions[key];\nconst socket=client?.socketId;\nif(client && p.action===\"admin_login\"){\n  const username=env.get(\"WEBGIS_ADMIN_USER\")||\"admin\";\n  const password=env.get(\"WEBGIS_ADMIN_PASSWORD\")||\"admin123\";\n  if(!socket||p.username!==username||p.password!==password)return reply({action:\"login_result\",success:false,message:\"Username atau password salah\"});\n  const token=now.toString(36)+\"-\"+Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2);\n  sessions[token]={socket,expires:now+1800000};flow.set(\"gis_admin_sessions\",sessions);\n  return reply({action:\"login_result\",success:true,token,message:\"Login berhasil\"});\n}\nconst authorized=()=>{\n  const token=String(p.token||\"\");\n  if(!socket||!token||!sessions[token]||sessions[token].socket!==socket)return false;\n  sessions[token].expires=now+1800000;flow.set(\"gis_admin_sessions\",sessions);return true;\n};\nif(client && p.action===\"admin_logout\"){\n  if(authorized()){delete sessions[String(p.token)];flow.set(\"gis_admin_sessions\",sessions);}\n  return reply({action:\"logout_result\"});\n}\nif(msg._kind===\"mqtt_status\"){\n flow.set(\"gis_mqtt\",msg.status?.fill===\"green\");\n return reply({action:\"connection\",sqlite:!!flow.get(\"gis_db_ready\"),ready:!!flow.get(\"gis_db_ready\"),mqtt:!!flow.get(\"gis_mqtt\"),group_id:group,error:flow.get(\"gis_db_error\")||\"\"});\n}\nif(client && p.action===\"get_state\"){\n if(!flow.get(\"gis_db_ready\"))return reply({action:\"connection\",sqlite:false,ready:false,mqtt:!!flow.get(\"gis_mqtt\"),group_id:group,error:flow.get(\"gis_db_error\")||\"\"});\n msg.params={$group:group};return [msg];\n}\nconst adminActions=[\"register\",\"admin_users\",\"admin_history\",\"admin_update\",\"admin_delete\",\"admin_toggle\"];\nif(client && adminActions.includes(p.action) && !authorized())return reply({action:\"session_expired\",message:\"Sesi admin berakhir. Silakan login kembali.\"});\nif(!flow.get(\"gis_db_ready\"))return client?fail(\"Database belum siap.\"):null;\nif(client && p.action===\"admin_users\"){\n msg.params={$group:group};msg._op=\"admin_users\";return [null,null,null,null,null,null,null,msg];\n}\nif(client && p.action===\"admin_history\"){\n msg.params={$group:group};msg._op=\"admin_history\";return [null,null,null,null,null,null,null,null,msg];\n}\nif(client && p.action===\"get_profile\"){\n if(!uidValid)return fail(\"UID tidak valid\");\n msg.params={$group:group,$uid:uid};return [null,msg];\n}\nconst validateProfile=()=>{\n const name=String(p.name||\"\").trim();const photo=String(p.photo||\"\");\n if(!name||name.length>100)return \"Nama wajib diisi, maksimal 100 karakter.\";\n if(typeof p.latitude!==\"number\"||typeof p.longitude!==\"number\"||\n   !Number.isFinite(p.latitude)||!Number.isFinite(p.longitude)||\n   Math.abs(p.latitude)>90||Math.abs(p.longitude)>180)return \"Koordinat tidak valid.\";\n if(photo&&(!/^data:image\\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(photo)||\n    Buffer.byteLength(photo,\"utf8\")>210000))return \"Foto tidak valid atau terlalu besar.\";\n return \"\";\n};\nif(client && p.action===\"register\"){\n if(!uidValid)return fail(\"UID harus 8, 14, atau 20 karakter heksadesimal.\");\n const error=validateProfile();if(error)return fail(error);\n msg._request={uid,request_id:p.request_id||\"\",group};msg._op=\"register\";\n msg.params={$group:group,$uid:uid,$name:p.name.trim(),$photo:p.photo||\"\",$lat:p.latitude,$lng:p.longitude,$now:now};\n return [null,null,msg];\n}\nif(client && p.action===\"admin_update\"){\n if(!uidValid)return fail(\"UID tidak valid.\");const error=validateProfile();if(error)return fail(error);\n if(![\"IDLE\",\"CHECK_IN\",\"CHECK_OUT\"].includes(p.status))return fail(\"Status tidak valid.\");\n msg._request={uid,request_id:p.request_id||\"\",group};msg._op=\"admin_update\";\n msg.params={$group:group,$uid:uid,$name:p.name.trim(),$photo:p.photo||\"\",$lat:p.latitude,$lng:p.longitude,$status:p.status,$now:now};\n const out=Array(12).fill(null);out[9]=msg;return out;\n}\nif(client && (p.action===\"admin_delete\"||p.action===\"admin_toggle\")){\n if(!uidValid)return fail(\"UID tidak valid.\");\n if(p.action===\"admin_toggle\"&&typeof p.enabled!==\"boolean\")return fail(\"Status UID tidak valid.\");\n msg._request={uid,request_id:p.request_id||\"\",group};msg._op=p.action;\n msg.params=p.action===\"admin_toggle\"\n  ? {$group:group,$uid:uid,$enabled:p.enabled?1:0}\n  : {$group:group,$uid:uid};\n const out=Array(12).fill(null);out[p.action===\"admin_delete\"?10:11]=msg;return out;\n}\nif(msg._kind!==\"scan\"||msg.retain)return null;\nif(p.group_id!==group)return null;\nif(!uidValid)return null;\nconst mode=String(p.mode||\"SCAN\").toUpperCase();\nif(mode===\"REGISTER\"){const out=reply({action:\"registration_uid\",uid});if(p.event_id&&p.node_id)out[6]={payload:{node_id:p.node_id,event_id:p.event_id,type:\"scan\",result:\"RECEIVED\"}};return out;}\nif(mode!==\"SCAN\")return null;\nconst nodeId=String(p.node_id||\"mqttx\"),eventId=String(p.event_id||msg._msgid||\"\");\nif(!/^[A-Za-z0-9_-]{1,64}$/.test(nodeId)||!eventId||eventId.length>160)return null;\nmsg._request={uid,group,node_id:nodeId,event_id:eventId};msg._op=\"scan\";\nmsg.params={$group:group,$uid:uid,$event:eventId,$node:nodeId,$now:now};\nreturn [null,null,null,msg];\n\n",
         "outputs": 12,
         "timeout": 0,
         "noerr": 0,
@@ -426,40 +426,40 @@
         "y": 840,
         "wires": [
             [
-                "a2984fef42dc3ce6"
+                "06f5528133ef0346"
             ],
             [
-                "ba4dd82feadb8703"
+                "cdd39adc7dfb2fe4"
             ],
             [
-                "0e840e1eee85b1b1"
+                "3014569f5c27e739"
             ],
             [
-                "7973546fc0977efe"
+                "819628c98cdab5fc"
             ],
             [
-                "6181b5a57d6f7c5e"
+                "5fcf75a7f3403482"
             ],
             [
-                "03b783f62b65f8ae"
+                "599f299c8d5ac388"
             ],
             [
-                "e2b807ef9490a56a"
+                "9285c625a05dec8e"
             ],
             [
-                "7afd4b231f1be5a6"
+                "96ec25172e4174b1"
             ],
             [
-                "82e3143be1152ac7"
+                "42194f80d0b2f8a7"
             ],
             [
-                "dd96579c996ba04f"
+                "f2ce80261664e430"
             ],
             [
-                "0cbc4f44eb627974"
+                "590b1aeef2f75ca5"
             ],
             [
-                "91980b582d734903"
+                "2ecee212b1c191a7"
             ]
         ],
         "outputLabels": [
@@ -472,10 +472,10 @@
         ]
     },
     {
-        "id": "985b59ce67c482f5",
+        "id": "3fbcbebac67f9002",
         "type": "sqlite",
-        "z": "fcf79fc60c4feb4d",
-        "g": "6978308525cc2145",
+        "z": "8529ead17eac2305",
+        "g": "ace49227efc3e065",
         "mydb": "sqg_db",
         "sqlquery": "prepared",
         "sql": "SELECT p.uid,p.name,p.latitude,p.longitude,p.photo,(length(p.photo)>0) AS has_photo,\n CASE WHEN COALESCE(c.enabled,1)=0 THEN 'DISABLED' ELSE COALESCE(s.status,'IDLE') END AS status,\n s.updated_at,COALESCE(s.node_id,'') AS node_id,COALESCE(s.event_id,'') AS last_event_id,\n COALESCE(c.enabled,1) AS enabled\n FROM profiles p LEFT JOIN profile_controls c ON c.group_id=p.group_id AND c.uid=p.uid\n LEFT JOIN presence s ON s.group_id=p.group_id AND s.uid=p.uid\n WHERE p.group_id=$group AND COALESCE(c.deleted,0)=0 ORDER BY p.name,p.uid",
@@ -484,15 +484,15 @@
         "y": 1030,
         "wires": [
             [
-                "5bd738985b5f6087"
+                "ebf6d1803c9cc998"
             ]
         ]
     },
     {
-        "id": "89cee63aac52f5e8",
+        "id": "2171db51d85e5137",
         "type": "sqlite",
-        "z": "fcf79fc60c4feb4d",
-        "g": "6978308525cc2145",
+        "z": "8529ead17eac2305",
+        "g": "ace49227efc3e065",
         "mydb": "sqg_db",
         "sqlquery": "prepared",
         "sql": "SELECT p.uid,p.name,p.photo,p.latitude,p.longitude,p.created_at FROM profiles p\n LEFT JOIN profile_controls c ON c.group_id=p.group_id AND c.uid=p.uid\n WHERE p.group_id=$group AND p.uid=$uid AND COALESCE(c.deleted,0)=0",
@@ -501,15 +501,15 @@
         "y": 1120,
         "wires": [
             [
-                "09592827f5c27983"
+                "863f54ad5c667b92"
             ]
         ]
     },
     {
-        "id": "6dcc6f26090f6040",
+        "id": "e9b1d2b4613add94",
         "type": "sqlite",
-        "z": "fcf79fc60c4feb4d",
-        "g": "6978308525cc2145",
+        "z": "8529ead17eac2305",
+        "g": "ace49227efc3e065",
         "mydb": "sqg_db",
         "sqlquery": "prepared",
         "sql": "INSERT INTO profiles(group_id,uid,name,photo,latitude,longitude,created_at)\n VALUES($group,$uid,$name,$photo,$lat,$lng,$now)\n ON CONFLICT(group_id,uid) DO UPDATE SET name=excluded.name,photo=excluded.photo,\n latitude=excluded.latitude,longitude=excluded.longitude,created_at=excluded.created_at\n WHERE EXISTS(SELECT 1 FROM profile_controls c WHERE c.group_id=$group AND c.uid=$uid AND c.deleted=1)\n RETURNING uid",
@@ -518,15 +518,15 @@
         "y": 1210,
         "wires": [
             [
-                "c9a34d0af655db9d"
+                "3cf2e45a99786be0"
             ]
         ]
     },
     {
-        "id": "ec774674c03b3d34",
+        "id": "627accf1984103cb",
         "type": "sqlite",
-        "z": "fcf79fc60c4feb4d",
-        "g": "6978308525cc2145",
+        "z": "8529ead17eac2305",
+        "g": "ace49227efc3e065",
         "mydb": "sqg_db",
         "sqlquery": "prepared",
         "sql": "INSERT INTO scan_events(group_id,event_id,uid,node_id,status,scanned_at)\n SELECT $group,$event,$uid,$node,CASE WHEN s.status='CHECK_IN' THEN 'CHECK_OUT' ELSE 'CHECK_IN' END,$now\n FROM profiles p LEFT JOIN profile_controls c ON c.group_id=p.group_id AND c.uid=p.uid\n LEFT JOIN presence s ON s.group_id=p.group_id AND s.uid=p.uid\n WHERE p.group_id=$group AND p.uid=$uid AND COALESCE(c.enabled,1)=1 AND COALESCE(c.deleted,0)=0 AND (s.updated_at IS NULL OR $now-s.updated_at>=2000)\n ON CONFLICT(group_id,event_id) DO NOTHING RETURNING uid,status,scanned_at,\n (SELECT name FROM profiles WHERE profiles.group_id=scan_events.group_id AND profiles.uid=scan_events.uid) AS name",
@@ -535,15 +535,15 @@
         "y": 1300,
         "wires": [
             [
-                "4ac36f97dab8b857"
+                "264af11feff19d36"
             ]
         ]
     },
     {
-        "id": "68fbab65ee86f1eb",
+        "id": "ca860386579daede",
         "type": "sqlite",
-        "z": "fcf79fc60c4feb4d",
-        "g": "6978308525cc2145",
+        "z": "8529ead17eac2305",
+        "g": "ace49227efc3e065",
         "mydb": "sqg_db",
         "sqlquery": "prepared",
         "sql": "SELECT p.uid AS registered_uid,COALESCE(c.enabled,1) AS enabled,COALESCE(c.deleted,0) AS deleted,e.uid AS event_uid,e.status AS event_status,e.scanned_at,\n COALESCE(s.status,'IDLE') AS status FROM (SELECT 1) seed\n LEFT JOIN profiles p ON p.group_id=$group AND p.uid=$uid\n LEFT JOIN profile_controls c ON c.group_id=$group AND c.uid=$uid\n LEFT JOIN presence s ON s.group_id=$group AND s.uid=$uid\n LEFT JOIN scan_events e ON e.group_id=$group AND e.event_id=$event",
@@ -552,15 +552,15 @@
         "y": 1390,
         "wires": [
             [
-                "a9d2d111b38fcddd"
+                "9db1e1c088be5a11"
             ]
         ]
     },
     {
-        "id": "5bd738985b5f6087",
+        "id": "ebf6d1803c9cc998",
         "type": "function",
-        "z": "fcf79fc60c4feb4d",
-        "g": "6978308525cc2145",
+        "z": "8529ead17eac2305",
+        "g": "ace49227efc3e065",
         "name": "Kirim snapshot tanpa foto",
         "func": "const group = flow.get(\"webgis_group\");\nflow.set(\"gis_db_ready\", true);\nflow.set(\"gis_db_error\", \"\");\nconst connection = {\n  _client: msg._client,\n  payload: {\n    action: \"connection\",\n    sqlite: true,\n    ready: true,\n    mqtt: !!flow.get(\"gis_mqtt\"),\n    group_id: group,\n    error: \"\",\n  },\n};\nconst snapshot = {\n  _client: msg._client,\n  payload: {\n    action: \"snapshot\",\n    group_id: group,\n    items: Array.isArray(msg.payload) ? msg.payload : [],\n  },\n};\nreturn [msg._client || msg._op === \"init\" ? [connection, snapshot] : snapshot];\n",
         "outputs": 1,
@@ -573,15 +573,15 @@
         "y": 1030,
         "wires": [
             [
-                "893204db485a4d95"
+                "de8b99ba84d19d0e"
             ]
         ]
     },
     {
-        "id": "09592827f5c27983",
+        "id": "863f54ad5c667b92",
         "type": "function",
-        "z": "fcf79fc60c4feb4d",
-        "g": "6978308525cc2145",
+        "z": "8529ead17eac2305",
+        "g": "ace49227efc3e065",
         "name": "Kirim foto ke peminta",
         "func": "return {\n  _client: msg._client,\n  payload: {\n    action: \"profile\",\n    uid: msg._request.uid,\n    profile: msg.payload[0] || null,\n  },\n};\n",
         "outputs": 1,
@@ -594,15 +594,15 @@
         "y": 1120,
         "wires": [
             [
-                "5a9f316e5b2ccd9a"
+                "87fe7ada02d95098"
             ]
         ]
     },
     {
-        "id": "c9a34d0af655db9d",
+        "id": "3cf2e45a99786be0",
         "type": "function",
-        "z": "fcf79fc60c4feb4d",
-        "g": "6978308525cc2145",
+        "z": "8529ead17eac2305",
+        "g": "ace49227efc3e065",
         "name": "Konfirmasi pendaftaran",
         "func": "const success = Array.isArray(msg.payload) && msg.payload.length > 0;\nconst reply = {\n  _client: msg._client,\n  payload: {\n    action: \"operation_result\",\n    request_id: msg._request.request_id,\n    operation: \"register\",\n    success,\n    message: success\n      ? \"Pendaftaran berhasil. Marker baru berstatus IDLE.\"\n      : \"UID sudah terdaftar. Gunakan kartu lain.\",\n  },\n};\nreturn [reply, success ? { params: { $group: msg._request.group } } : null];\n",
         "outputs": 2,
@@ -615,18 +615,18 @@
         "y": 1210,
         "wires": [
             [
-                "fec39a892b60eaba"
+                "4ed5c758036764a4"
             ],
             [
-                "65253e9f71a6d2f8"
+                "57d051aa8a4fa28a"
             ]
         ]
     },
     {
-        "id": "4ac36f97dab8b857",
+        "id": "264af11feff19d36",
         "type": "function",
-        "z": "fcf79fc60c4feb4d",
-        "g": "6978308525cc2145",
+        "z": "8529ead17eac2305",
+        "g": "ace49227efc3e065",
         "name": "Hasil scan tersimpan",
         "func": "const row = msg.payload?.[0],\n  e = msg._request;\nif (!row) {\n  msg.params = { $group: e.group, $uid: e.uid, $event: e.event_id };\n  return [msg, null, null, null];\n}\nconst ui = {\n  payload: {\n    action: \"scan_result\",\n    success: true,\n    uid: e.uid,\n    name: row.name,\n    status: row.status,\n    timestamp: row.scanned_at,\n    message: row.status === \"CHECK_IN\" ? \"Check-in berhasil\" : \"Check-out berhasil\",\n  },\n};\nreturn [null, ui, { params: { $group: e.group } },\n  { payload: { node_id:e.node_id, event_id:e.event_id, type:\"scan\", result:\"OK\", state:row.status } }];\n",
         "outputs": 4,
@@ -639,24 +639,24 @@
         "y": 1300,
         "wires": [
             [
-                "4397d3ec2350e318"
+                "bc29b6b65d5bf197"
             ],
             [
-                "eeb8d176dd637fa0"
+                "896ab52d0727a928"
             ],
             [
-                "ead7e6ef4d884b5f"
+                "4133ce9ead24ca42"
             ],
             [
-                "233f5c68bef941a5"
+                "c2d48657e5febaee"
             ]
         ]
     },
     {
-        "id": "a9d2d111b38fcddd",
+        "id": "9db1e1c088be5a11",
         "type": "function",
-        "z": "fcf79fc60c4feb4d",
-        "g": "6978308525cc2145",
+        "z": "8529ead17eac2305",
+        "g": "ace49227efc3e065",
         "name": "Respon UID atau duplikat",
         "func": "const r = msg.payload?.[0] || {},\n  e = msg._request;\nconst result = r.event_uid\n  ? r.event_uid === e.uid\n    ? \"DUPLICATE\"\n    : \"EVENT_ID_CONFLICT\"\n  : !r.registered_uid || r.deleted\n    ? \"UNKNOWN_UID\"\n    : !r.enabled ? \"INACTIVE_UID\" : \"COOLDOWN\";\nconst ui = (result === \"UNKNOWN_UID\" || result === \"INACTIVE_UID\") ? {\n  payload: { action: \"scan_result\", success: false, uid: result === \"UNKNOWN_UID\" ? \"UID unknown\" : e.uid,\n    message: result === \"INACTIVE_UID\" ? \"UID sedang dinonaktifkan\" : \"UID belum terdaftar\" }\n} : null;\nreturn [ui, { payload: { node_id:e.node_id, event_id:e.event_id, type:\"scan\", result } }];\n",
         "outputs": 2,
@@ -669,18 +669,18 @@
         "y": 1390,
         "wires": [
             [
-                "89ee7f0e4e6cb283"
+                "55ef429869b3526f"
             ],
             [
-                "2daabc2862caaaa3"
+                "7007fce4419ec057"
             ]
         ]
     },
     {
-        "id": "92262c71eef2b141",
+        "id": "d82e3392ddb0b4c0",
         "type": "function",
-        "z": "fcf79fc60c4feb4d",
-        "g": "f1f4f778b71e4eb3",
+        "z": "8529ead17eac2305",
+        "g": "304b074b13783361",
         "name": "Error database ke dashboard",
         "func": "function respond() {\nconst text = msg.error?.message || \"Operasi SQLite gagal\";\nnode.warn(text);\nif (msg._op === \"init\") {\n  flow.set(\"gis_db_ready\", false);\n  flow.set(\"gis_db_error\", text);\n  return [\n    {\n      payload: {\n        action: \"connection\",\n        sqlite: false,\n        ready: false,\n        mqtt: !!flow.get(\"gis_mqtt\"),\n        group_id: flow.get(\"webgis_group\"),\n        error: \"SQLite gagal: \" + text,\n      },\n    },\n    null,\n  ];\n}\nif (msg._client)\n  return [\n    {\n      _client: msg._client,\n      payload: {\n        action: \"operation_result\",\n        request_id: msg._request?.request_id || \"\",\n        success: false,\n        message: \"Operasi SQLite gagal. Periksa Debug.\",\n      },\n    },\n    null,\n  ];\nreturn [{ payload: { action: \"scan_result\", success: false,\n  uid: msg._request?.uid || \"\", message: \"Operasi SQLite gagal. Periksa Debug.\" } }, null];\n\n}\nconst result = respond();\nconst e = msg._request;\nconst ack = msg._op === \"scan\" && e?.node_id && e?.event_id\n  ? { payload: { node_id:e.node_id, event_id:e.event_id, type:\"scan\", result:\"ERROR\" } } : null;\nreturn [result ? result[0] : null, ack];",
         "outputs": 2,
@@ -693,47 +693,47 @@
         "y": 1860,
         "wires": [
             [
-                "0f08a00b4a1c95ee"
+                "40a379af75c2a0bd"
             ],
             [
-                "2bb58ce8fccc34ea"
+                "7fba468129be41fd"
             ]
         ]
     },
     {
-        "id": "fc96ccd7f7383585",
+        "id": "83ccaf4b4e3915fc",
         "type": "catch",
-        "z": "fcf79fc60c4feb4d",
-        "g": "f1f4f778b71e4eb3",
+        "z": "8529ead17eac2305",
+        "g": "304b074b13783361",
         "name": "Tangkap error SQLite",
         "scope": [
-            "54e5ebdf39bc48aa",
-            "985b59ce67c482f5",
-            "89cee63aac52f5e8",
-            "6dcc6f26090f6040",
-            "ec774674c03b3d34",
-            "68fbab65ee86f1eb"
+            "71ae80265be26d63",
+            "3fbcbebac67f9002",
+            "2171db51d85e5137",
+            "e9b1d2b4613add94",
+            "627accf1984103cb",
+            "ca860386579daede"
         ],
         "uncaught": false,
         "x": 240,
         "y": 1860,
         "wires": [
             [
-                "92262c71eef2b141",
-                "e650e19e647b5a3c"
+                "d82e3392ddb0b4c0",
+                "1fa618259689c2ac"
             ]
         ]
     },
     {
-        "id": "8f3c24973be33b4f",
+        "id": "56f5b44296a6fef2",
         "type": "mqtt in",
-        "z": "fcf79fc60c4feb4d",
-        "g": "507b5f3be02d1a34",
+        "z": "8529ead17eac2305",
+        "g": "a5d4dab517211a88",
         "name": "Heartbeat ESP32",
         "topic": "",
         "qos": "1",
         "datatype": "auto-detect",
-        "broker": "sqg_broker",
+        "broker": "rg_broker",
         "nl": false,
         "rap": true,
         "rh": 0,
@@ -742,15 +742,15 @@
         "y": 560,
         "wires": [
             [
-                "3b6e9146e224b474"
+                "764a7d7554bfc10b"
             ]
         ]
     },
     {
-        "id": "3b6e9146e224b474",
+        "id": "764a7d7554bfc10b",
         "type": "function",
-        "z": "fcf79fc60c4feb4d",
-        "g": "507b5f3be02d1a34",
+        "z": "8529ead17eac2305",
+        "g": "a5d4dab517211a88",
         "name": "Laporan terakhir ESP32 + ACK",
         "func": "const group = flow.get(\"webgis_group\");\nlet devices = context.get(\"devices\") || {};\nconst now = Date.now();\nlet p = msg.payload;\nlet ack = null;\nif (msg.topic?.startsWith(\"webgis/\")) {\n  if (msg.retain) return null;\n  try { if (Buffer.isBuffer(p)) p = p.toString(); if (typeof p === \"string\") p = JSON.parse(p); }\n  catch (_) { return null; }\n  if (!p || typeof p !== \"object\" || Array.isArray(p)) return null;\n  const id = String(p.node_id || \"\");\n  if (!/^[A-Za-z0-9_-]{1,40}$/.test(id) || p.group_id !== group ||\n      msg.topic !== `webgis/${group}/node/${id}/status` ||\n      ![\"SCAN\", \"REGISTER\"].includes(p.mode) || p.status !== \"ONLINE\") return null;\n  if (!devices[id] && Object.keys(devices).length >= 32) return null;\n  devices[id] = { node_id: id, mode: p.mode, reader_ready: p.reader_ready === true,\n    rssi: Number.isFinite(p.rssi) ? p.rssi : null, last_seen: now };\n  ack = { payload: { node_id:id, type:\"status\", result:\"RECEIVED\", mode:p.mode } };\n}\nconst nodes = Object.values(devices);\ncontext.set(\"devices\", devices);\nconst payload = { action: \"device_status\", nodes };\nconst requested = p?.action === \"get_state\";\nconst signature = JSON.stringify(nodes);\nif (signature === context.get(\"last\") && !requested) return [null, ack];\ncontext.set(\"last\", signature);\nreturn [{ payload, ...(requested ? { _client: msg._client } : {}) }, ack];\n",
         "outputs": 2,
@@ -763,530 +763,530 @@
         "y": 560,
         "wires": [
             [
-                "7b428158707892a3"
+                "53f37525966ec840"
             ],
             [
-                "832596af71f471c7"
+                "637d775b5c20ede1"
             ]
         ]
     },
     {
-        "id": "d13ccd60b0b2ab92",
+        "id": "49a6a6eaaa92d29e",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
-        "g": "507b5f3be02d1a34",
+        "z": "8529ead17eac2305",
+        "g": "a5d4dab517211a88",
         "name": "Ke Router WebGIS SQLite",
         "mode": "link",
         "links": [
-            "1cdbed79889ace51"
+            "ca611babf9479d40"
         ],
         "x": 650,
         "y": 412,
         "wires": []
     },
     {
-        "id": "1cdbed79889ace51",
+        "id": "ca611babf9479d40",
         "type": "link in",
-        "z": "fcf79fc60c4feb4d",
-        "g": "34df75a4ccc81386",
+        "z": "8529ead17eac2305",
+        "g": "e8d1e6a97ec35af9",
         "name": "Masuk: Router WebGIS SQLite",
         "links": [
-            "d13ccd60b0b2ab92",
-            "c5132ae280e54033",
-            "b997841222d574eb",
-            "76843eb2b01c6161"
+            "49a6a6eaaa92d29e",
+            "6a89cbeba2fec232",
+            "372d07509da24a1f",
+            "3c19f1c1f8b3de10"
         ],
         "x": 85,
         "y": 840,
         "wires": [
             [
-                "996baaf885b67772"
+                "3b40d39657808bda"
             ]
         ]
     },
     {
-        "id": "c5132ae280e54033",
+        "id": "6a89cbeba2fec232",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
-        "g": "507b5f3be02d1a34",
+        "z": "8529ead17eac2305",
+        "g": "a5d4dab517211a88",
         "name": "Ke Router WebGIS SQLite, Status ESP32 / timeout 15 detik",
         "mode": "link",
         "links": [
-            "1cdbed79889ace51",
-            "7b9b855d21b505f3"
+            "ca611babf9479d40",
+            "90e7a49df41aa526"
         ],
         "x": 650,
         "y": 502,
         "wires": []
     },
     {
-        "id": "7b9b855d21b505f3",
+        "id": "90e7a49df41aa526",
         "type": "link in",
-        "z": "fcf79fc60c4feb4d",
-        "g": "507b5f3be02d1a34",
+        "z": "8529ead17eac2305",
+        "g": "a5d4dab517211a88",
         "name": "Masuk: Status ESP32 / timeout 15 detik",
         "links": [
-            "c5132ae280e54033",
-            "b997841222d574eb",
-            "76843eb2b01c6161"
+            "6a89cbeba2fec232",
+            "372d07509da24a1f",
+            "3c19f1c1f8b3de10"
         ],
         "x": 345,
         "y": 560,
         "wires": [
             [
-                "3b6e9146e224b474"
+                "764a7d7554bfc10b"
             ]
         ]
     },
     {
-        "id": "b997841222d574eb",
+        "id": "372d07509da24a1f",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
-        "g": "f054bbea7eaa857e",
+        "z": "8529ead17eac2305",
+        "g": "ea54c78ae25f57a0",
         "name": "Ke Router WebGIS SQLite, Status ESP32 / timeout 15 detik",
         "mode": "link",
         "links": [
-            "1cdbed79889ace51",
-            "7b9b855d21b505f3"
+            "ca611babf9479d40",
+            "90e7a49df41aa526"
         ],
         "x": 390,
         "y": 1612,
         "wires": []
     },
     {
-        "id": "76843eb2b01c6161",
+        "id": "3c19f1c1f8b3de10",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
-        "g": "f054bbea7eaa857e",
+        "z": "8529ead17eac2305",
+        "g": "ea54c78ae25f57a0",
         "name": "Ke Router WebGIS SQLite, Status ESP32 / timeout 15 detik",
         "mode": "link",
         "links": [
-            "1cdbed79889ace51",
-            "7b9b855d21b505f3"
+            "ca611babf9479d40",
+            "90e7a49df41aa526"
         ],
         "x": 390,
         "y": 1702,
         "wires": []
     },
     {
-        "id": "e6a5087f96a2972c",
+        "id": "e07b57fc527177a6",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
-        "g": "d4c18f35d7d0d769",
+        "z": "8529ead17eac2305",
+        "g": "5575d077a2034bb1",
         "name": "Ke SQLite - Daftar marker",
         "mode": "link",
         "links": [
-            "964f9109a03fe44b"
+            "c0d192b9054e87f6"
         ],
         "x": 1170,
         "y": 132,
         "wires": []
     },
     {
-        "id": "964f9109a03fe44b",
+        "id": "c0d192b9054e87f6",
         "type": "link in",
-        "z": "fcf79fc60c4feb4d",
-        "g": "6978308525cc2145",
+        "z": "8529ead17eac2305",
+        "g": "ace49227efc3e065",
         "name": "Masuk: SQLite - Daftar marker",
         "links": [
-            "e6a5087f96a2972c",
-            "a2984fef42dc3ce6",
-            "65253e9f71a6d2f8",
-            "ead7e6ef4d884b5f"
+            "e07b57fc527177a6",
+            "06f5528133ef0346",
+            "57d051aa8a4fa28a",
+            "4133ce9ead24ca42"
         ],
         "x": 85,
         "y": 1030,
         "wires": [
             [
-                "985b59ce67c482f5"
+                "3fbcbebac67f9002"
             ]
         ]
     },
     {
-        "id": "a2984fef42dc3ce6",
+        "id": "06f5528133ef0346",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
-        "g": "34df75a4ccc81386",
+        "z": "8529ead17eac2305",
+        "g": "e8d1e6a97ec35af9",
         "name": "Ke SQLite - Daftar marker",
         "mode": "link",
         "links": [
-            "964f9109a03fe44b"
+            "c0d192b9054e87f6"
         ],
         "x": 390,
         "y": 872,
         "wires": []
     },
     {
-        "id": "ba4dd82feadb8703",
+        "id": "cdd39adc7dfb2fe4",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
-        "g": "34df75a4ccc81386",
+        "z": "8529ead17eac2305",
+        "g": "e8d1e6a97ec35af9",
         "name": "Ke SQLite - Foto identitas",
         "mode": "link",
         "links": [
-            "ec752ce34e5ad1aa"
+            "73555c9167e0dfcb"
         ],
         "x": 425,
         "y": 872,
         "wires": []
     },
     {
-        "id": "ec752ce34e5ad1aa",
+        "id": "73555c9167e0dfcb",
         "type": "link in",
-        "z": "fcf79fc60c4feb4d",
-        "g": "6978308525cc2145",
+        "z": "8529ead17eac2305",
+        "g": "ace49227efc3e065",
         "name": "Masuk: SQLite - Foto identitas",
         "links": [
-            "ba4dd82feadb8703"
+            "cdd39adc7dfb2fe4"
         ],
         "x": 85,
         "y": 1120,
         "wires": [
             [
-                "89cee63aac52f5e8"
+                "2171db51d85e5137"
             ]
         ]
     },
     {
-        "id": "0e840e1eee85b1b1",
+        "id": "3014569f5c27e739",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
-        "g": "34df75a4ccc81386",
+        "z": "8529ead17eac2305",
+        "g": "e8d1e6a97ec35af9",
         "name": "Ke SQLite - Pendaftaran",
         "mode": "link",
         "links": [
-            "b6cad307c3522899"
+            "6f220d83341904bb"
         ],
         "x": 460,
         "y": 872,
         "wires": []
     },
     {
-        "id": "b6cad307c3522899",
+        "id": "6f220d83341904bb",
         "type": "link in",
-        "z": "fcf79fc60c4feb4d",
-        "g": "6978308525cc2145",
+        "z": "8529ead17eac2305",
+        "g": "ace49227efc3e065",
         "name": "Masuk: SQLite - Pendaftaran",
         "links": [
-            "0e840e1eee85b1b1"
+            "3014569f5c27e739"
         ],
         "x": 85,
         "y": 1210,
         "wires": [
             [
-                "6dcc6f26090f6040"
+                "e9b1d2b4613add94"
             ]
         ]
     },
     {
-        "id": "7973546fc0977efe",
+        "id": "819628c98cdab5fc",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
-        "g": "34df75a4ccc81386",
+        "z": "8529ead17eac2305",
+        "g": "e8d1e6a97ec35af9",
         "name": "Ke SQLite - Scan atomik",
         "mode": "link",
         "links": [
-            "5c9f2ce98f8d906a"
+            "111f65d8990de15a"
         ],
         "x": 495,
         "y": 872,
         "wires": []
     },
     {
-        "id": "5c9f2ce98f8d906a",
+        "id": "111f65d8990de15a",
         "type": "link in",
-        "z": "fcf79fc60c4feb4d",
-        "g": "6978308525cc2145",
+        "z": "8529ead17eac2305",
+        "g": "ace49227efc3e065",
         "name": "Masuk: SQLite - Scan atomik",
         "links": [
-            "7973546fc0977efe"
+            "819628c98cdab5fc"
         ],
         "x": 85,
         "y": 1300,
         "wires": [
             [
-                "ec774674c03b3d34"
+                "627accf1984103cb"
             ]
         ]
     },
     {
-        "id": "6181b5a57d6f7c5e",
+        "id": "5fcf75a7f3403482",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
-        "g": "34df75a4ccc81386",
+        "z": "8529ead17eac2305",
+        "g": "e8d1e6a97ec35af9",
         "name": "Ke Peta Pemantauan, Pendaftaran UID dan Lokasi",
         "mode": "link",
         "links": [
-            "ea67f101a3a0f74e",
-            "b383aa5e1099733e"
+            "d87e9eac0c0406b3",
+            "797f303edd7f0882"
         ],
         "x": 530,
         "y": 872,
         "wires": []
     },
     {
-        "id": "ea67f101a3a0f74e",
+        "id": "d87e9eac0c0406b3",
         "type": "link in",
-        "z": "fcf79fc60c4feb4d",
-        "g": "f054bbea7eaa857e",
+        "z": "8529ead17eac2305",
+        "g": "ea54c78ae25f57a0",
         "name": "Masuk: Peta Pemantauan",
         "links": [
-            "6181b5a57d6f7c5e",
-            "893204db485a4d95",
-            "5a9f316e5b2ccd9a",
-            "fec39a892b60eaba",
-            "eeb8d176dd637fa0",
-            "89ee7f0e4e6cb283",
-            "0f08a00b4a1c95ee",
-            "7b428158707892a3"
+            "5fcf75a7f3403482",
+            "de8b99ba84d19d0e",
+            "87fe7ada02d95098",
+            "4ed5c758036764a4",
+            "896ab52d0727a928",
+            "55ef429869b3526f",
+            "40a379af75c2a0bd",
+            "53f37525966ec840"
         ],
         "x": 85,
         "y": 1580,
         "wires": [
             [
-                "580ed1080ce70a80"
+                "da4950cf6bdc74a1"
             ]
         ]
     },
     {
-        "id": "b383aa5e1099733e",
+        "id": "797f303edd7f0882",
         "type": "link in",
-        "z": "fcf79fc60c4feb4d",
-        "g": "f054bbea7eaa857e",
+        "z": "8529ead17eac2305",
+        "g": "ea54c78ae25f57a0",
         "name": "Masuk: Pendaftaran UID dan Lokasi",
         "links": [
-            "6181b5a57d6f7c5e",
-            "893204db485a4d95",
-            "5a9f316e5b2ccd9a",
-            "fec39a892b60eaba",
-            "eeb8d176dd637fa0",
-            "89ee7f0e4e6cb283",
-            "0f08a00b4a1c95ee",
-            "7b428158707892a3"
+            "5fcf75a7f3403482",
+            "de8b99ba84d19d0e",
+            "87fe7ada02d95098",
+            "4ed5c758036764a4",
+            "896ab52d0727a928",
+            "55ef429869b3526f",
+            "40a379af75c2a0bd",
+            "53f37525966ec840"
         ],
         "x": 85,
         "y": 1670,
         "wires": [
             [
-                "209c8c3e9398c0fa"
+                "a221951f48b96de5"
             ]
         ]
     },
     {
-        "id": "03b783f62b65f8ae",
+        "id": "599f299c8d5ac388",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
-        "g": "34df75a4ccc81386",
+        "z": "8529ead17eac2305",
+        "g": "e8d1e6a97ec35af9",
         "name": "Ke WebGIS Diagnostics",
         "mode": "link",
         "links": [
-            "3adc32c27e60de8e"
+            "90f9d0c627628fe6"
         ],
         "x": 565,
         "y": 872,
         "wires": []
     },
     {
-        "id": "3adc32c27e60de8e",
+        "id": "90f9d0c627628fe6",
         "type": "link in",
-        "z": "fcf79fc60c4feb4d",
-        "g": "f1f4f778b71e4eb3",
+        "z": "8529ead17eac2305",
+        "g": "304b074b13783361",
         "name": "Masuk: WebGIS Diagnostics",
         "links": [
-            "03b783f62b65f8ae",
-            "e650e19e647b5a3c"
+            "599f299c8d5ac388",
+            "1fa618259689c2ac"
         ],
         "x": 85,
         "y": 1950,
         "wires": [
             [
-                "64b24352e42fe138"
+                "e78bfeabb26e3e77"
             ]
         ]
     },
     {
-        "id": "893204db485a4d95",
+        "id": "de8b99ba84d19d0e",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
-        "g": "6978308525cc2145",
+        "z": "8529ead17eac2305",
+        "g": "ace49227efc3e065",
         "name": "Ke Peta Pemantauan, Pendaftaran UID dan Lokasi",
         "mode": "link",
         "links": [
-            "ea67f101a3a0f74e",
-            "b383aa5e1099733e"
+            "d87e9eac0c0406b3",
+            "797f303edd7f0882"
         ],
         "x": 650,
         "y": 1062,
         "wires": []
     },
     {
-        "id": "5a9f316e5b2ccd9a",
+        "id": "87fe7ada02d95098",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
-        "g": "6978308525cc2145",
+        "z": "8529ead17eac2305",
+        "g": "ace49227efc3e065",
         "name": "Ke Peta Pemantauan, Pendaftaran UID dan Lokasi",
         "mode": "link",
         "links": [
-            "ea67f101a3a0f74e",
-            "b383aa5e1099733e"
+            "d87e9eac0c0406b3",
+            "797f303edd7f0882"
         ],
         "x": 650,
         "y": 1152,
         "wires": []
     },
     {
-        "id": "fec39a892b60eaba",
+        "id": "4ed5c758036764a4",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
-        "g": "6978308525cc2145",
+        "z": "8529ead17eac2305",
+        "g": "ace49227efc3e065",
         "name": "Ke Peta Pemantauan, Pendaftaran UID dan Lokasi",
         "mode": "link",
         "links": [
-            "ea67f101a3a0f74e",
-            "b383aa5e1099733e"
+            "d87e9eac0c0406b3",
+            "797f303edd7f0882"
         ],
         "x": 650,
         "y": 1242,
         "wires": []
     },
     {
-        "id": "65253e9f71a6d2f8",
+        "id": "57d051aa8a4fa28a",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
-        "g": "6978308525cc2145",
+        "z": "8529ead17eac2305",
+        "g": "ace49227efc3e065",
         "name": "Ke SQLite - Daftar marker",
         "mode": "link",
         "links": [
-            "964f9109a03fe44b"
+            "c0d192b9054e87f6"
         ],
         "x": 685,
         "y": 1242,
         "wires": []
     },
     {
-        "id": "4397d3ec2350e318",
+        "id": "bc29b6b65d5bf197",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
-        "g": "6978308525cc2145",
+        "z": "8529ead17eac2305",
+        "g": "ace49227efc3e065",
         "name": "Ke SQLite - Alasan scan diabaikan",
         "mode": "link",
         "links": [
-            "43a5245102c49279"
+            "a8e1bf5ddba2d1b9"
         ],
         "x": 650,
         "y": 1332,
         "wires": []
     },
     {
-        "id": "43a5245102c49279",
+        "id": "a8e1bf5ddba2d1b9",
         "type": "link in",
-        "z": "fcf79fc60c4feb4d",
-        "g": "6978308525cc2145",
+        "z": "8529ead17eac2305",
+        "g": "ace49227efc3e065",
         "name": "Masuk: SQLite - Alasan scan diabaikan",
         "links": [
-            "4397d3ec2350e318"
+            "bc29b6b65d5bf197"
         ],
         "x": 85,
         "y": 1390,
         "wires": [
             [
-                "68fbab65ee86f1eb"
+                "ca860386579daede"
             ]
         ]
     },
     {
-        "id": "eeb8d176dd637fa0",
+        "id": "896ab52d0727a928",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
-        "g": "6978308525cc2145",
+        "z": "8529ead17eac2305",
+        "g": "ace49227efc3e065",
         "name": "Ke Peta Pemantauan, Pendaftaran UID dan Lokasi",
         "mode": "link",
         "links": [
-            "ea67f101a3a0f74e",
-            "b383aa5e1099733e"
+            "d87e9eac0c0406b3",
+            "797f303edd7f0882"
         ],
         "x": 685,
         "y": 1332,
         "wires": []
     },
     {
-        "id": "ead7e6ef4d884b5f",
+        "id": "4133ce9ead24ca42",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
-        "g": "6978308525cc2145",
+        "z": "8529ead17eac2305",
+        "g": "ace49227efc3e065",
         "name": "Ke SQLite - Daftar marker",
         "mode": "link",
         "links": [
-            "964f9109a03fe44b"
+            "c0d192b9054e87f6"
         ],
         "x": 720,
         "y": 1332,
         "wires": []
     },
     {
-        "id": "89ee7f0e4e6cb283",
+        "id": "55ef429869b3526f",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
-        "g": "6978308525cc2145",
+        "z": "8529ead17eac2305",
+        "g": "ace49227efc3e065",
         "name": "Ke Peta Pemantauan, Pendaftaran UID dan Lokasi",
         "mode": "link",
         "links": [
-            "ea67f101a3a0f74e",
-            "b383aa5e1099733e"
+            "d87e9eac0c0406b3",
+            "797f303edd7f0882"
         ],
         "x": 650,
         "y": 1422,
         "wires": []
     },
     {
-        "id": "0f08a00b4a1c95ee",
+        "id": "40a379af75c2a0bd",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
-        "g": "f1f4f778b71e4eb3",
+        "z": "8529ead17eac2305",
+        "g": "304b074b13783361",
         "name": "Ke Peta Pemantauan, Pendaftaran UID dan Lokasi",
         "mode": "link",
         "links": [
-            "ea67f101a3a0f74e",
-            "b383aa5e1099733e"
+            "d87e9eac0c0406b3",
+            "797f303edd7f0882"
         ],
         "x": 650,
         "y": 1892,
         "wires": []
     },
     {
-        "id": "e650e19e647b5a3c",
+        "id": "1fa618259689c2ac",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
-        "g": "f1f4f778b71e4eb3",
+        "z": "8529ead17eac2305",
+        "g": "304b074b13783361",
         "name": "Ke WebGIS Diagnostics",
         "mode": "link",
         "links": [
-            "3adc32c27e60de8e"
+            "90f9d0c627628fe6"
         ],
         "x": 390,
         "y": 1892,
         "wires": []
     },
     {
-        "id": "7b428158707892a3",
+        "id": "53f37525966ec840",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
-        "g": "507b5f3be02d1a34",
+        "z": "8529ead17eac2305",
+        "g": "a5d4dab517211a88",
         "name": "Ke Peta Pemantauan, Pendaftaran UID dan Lokasi",
         "mode": "link",
         "links": [
-            "ea67f101a3a0f74e",
-            "b383aa5e1099733e"
+            "d87e9eac0c0406b3",
+            "797f303edd7f0882"
         ],
         "x": 650,
         "y": 592,
         "wires": []
     },
     {
-        "id": "64421b6cf842046d",
+        "id": "9ddf22e4d0f8dd98",
         "type": "inject",
-        "z": "fcf79fc60c4feb4d",
-        "g": "507b5f3be02d1a34",
+        "z": "8529ead17eac2305",
+        "g": "a5d4dab517211a88",
         "name": "Saat deploy: pilih kelompok",
         "props": [
             {
@@ -1301,15 +1301,15 @@
         "y": 290,
         "wires": [
             [
-                "b3b59f951ed65ddb"
+                "cc55cffad9af719b"
             ]
         ]
     },
     {
-        "id": "b3b59f951ed65ddb",
+        "id": "cc55cffad9af719b",
         "type": "function",
-        "z": "fcf79fc60c4feb4d",
-        "g": "507b5f3be02d1a34",
+        "z": "8529ead17eac2305",
+        "g": "a5d4dab517211a88",
         "name": "Konfigurasi Kelompok - ubah di sini",
         "func": "const group = \"kelompok-00\";\nflow.set(\"webgis_group\", group);\nreturn [\n  { action: \"subscribe\", topic: `webgis/${group}/rfid/scan` },\n  { action: \"subscribe\", topic: `webgis/${group}/node/+/status` }\n];",
         "outputs": 2,
@@ -1319,102 +1319,102 @@
         "finalize": "",
         "libs": [],
         "x": 540,
-        "y": 280,
+        "y": 300,
         "wires": [
             [
-                "5a2f85c63f8b0b23"
+                "94a896ec1e3192f0"
             ],
             [
-                "1ce7fadc353f60b6"
+                "b860889326b3e8b1"
             ]
         ]
     },
     {
-        "id": "5a2f85c63f8b0b23",
+        "id": "94a896ec1e3192f0",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
-        "g": "507b5f3be02d1a34",
+        "z": "8529ead17eac2305",
+        "g": "a5d4dab517211a88",
         "name": "Ke Scan RFID",
         "mode": "link",
         "links": [
-            "71afbacb406dda6c"
+            "b82ef6890999f4a3"
         ],
         "x": 800,
         "y": 275,
         "wires": []
     },
     {
-        "id": "1ce7fadc353f60b6",
+        "id": "b860889326b3e8b1",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
-        "g": "507b5f3be02d1a34",
+        "z": "8529ead17eac2305",
+        "g": "a5d4dab517211a88",
         "name": "Ke Status ESP32",
         "mode": "link",
         "links": [
-            "6d5deb707c9deb06"
+            "69d19907b160c5e7"
         ],
         "x": 800,
         "y": 305,
         "wires": []
     },
     {
-        "id": "71afbacb406dda6c",
+        "id": "b82ef6890999f4a3",
         "type": "link in",
-        "z": "fcf79fc60c4feb4d",
-        "g": "507b5f3be02d1a34",
+        "z": "8529ead17eac2305",
+        "g": "a5d4dab517211a88",
         "name": "Subscribe Scan RFID",
         "links": [
-            "5a2f85c63f8b0b23"
+            "94a896ec1e3192f0"
         ],
         "x": 80,
         "y": 380,
         "wires": [
             [
-                "aa4baa2032f206ca"
+                "c8f696486c8a1455"
             ]
         ]
     },
     {
-        "id": "6d5deb707c9deb06",
+        "id": "69d19907b160c5e7",
         "type": "link in",
-        "z": "fcf79fc60c4feb4d",
-        "g": "507b5f3be02d1a34",
+        "z": "8529ead17eac2305",
+        "g": "a5d4dab517211a88",
         "name": "Subscribe Status ESP32",
         "links": [
-            "1ce7fadc353f60b6"
+            "b860889326b3e8b1"
         ],
         "x": 80,
         "y": 560,
         "wires": [
             [
-                "8f3c24973be33b4f"
+                "56f5b44296a6fef2"
             ]
         ]
     },
     {
-        "id": "f566344200e975d5",
+        "id": "581daab053bb7e30",
         "type": "link in",
-        "z": "fcf79fc60c4feb4d",
+        "z": "8529ead17eac2305",
         "name": "Masuk: ACK ke ESP32",
         "links": [
-            "e2b807ef9490a56a",
-            "233f5c68bef941a5",
-            "2daabc2862caaaa3",
-            "2bb58ce8fccc34ea",
-            "832596af71f471c7"
+            "9285c625a05dec8e",
+            "c2d48657e5febaee",
+            "7007fce4419ec057",
+            "7fba468129be41fd",
+            "637d775b5c20ede1"
         ],
         "x": 180,
         "y": 640,
         "wires": [
             [
-                "d8b1d37a6996bb32"
+                "b1dda8f1d00f60b4"
             ]
         ]
     },
     {
-        "id": "d8b1d37a6996bb32",
+        "id": "b1dda8f1d00f60b4",
         "type": "function",
-        "z": "fcf79fc60c4feb4d",
+        "z": "8529ead17eac2305",
         "name": "ACK berdasarkan kelompok",
         "func": "const group = flow.get(\"webgis_group\");\nconst p = msg.payload || {};\nconst nodeId = String(p.node_id || \"\");\nif (!group || !/^[A-Za-z0-9_-]{1,40}$/.test(nodeId) ||\n    ![\"status\", \"scan\"].includes(p.type)) return null;\nconst ack = { group_id: group, node_id: nodeId, type: p.type,\n  result: String(p.result || \"ERROR\") };\nif (p.type === \"status\") ack.mode = p.mode;\nif (p.type === \"scan\") {\n  ack.event_id = String(p.event_id || \"\");\n  if (!ack.event_id) return null;\n  if (p.state) ack.state = p.state;\n}\nreturn { topic: `webgis/${group}/node/${nodeId}/ack`,\n  payload: JSON.stringify(ack), qos: \"1\", retain: false };",
         "outputs": 1,
@@ -1426,14 +1426,14 @@
         "y": 640,
         "wires": [
             [
-                "ca1cd39087a0446c"
+                "15c2e632a36eaddc"
             ]
         ]
     },
     {
-        "id": "ca1cd39087a0446c",
+        "id": "15c2e632a36eaddc",
         "type": "mqtt out",
-        "z": "fcf79fc60c4feb4d",
+        "z": "8529ead17eac2305",
         "name": "ACK ESP32 (QoS 1)",
         "topic": "",
         "qos": "1",
@@ -1443,80 +1443,80 @@
         "userProps": "",
         "correl": "",
         "expiry": "",
-        "broker": "sqg_broker",
+        "broker": "rg_broker",
         "x": 640,
         "y": 640,
         "wires": []
     },
     {
-        "id": "e2b807ef9490a56a",
+        "id": "9285c625a05dec8e",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
+        "z": "8529ead17eac2305",
         "name": "Ke ACK ESP32",
         "mode": "link",
         "links": [
-            "f566344200e975d5"
+            "581daab053bb7e30"
         ],
         "x": 680,
         "y": 640,
         "wires": []
     },
     {
-        "id": "233f5c68bef941a5",
+        "id": "c2d48657e5febaee",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
+        "z": "8529ead17eac2305",
         "name": "Ke ACK ESP32",
         "mode": "link",
         "links": [
-            "f566344200e975d5"
+            "581daab053bb7e30"
         ],
         "x": 680,
         "y": 670,
         "wires": []
     },
     {
-        "id": "2daabc2862caaaa3",
+        "id": "7007fce4419ec057",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
+        "z": "8529ead17eac2305",
         "name": "Ke ACK ESP32",
         "mode": "link",
         "links": [
-            "f566344200e975d5"
+            "581daab053bb7e30"
         ],
         "x": 680,
         "y": 700,
         "wires": []
     },
     {
-        "id": "2bb58ce8fccc34ea",
+        "id": "7fba468129be41fd",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
+        "z": "8529ead17eac2305",
         "name": "Ke ACK ESP32",
         "mode": "link",
         "links": [
-            "f566344200e975d5"
+            "581daab053bb7e30"
         ],
         "x": 680,
         "y": 730,
         "wires": []
     },
     {
-        "id": "832596af71f471c7",
+        "id": "637d775b5c20ede1",
         "type": "link out",
-        "z": "fcf79fc60c4feb4d",
+        "z": "8529ead17eac2305",
         "name": "Ke ACK ESP32",
         "mode": "link",
         "links": [
-            "f566344200e975d5"
+            "581daab053bb7e30"
         ],
         "x": 680,
         "y": 760,
         "wires": []
     },
     {
-        "id": "7afd4b231f1be5a6",
+        "id": "96ec25172e4174b1",
         "type": "sqlite",
-        "z": "fcf79fc60c4feb4d",
+        "z": "8529ead17eac2305",
         "mydb": "sqg_db",
         "sqlquery": "prepared",
         "sql": "SELECT p.uid,p.name,p.photo,p.latitude,p.longitude,COALESCE(s.status,'IDLE') AS status,\n COALESCE(c.enabled,1) AS enabled,p.created_at\n FROM profiles p LEFT JOIN profile_controls c ON c.group_id=p.group_id AND c.uid=p.uid\n LEFT JOIN presence s ON s.group_id=p.group_id AND s.uid=p.uid\n WHERE p.group_id=$group AND COALESCE(c.deleted,0)=0 ORDER BY p.name,p.uid",
@@ -1525,14 +1525,14 @@
         "y": 1430,
         "wires": [
             [
-                "7b2e3cca2e9c9d08"
+                "8e46b0a5dda550e5"
             ]
         ]
     },
     {
-        "id": "82e3143be1152ac7",
+        "id": "42194f80d0b2f8a7",
         "type": "sqlite",
-        "z": "fcf79fc60c4feb4d",
+        "z": "8529ead17eac2305",
         "mydb": "sqg_db",
         "sqlquery": "prepared",
         "sql": "SELECT e.event_id,e.uid,COALESCE(p.name,'(dihapus)') AS name,e.node_id,e.status,e.scanned_at\n FROM scan_events e LEFT JOIN profiles p ON p.group_id=e.group_id AND p.uid=e.uid\n WHERE e.group_id=$group ORDER BY e.scanned_at DESC,e.rowid DESC LIMIT 500",
@@ -1541,14 +1541,14 @@
         "y": 1490,
         "wires": [
             [
-                "7b2e3cca2e9c9d08"
+                "8e46b0a5dda550e5"
             ]
         ]
     },
     {
-        "id": "dd96579c996ba04f",
+        "id": "f2ce80261664e430",
         "type": "sqlite",
-        "z": "fcf79fc60c4feb4d",
+        "z": "8529ead17eac2305",
         "mydb": "sqg_db",
         "sqlquery": "prepared",
         "sql": "INSERT INTO admin_updates(group_id,uid,name,photo,latitude,longitude,status,changed_at)\n VALUES($group,$uid,$name,$photo,$lat,$lng,$status,$now) RETURNING uid",
@@ -1557,14 +1557,14 @@
         "y": 1550,
         "wires": [
             [
-                "7b2e3cca2e9c9d08"
+                "8e46b0a5dda550e5"
             ]
         ]
     },
     {
-        "id": "91980b582d734903",
+        "id": "2ecee212b1c191a7",
         "type": "sqlite",
-        "z": "fcf79fc60c4feb4d",
+        "z": "8529ead17eac2305",
         "mydb": "sqg_db",
         "sqlquery": "prepared",
         "sql": "INSERT INTO profile_controls(group_id,uid,enabled,deleted)\n SELECT $group,$uid,$enabled,0 WHERE EXISTS(\n SELECT 1 FROM profiles p LEFT JOIN profile_controls c ON c.group_id=p.group_id AND c.uid=p.uid\n WHERE p.group_id=$group AND p.uid=$uid AND COALESCE(c.deleted,0)=0)\n ON CONFLICT(group_id,uid) DO UPDATE SET enabled=excluded.enabled WHERE profile_controls.deleted=0\n RETURNING uid",
@@ -1573,14 +1573,14 @@
         "y": 1610,
         "wires": [
             [
-                "7b2e3cca2e9c9d08"
+                "8e46b0a5dda550e5"
             ]
         ]
     },
     {
-        "id": "0cbc4f44eb627974",
+        "id": "590b1aeef2f75ca5",
         "type": "sqlite",
-        "z": "fcf79fc60c4feb4d",
+        "z": "8529ead17eac2305",
         "mydb": "sqg_db",
         "sqlquery": "prepared",
         "sql": "INSERT INTO profile_controls(group_id,uid,enabled,deleted)\n SELECT $group,$uid,0,1 WHERE EXISTS(\n SELECT 1 FROM profiles p LEFT JOIN profile_controls c ON c.group_id=p.group_id AND c.uid=p.uid\n WHERE p.group_id=$group AND p.uid=$uid AND COALESCE(c.deleted,0)=0)\n ON CONFLICT(group_id,uid) DO UPDATE SET enabled=0,deleted=1 WHERE profile_controls.deleted=0\n RETURNING uid",
@@ -1589,14 +1589,14 @@
         "y": 1670,
         "wires": [
             [
-                "7b2e3cca2e9c9d08"
+                "8e46b0a5dda550e5"
             ]
         ]
     },
     {
-        "id": "7b2e3cca2e9c9d08",
+        "id": "8e46b0a5dda550e5",
         "type": "function",
-        "z": "fcf79fc60c4feb4d",
+        "z": "8529ead17eac2305",
         "name": "Hasil operasi admin",
         "func": "const op=msg._op,rows=Array.isArray(msg.payload)?msg.payload:[];\nif(op===\"admin_users\")return [{payload:{action:\"admin_users\",users:rows},_client:msg._client},null];\nif(op===\"admin_history\")return [{payload:{action:\"admin_history\",history:rows},_client:msg._client},null];\nconst success=rows.length>0;\nconst names={admin_update:\"Data pengguna diperbarui.\",admin_delete:\"Pengguna diarsipkan; riwayat scan tersimpan.\",admin_toggle:\"Status UID diperbarui.\"};\nconst response={payload:{action:\"operation_result\",operation:op,request_id:msg._request?.request_id||\"\",success,\n message:success?names[op]:\"UID tidak ditemukan atau sudah diarsipkan.\"},_client:msg._client};\nreturn [response,success?{params:{$group:msg._request.group}}:null];",
         "outputs": 2,
@@ -1608,15 +1608,15 @@
         "y": 1550,
         "wires": [
             [
-                "6181b5a57d6f7c5e"
+                "5fcf75a7f3403482"
             ],
             [
-                "985b59ce67c482f5"
+                "3fbcbebac67f9002"
             ]
         ]
     },
     {
-        "id": "sqg_broker",
+        "id": "rg_broker",
         "type": "mqtt-broker",
         "name": "MQTT WebGIS",
         "broker": "broker.emqx.io",
@@ -1642,10 +1642,10 @@
         "willMsg": {}
     },
     {
-        "id": "720fa6c999ab0989",
+        "id": "f13f5393cdd68541",
         "type": "ui-group",
         "name": "Peta",
-        "page": "5f1be23caaf04630",
+        "page": "0b1e03e4a23e74a5",
         "width": "12",
         "height": "1",
         "order": 1,
@@ -1656,10 +1656,10 @@
         "groupType": "default"
     },
     {
-        "id": "0f70cd7b451f742f",
+        "id": "5490dadf5eae7689",
         "type": "ui-group",
         "name": "Administrasi",
-        "page": "3258300534e93ab9",
+        "page": "8861d1fe94d39bd1",
         "width": "12",
         "height": "1",
         "order": 1,
@@ -1676,7 +1676,7 @@
         "mode": "RWC"
     },
     {
-        "id": "5f1be23caaf04630",
+        "id": "0b1e03e4a23e74a5",
         "type": "ui-page",
         "name": "Peta Pemantauan",
         "ui": "0df8b8a20bb13f1b",
@@ -1708,7 +1708,7 @@
         "disabled": "false"
     },
     {
-        "id": "3258300534e93ab9",
+        "id": "8861d1fe94d39bd1",
         "type": "ui-page",
         "name": "Admin WebGIS",
         "ui": "0df8b8a20bb13f1b",
@@ -1779,7 +1779,7 @@
         }
     },
     {
-        "id": "27bd37c60ff641df",
+        "id": "640e7a1ebbb634e5",
         "type": "global-config",
         "env": [],
         "modules": {
