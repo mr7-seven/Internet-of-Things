@@ -1,41 +1,182 @@
 [
     {
-        "id": "205b93c675cd169a",
+        "id": "0bd030bfd44f393b",
         "type": "tab",
         "label": "Smart Parking OCR + Admin",
         "disabled": false,
-        "info": "Satu master per GROUP_ID. Entry ROLE=master, exit ROLE=monitor. Kapasitas 1–100 di Admin. Slot masuk acak diputuskan master. Import pada kedua laptop dan nonaktifkan flow lama. Migrasi v3 dilakukan otomatis; gunakan database yang sama. Identitas 2 orang diedit di node template Identitas. SweetAlert2 dan gambar mobil tertanam dalam JSON. Login admin/admin123; ubah ADMIN_USERNAME/ADMIN_PASSWORD sama pada kedua laptop. Sesi 30 menit. Status sidebar khusus halaman pemantauan parkir; tidak tampil di Admin atau dashboard lain. Revisi sidebar-page-only-1.",
-        "env": [
-            {
-                "name": "GROUP_ID",
-                "value": "kelompok-00",
-                "type": "str"
-            },
-            {
-                "name": "ROLE",
-                "value": "master",
-                "type": "str"
-            },
-            {
-                "name": "ADMIN_USERNAME",
-                "value": "admin",
-                "type": "str"
-            },
-            {
-                "name": "ADMIN_PASSWORD",
-                "value": "admin123",
-                "type": "str"
-            }
-        ]
+        "info": "Revisi exact-topics-1. Ubah GROUP_ID dan NODE_ID hanya pada Function KONFIGURASI PARKIR. node1=master/entry; node2=monitor/exit. Satu master per kelompok. Semua subscription MQTT adalah topik persis, dibentuk otomatis tanpa wildcard. Login admin dan kredensial juga di Function konfigurasi. Broker dan path SQLite tetap pada config node masing-masing. Deploy Full setelah mengubah kelompok.",
+        "env": []
     },
     {
-        "id": "c2c363021f7efe24",
+        "id": "0240ab171e4869f6",
+        "type": "group",
+        "z": "0bd030bfd44f393b",
+        "name": "01 • KONFIGURASI TUNGGAL / STARTUP",
+        "style": {
+            "label": true,
+            "stroke": "#c4d1d7",
+            "fill": "#e8f2ff",
+            "color": "#36536a"
+        },
+        "nodes": [
+            "04f012dbc3075bc2",
+            "ade91fa81e92dc16",
+            "d9af96f9d161d0c3",
+            "911454803a6c8d50",
+            "68099c65accb313e",
+            "df22081efeb10868",
+            "b0a440b8cfd188a7",
+            "b37b21988442fce3",
+            "732083cde7d863b7",
+            "24d57fda6eac99b4",
+            "5f009e5718a46001"
+        ],
+        "x": 44,
+        "y": 79,
+        "w": 1357,
+        "h": 272
+    },
+    {
+        "id": "c74d3bc3bd1d51b7",
+        "type": "group",
+        "z": "0bd030bfd44f393b",
+        "name": "02 • MQTT RX / TX — TANPA WILDCARD",
+        "style": {
+            "label": true,
+            "stroke": "#c4d1d7",
+            "fill": "#e9f6ef",
+            "color": "#36536a"
+        },
+        "nodes": [
+            "cd7708c8c2796322",
+            "701eb2fb0d6f311b",
+            "5608223d344b06d9",
+            "e2aacb70338d84a1",
+            "a42b3324bf4ad6f9",
+            "14be7e0e634febb2"
+        ],
+        "x": 89,
+        "y": 369,
+        "w": 677,
+        "h": 222
+    },
+    {
+        "id": "b7bcc01645275c0e",
+        "type": "group",
+        "z": "0bd030bfd44f393b",
+        "name": "03 • CONTROLLER / ROUTING",
+        "style": {
+            "label": true,
+            "stroke": "#c4d1d7",
+            "fill": "#fff4df",
+            "color": "#36536a"
+        },
+        "nodes": [
+            "9eeb5a62827814b3",
+            "e1b0d78e15464f54",
+            "0c913823d2d6da94",
+            "ff1a936988d944df",
+            "6b838ca6efb3b149",
+            "ddb13a10727f290b",
+            "2b70904f4ca44b30",
+            "4d48530a01e7fe65"
+        ],
+        "x": 749,
+        "y": 369,
+        "w": 432,
+        "h": 282
+    },
+    {
+        "id": "8798913023d3c50d",
+        "type": "group",
+        "z": "0bd030bfd44f393b",
+        "name": "04 • SQLITE / ERROR / RETURN",
+        "style": {
+            "label": true,
+            "stroke": "#c4d1d7",
+            "fill": "#fff0ed",
+            "color": "#36536a"
+        },
+        "nodes": [
+            "e68a23e6042fbe3c",
+            "a75938cb9e2162ea",
+            "d0f814f1a1bcaf2e",
+            "9125a7b1e7d2c710",
+            "6cb6cea10bc6f201",
+            "17e9c5446f015e76",
+            "63773c22a7eadbb9"
+        ],
+        "x": 89,
+        "y": 759,
+        "w": 592,
+        "h": 192
+    },
+    {
+        "id": "8fbe56614b6d1fc5",
+        "type": "group",
+        "z": "0bd030bfd44f393b",
+        "name": "05 • DIAGNOSTIK",
+        "style": {
+            "label": true,
+            "stroke": "#c4d1d7",
+            "fill": "#f1f3f5",
+            "color": "#36536a"
+        },
+        "nodes": [
+            "29fad769291d794b",
+            "492ee36bb58fde73"
+        ],
+        "x": 749,
+        "y": 849,
+        "w": 407,
+        "h": 82
+    },
+    {
+        "id": "abf1d399145a12bc",
+        "type": "group",
+        "z": "0bd030bfd44f393b",
+        "name": "06 • DASHBOARD / ADMIN / IDENTITAS",
+        "style": {
+            "label": true,
+            "stroke": "#c4d1d7",
+            "fill": "#eaf5f7",
+            "color": "#36536a"
+        },
+        "nodes": [
+            "2ed9394875a1d94e",
+            "25e16a6082124ac0",
+            "99754186fdd7b3eb",
+            "3c0c4a02d1c1a8d5",
+            "55d71da76978814f",
+            "8841dc008b6bd499",
+            "ecfbca25269f7c84",
+            "32dc3227d76d7f37",
+            "af3d77c70cc61175"
+        ],
+        "x": 1419,
+        "y": 659,
+        "w": 632,
+        "h": 512
+    },
+    {
+        "id": "47c1fa5b7a82409c",
+        "type": "comment",
+        "z": "0bd030bfd44f393b",
+        "name": "UBAH HANYA: KONFIGURASI PARKIR • node1 entry / node2 exit",
+        "info": "Revisi exact-topics-1. Ubah GROUP_ID dan NODE_ID hanya pada Function KONFIGURASI PARKIR. node1=master/entry; node2=monitor/exit. Satu master per kelompok. Semua subscription MQTT adalah topik persis, dibentuk otomatis tanpa wildcard. Login admin dan kredensial juga di Function konfigurasi. Broker dan path SQLite tetap pada config node masing-masing. Deploy Full setelah mengubah kelompok.",
+        "x": 280,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "55d71da76978814f",
         "type": "ui-template",
-        "z": "205b93c675cd169a",
-        "group": "8f28f8d03c3281bc",
+        "z": "0bd030bfd44f393b",
+        "g": "abf1d399145a12bc",
+        "group": "c3f5b0a4e884a090",
         "page": "",
         "ui": "",
-        "name": "Pemantauan slot dinamis",
+        "name": "Parkir • denah slot",
         "order": 1,
         "width": 12,
         "height": 0,
@@ -46,72 +187,73 @@
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 910,
-        "y": 440,
+        "x": 1660,
+        "y": 800,
         "wires": [
             [
-                "ff10cb1cc1f837c3"
+                "32dc3227d76d7f37"
             ]
         ]
     },
     {
-        "id": "74765ac958168d41",
+        "id": "9eeb5a62827814b3",
         "type": "function",
-        "z": "205b93c675cd169a",
+        "z": "0bd030bfd44f393b",
+        "g": "b7bcc01645275c0e",
         "name": "controller",
-        "func": "var parkingCrypto=(()=>{var T=(t,e)=>()=>(e||t((e={exports:{}}).exports,e),e.exports);var pt=T(Q=>{\"use strict\";Object.defineProperty(Q,\"__esModule\",{value:!0});Q.crypto=void 0;Q.crypto=typeof globalThis==\"object\"&&\"crypto\"in globalThis?globalThis.crypto:void 0});var K=T(h=>{\"use strict\";Object.defineProperty(h,\"__esModule\",{value:!0});h.wrapXOFConstructorWithOpts=h.wrapConstructorWithOpts=h.wrapConstructor=h.Hash=h.nextTick=h.swap32IfBE=h.byteSwapIfBE=h.swap8IfBE=h.isLE=void 0;h.isBytes=yt;h.anumber=ht;h.abytes=q;h.ahash=se;h.aexists=re;h.aoutput=ne;h.u8=ie;h.u32=oe;h.clean=ce;h.createView=he;h.rotr=ae;h.rotl=fe;h.byteSwap=ft;h.byteSwap32=St;h.bytesToHex=ue;h.hexToBytes=xe;h.asyncLoop=be;h.utf8ToBytes=dt;h.bytesToUtf8=He;h.toBytes=Y;h.kdfInputToBytes=pe;h.concatBytes=Ae;h.checkOpts=ye;h.createHasher=gt;h.createOptHasher=It;h.createXOFer=Bt;h.randomBytes=Se;var W=pt();function yt(t){return t instanceof Uint8Array||ArrayBuffer.isView(t)&&t.constructor.name===\"Uint8Array\"}function ht(t){if(!Number.isSafeInteger(t)||t<0)throw new Error(\"positive integer expected, got \"+t)}function q(t,...e){if(!yt(t))throw new Error(\"Uint8Array expected\");if(e.length>0&&!e.includes(t.length))throw new Error(\"Uint8Array expected of length \"+e+\", got length=\"+t.length)}function se(t){if(typeof t!=\"function\"||typeof t.create!=\"function\")throw new Error(\"Hash should be wrapped by utils.createHasher\");ht(t.outputLen),ht(t.blockLen)}function re(t,e=!0){if(t.destroyed)throw new Error(\"Hash instance has been destroyed\");if(e&&t.finished)throw new Error(\"Hash#digest() has already been called\")}function ne(t,e){q(t);let s=e.outputLen;if(t.length<s)throw new Error(\"digestInto() expects output buffer of length at least \"+s)}function ie(t){return new Uint8Array(t.buffer,t.byteOffset,t.byteLength)}function oe(t){return new Uint32Array(t.buffer,t.byteOffset,Math.floor(t.byteLength/4))}function ce(...t){for(let e=0;e<t.length;e++)t[e].fill(0)}function he(t){return new DataView(t.buffer,t.byteOffset,t.byteLength)}function ae(t,e){return t<<32-e|t>>>e}function fe(t,e){return t<<e|t>>>32-e>>>0}h.isLE=new Uint8Array(new Uint32Array([287454020]).buffer)[0]===68;function ft(t){return t<<24&4278190080|t<<8&16711680|t>>>8&65280|t>>>24&255}h.swap8IfBE=h.isLE?t=>t:t=>ft(t);h.byteSwapIfBE=h.swap8IfBE;function St(t){for(let e=0;e<t.length;e++)t[e]=ft(t[e]);return t}h.swap32IfBE=h.isLE?t=>t:St;var _t=typeof Uint8Array.from([]).toHex==\"function\"&&typeof Uint8Array.fromHex==\"function\",de=Array.from({length:256},(t,e)=>e.toString(16).padStart(2,\"0\"));function ue(t){if(q(t),_t)return t.toHex();let e=\"\";for(let s=0;s<t.length;s++)e+=de[t[s]];return e}var C={_0:48,_9:57,A:65,F:70,a:97,f:102};function At(t){if(t>=C._0&&t<=C._9)return t-C._0;if(t>=C.A&&t<=C.F)return t-(C.A-10);if(t>=C.a&&t<=C.f)return t-(C.a-10)}function xe(t){if(typeof t!=\"string\")throw new Error(\"hex string expected, got \"+typeof t);if(_t)return Uint8Array.fromHex(t);let e=t.length,s=e/2;if(e%2)throw new Error(\"hex string expected, got unpadded hex of length \"+e);let r=new Uint8Array(s);for(let n=0,i=0;n<s;n++,i+=2){let o=At(t.charCodeAt(i)),f=At(t.charCodeAt(i+1));if(o===void 0||f===void 0){let x=t[i]+t[i+1];throw new Error('hex string expected, got non-hex character \"'+x+'\" at index '+i)}r[n]=o*16+f}return r}var le=async()=>{};h.nextTick=le;async function be(t,e,s){let r=Date.now();for(let n=0;n<t;n++){s(n);let i=Date.now()-r;i>=0&&i<e||(await(0,h.nextTick)(),r+=i)}}function dt(t){if(typeof t!=\"string\")throw new Error(\"string expected\");return new Uint8Array(new TextEncoder().encode(t))}function He(t){return new TextDecoder().decode(t)}function Y(t){return typeof t==\"string\"&&(t=dt(t)),q(t),t}function pe(t){return typeof t==\"string\"&&(t=dt(t)),q(t),t}function Ae(...t){let e=0;for(let r=0;r<t.length;r++){let n=t[r];q(n),e+=n.length}let s=new Uint8Array(e);for(let r=0,n=0;r<t.length;r++){let i=t[r];s.set(i,n),n+=i.length}return s}function ye(t,e){if(e!==void 0&&{}.toString.call(e)!==\"[object Object]\")throw new Error(\"options should be object or undefined\");return Object.assign(t,e)}var at=class{};h.Hash=at;function gt(t){let e=r=>t().update(Y(r)).digest(),s=t();return e.outputLen=s.outputLen,e.blockLen=s.blockLen,e.create=()=>t(),e}function It(t){let e=(r,n)=>t(n).update(Y(r)).digest(),s=t({});return e.outputLen=s.outputLen,e.blockLen=s.blockLen,e.create=r=>t(r),e}function Bt(t){let e=(r,n)=>t(n).update(Y(r)).digest(),s=t({});return e.outputLen=s.outputLen,e.blockLen=s.blockLen,e.create=r=>t(r),e}h.wrapConstructor=gt;h.wrapConstructorWithOpts=It;h.wrapXOFConstructorWithOpts=Bt;function Se(t=32){if(W.crypto&&typeof W.crypto.getRandomValues==\"function\")return W.crypto.getRandomValues(new Uint8Array(t));if(W.crypto&&typeof W.crypto.randomBytes==\"function\")return Uint8Array.from(W.crypto.randomBytes(t));throw new Error(\"crypto.getRandomValues must be defined\")}});var Lt=T(I=>{\"use strict\";Object.defineProperty(I,\"__esModule\",{value:!0});I.SHA512_IV=I.SHA384_IV=I.SHA224_IV=I.SHA256_IV=I.HashMD=void 0;I.setBigUint64=wt;I.Chi=_e;I.Maj=ge;var V=K();function wt(t,e,s,r){if(typeof t.setBigUint64==\"function\")return t.setBigUint64(e,s,r);let n=BigInt(32),i=BigInt(4294967295),o=Number(s>>n&i),f=Number(s&i),x=r?4:0,p=r?0:4;t.setUint32(e+x,o,r),t.setUint32(e+p,f,r)}function _e(t,e,s){return t&e^~t&s}function ge(t,e,s){return t&e^t&s^e&s}var ut=class extends V.Hash{constructor(e,s,r,n){super(),this.finished=!1,this.length=0,this.pos=0,this.destroyed=!1,this.blockLen=e,this.outputLen=s,this.padOffset=r,this.isLE=n,this.buffer=new Uint8Array(e),this.view=(0,V.createView)(this.buffer)}update(e){(0,V.aexists)(this),e=(0,V.toBytes)(e),(0,V.abytes)(e);let{view:s,buffer:r,blockLen:n}=this,i=e.length;for(let o=0;o<i;){let f=Math.min(n-this.pos,i-o);if(f===n){let x=(0,V.createView)(e);for(;n<=i-o;o+=n)this.process(x,o);continue}r.set(e.subarray(o,o+f),this.pos),this.pos+=f,o+=f,this.pos===n&&(this.process(s,0),this.pos=0)}return this.length+=e.length,this.roundClean(),this}digestInto(e){(0,V.aexists)(this),(0,V.aoutput)(e,this),this.finished=!0;let{buffer:s,view:r,blockLen:n,isLE:i}=this,{pos:o}=this;s[o++]=128,(0,V.clean)(this.buffer.subarray(o)),this.padOffset>n-o&&(this.process(r,0),o=0);for(let d=o;d<n;d++)s[d]=0;wt(r,n-8,BigInt(this.length*8),i),this.process(r,0);let f=(0,V.createView)(e),x=this.outputLen;if(x%4)throw new Error(\"_sha2: outputLen should be aligned to 32bit\");let p=x/4,y=this.get();if(p>y.length)throw new Error(\"_sha2: outputLen bigger than state\");for(let d=0;d<p;d++)f.setUint32(4*d,y[d],i)}digest(){let{buffer:e,outputLen:s}=this;this.digestInto(e);let r=e.slice(0,s);return this.destroy(),r}_cloneInto(e){e||(e=new this.constructor),e.set(...this.get());let{blockLen:s,buffer:r,length:n,finished:i,destroyed:o,pos:f}=this;return e.destroyed=o,e.finished=i,e.length=n,e.pos=f,n%s&&e.buffer.set(r),e}clone(){return this._cloneInto()}};I.HashMD=ut;I.SHA256_IV=Uint32Array.from([1779033703,3144134277,1013904242,2773480762,1359893119,2600822924,528734635,1541459225]);I.SHA224_IV=Uint32Array.from([3238371032,914150663,812702999,4144912697,4290775857,1750603025,1694076839,3204075428]);I.SHA384_IV=Uint32Array.from([3418070365,3238371032,1654270250,914150663,2438529370,812702999,355462360,4144912697,1731405415,4290775857,2394180231,1750603025,3675008525,1694076839,1203062813,3204075428]);I.SHA512_IV=Uint32Array.from([1779033703,4089235720,3144134277,2227873595,1013904242,4271175723,2773480762,1595750129,1359893119,2917565137,2600822924,725511199,528734635,4215389547,1541459225,327033209])});var Jt=T(a=>{\"use strict\";Object.defineProperty(a,\"__esModule\",{value:!0});a.toBig=a.shrSL=a.shrSH=a.rotrSL=a.rotrSH=a.rotrBL=a.rotrBH=a.rotr32L=a.rotr32H=a.rotlSL=a.rotlSH=a.rotlBL=a.rotlBH=a.add5L=a.add5H=a.add4L=a.add4H=a.add3L=a.add3H=void 0;a.add=Wt;a.fromBig=lt;a.split=Vt;var Z=BigInt(2**32-1),xt=BigInt(32);function lt(t,e=!1){return e?{h:Number(t&Z),l:Number(t>>xt&Z)}:{h:Number(t>>xt&Z)|0,l:Number(t&Z)|0}}function Vt(t,e=!1){let s=t.length,r=new Uint32Array(s),n=new Uint32Array(s);for(let i=0;i<s;i++){let{h:o,l:f}=lt(t[i],e);[r[i],n[i]]=[o,f]}return[r,n]}var mt=(t,e)=>BigInt(t>>>0)<<xt|BigInt(e>>>0);a.toBig=mt;var Et=(t,e,s)=>t>>>s;a.shrSH=Et;var Ut=(t,e,s)=>t<<32-s|e>>>s;a.shrSL=Ut;var Ct=(t,e,s)=>t>>>s|e<<32-s;a.rotrSH=Ct;var Dt=(t,e,s)=>t<<32-s|e>>>s;a.rotrSL=Dt;var Ft=(t,e,s)=>t<<64-s|e>>>s-32;a.rotrBH=Ft;var Tt=(t,e,s)=>t>>>s-32|e<<64-s;a.rotrBL=Tt;var Ot=(t,e)=>e;a.rotr32H=Ot;var kt=(t,e)=>t;a.rotr32L=kt;var Gt=(t,e,s)=>t<<s|e>>>32-s;a.rotlSH=Gt;var Mt=(t,e,s)=>e<<s|t>>>32-s;a.rotlSL=Mt;var jt=(t,e,s)=>e<<s-32|t>>>64-s;a.rotlBH=jt;var vt=(t,e,s)=>t<<s-32|e>>>64-s;a.rotlBL=vt;function Wt(t,e,s,r){let n=(e>>>0)+(r>>>0);return{h:t+s+(n/2**32|0)|0,l:n|0}}var qt=(t,e,s)=>(t>>>0)+(e>>>0)+(s>>>0);a.add3L=qt;var Pt=(t,e,s,r)=>e+s+r+(t/2**32|0)|0;a.add3H=Pt;var Nt=(t,e,s,r)=>(t>>>0)+(e>>>0)+(s>>>0)+(r>>>0);a.add4L=Nt;var Kt=(t,e,s,r,n)=>e+s+r+n+(t/2**32|0)|0;a.add4H=Kt;var Xt=(t,e,s,r,n)=>(t>>>0)+(e>>>0)+(s>>>0)+(r>>>0)+(n>>>0);a.add5L=Xt;var Rt=(t,e,s,r,n,i)=>e+s+r+n+i+(t/2**32|0)|0;a.add5H=Rt;var Ie={fromBig:lt,split:Vt,toBig:mt,shrSH:Et,shrSL:Ut,rotrSH:Ct,rotrSL:Dt,rotrBH:Ft,rotrBL:Tt,rotr32H:Ot,rotr32L:kt,rotlSH:Gt,rotlSL:Mt,rotlBH:jt,rotlBL:vt,add:Wt,add3L:qt,add3H:Pt,add4L:Nt,add4H:Kt,add5H:Rt,add5L:Xt};a.default=Ie});var Qt=T(l=>{\"use strict\";Object.defineProperty(l,\"__esModule\",{value:!0});l.sha512_224=l.sha512_256=l.sha384=l.sha512=l.sha224=l.sha256=l.SHA512_256=l.SHA512_224=l.SHA384=l.SHA512=l.SHA224=l.SHA256=void 0;var c=Lt(),u=Jt(),A=K(),Be=Uint32Array.from([1116352408,1899447441,3049323471,3921009573,961987163,1508970993,2453635748,2870763221,3624381080,310598401,607225278,1426881987,1925078388,2162078206,2614888103,3248222580,3835390401,4022224774,264347078,604807628,770255983,1249150122,1555081692,1996064986,2554220882,2821834349,2952996808,3210313671,3336571891,3584528711,113926993,338241895,666307205,773529912,1294757372,1396182291,1695183700,1986661051,2177026350,2456956037,2730485921,2820302411,3259730800,3345764771,3516065817,3600352804,4094571909,275423344,430227734,506948616,659060556,883997877,958139571,1322822218,1537002063,1747873779,1955562222,2024104815,2227730452,2361852424,2428436474,2756734187,3204031479,3329325298]),O=new Uint32Array(64),X=class extends c.HashMD{constructor(e=32){super(64,e,8,!1),this.A=c.SHA256_IV[0]|0,this.B=c.SHA256_IV[1]|0,this.C=c.SHA256_IV[2]|0,this.D=c.SHA256_IV[3]|0,this.E=c.SHA256_IV[4]|0,this.F=c.SHA256_IV[5]|0,this.G=c.SHA256_IV[6]|0,this.H=c.SHA256_IV[7]|0}get(){let{A:e,B:s,C:r,D:n,E:i,F:o,G:f,H:x}=this;return[e,s,r,n,i,o,f,x]}set(e,s,r,n,i,o,f,x){this.A=e|0,this.B=s|0,this.C=r|0,this.D=n|0,this.E=i|0,this.F=o|0,this.G=f|0,this.H=x|0}process(e,s){for(let d=0;d<16;d++,s+=4)O[d]=e.getUint32(s,!1);for(let d=16;d<64;d++){let H=O[d-15],S=O[d-2],w=(0,A.rotr)(H,7)^(0,A.rotr)(H,18)^H>>>3,B=(0,A.rotr)(S,17)^(0,A.rotr)(S,19)^S>>>10;O[d]=B+O[d-7]+w+O[d-16]|0}let{A:r,B:n,C:i,D:o,E:f,F:x,G:p,H:y}=this;for(let d=0;d<64;d++){let H=(0,A.rotr)(f,6)^(0,A.rotr)(f,11)^(0,A.rotr)(f,25),S=y+H+(0,c.Chi)(f,x,p)+Be[d]+O[d]|0,B=((0,A.rotr)(r,2)^(0,A.rotr)(r,13)^(0,A.rotr)(r,22))+(0,c.Maj)(r,n,i)|0;y=p,p=x,x=f,f=o+S|0,o=i,i=n,n=r,r=S+B|0}r=r+this.A|0,n=n+this.B|0,i=i+this.C|0,o=o+this.D|0,f=f+this.E|0,x=x+this.F|0,p=p+this.G|0,y=y+this.H|0,this.set(r,n,i,o,f,x,p,y)}roundClean(){(0,A.clean)(O)}destroy(){this.set(0,0,0,0,0,0,0,0),(0,A.clean)(this.buffer)}};l.SHA256=X;var $=class extends X{constructor(){super(28),this.A=c.SHA224_IV[0]|0,this.B=c.SHA224_IV[1]|0,this.C=c.SHA224_IV[2]|0,this.D=c.SHA224_IV[3]|0,this.E=c.SHA224_IV[4]|0,this.F=c.SHA224_IV[5]|0,this.G=c.SHA224_IV[6]|0,this.H=c.SHA224_IV[7]|0}};l.SHA224=$;var zt=u.split([\"0x428a2f98d728ae22\",\"0x7137449123ef65cd\",\"0xb5c0fbcfec4d3b2f\",\"0xe9b5dba58189dbbc\",\"0x3956c25bf348b538\",\"0x59f111f1b605d019\",\"0x923f82a4af194f9b\",\"0xab1c5ed5da6d8118\",\"0xd807aa98a3030242\",\"0x12835b0145706fbe\",\"0x243185be4ee4b28c\",\"0x550c7dc3d5ffb4e2\",\"0x72be5d74f27b896f\",\"0x80deb1fe3b1696b1\",\"0x9bdc06a725c71235\",\"0xc19bf174cf692694\",\"0xe49b69c19ef14ad2\",\"0xefbe4786384f25e3\",\"0x0fc19dc68b8cd5b5\",\"0x240ca1cc77ac9c65\",\"0x2de92c6f592b0275\",\"0x4a7484aa6ea6e483\",\"0x5cb0a9dcbd41fbd4\",\"0x76f988da831153b5\",\"0x983e5152ee66dfab\",\"0xa831c66d2db43210\",\"0xb00327c898fb213f\",\"0xbf597fc7beef0ee4\",\"0xc6e00bf33da88fc2\",\"0xd5a79147930aa725\",\"0x06ca6351e003826f\",\"0x142929670a0e6e70\",\"0x27b70a8546d22ffc\",\"0x2e1b21385c26c926\",\"0x4d2c6dfc5ac42aed\",\"0x53380d139d95b3df\",\"0x650a73548baf63de\",\"0x766a0abb3c77b2a8\",\"0x81c2c92e47edaee6\",\"0x92722c851482353b\",\"0xa2bfe8a14cf10364\",\"0xa81a664bbc423001\",\"0xc24b8b70d0f89791\",\"0xc76c51a30654be30\",\"0xd192e819d6ef5218\",\"0xd69906245565a910\",\"0xf40e35855771202a\",\"0x106aa07032bbd1b8\",\"0x19a4c116b8d2d0c8\",\"0x1e376c085141ab53\",\"0x2748774cdf8eeb99\",\"0x34b0bcb5e19b48a8\",\"0x391c0cb3c5c95a63\",\"0x4ed8aa4ae3418acb\",\"0x5b9cca4f7763e373\",\"0x682e6ff3d6b2b8a3\",\"0x748f82ee5defb2fc\",\"0x78a5636f43172f60\",\"0x84c87814a1f0ab72\",\"0x8cc702081a6439ec\",\"0x90befffa23631e28\",\"0xa4506cebde82bde9\",\"0xbef9a3f7b2c67915\",\"0xc67178f2e372532b\",\"0xca273eceea26619c\",\"0xd186b8c721c0c207\",\"0xeada7dd6cde0eb1e\",\"0xf57d4f7fee6ed178\",\"0x06f067aa72176fba\",\"0x0a637dc5a2c898a6\",\"0x113f9804bef90dae\",\"0x1b710b35131c471b\",\"0x28db77f523047d84\",\"0x32caab7b40c72493\",\"0x3c9ebe0a15c9bebc\",\"0x431d67c49c100d4c\",\"0x4cc5d4becb3e42b6\",\"0x597f299cfc657e2a\",\"0x5fcb6fab3ad6faec\",\"0x6c44198c4a475817\"].map(t=>BigInt(t))),we=zt[0],Le=zt[1],k=new Uint32Array(80),G=new Uint32Array(80),M=class extends c.HashMD{constructor(e=64){super(128,e,16,!1),this.Ah=c.SHA512_IV[0]|0,this.Al=c.SHA512_IV[1]|0,this.Bh=c.SHA512_IV[2]|0,this.Bl=c.SHA512_IV[3]|0,this.Ch=c.SHA512_IV[4]|0,this.Cl=c.SHA512_IV[5]|0,this.Dh=c.SHA512_IV[6]|0,this.Dl=c.SHA512_IV[7]|0,this.Eh=c.SHA512_IV[8]|0,this.El=c.SHA512_IV[9]|0,this.Fh=c.SHA512_IV[10]|0,this.Fl=c.SHA512_IV[11]|0,this.Gh=c.SHA512_IV[12]|0,this.Gl=c.SHA512_IV[13]|0,this.Hh=c.SHA512_IV[14]|0,this.Hl=c.SHA512_IV[15]|0}get(){let{Ah:e,Al:s,Bh:r,Bl:n,Ch:i,Cl:o,Dh:f,Dl:x,Eh:p,El:y,Fh:d,Fl:H,Gh:S,Gl:w,Hh:B,Hl:L}=this;return[e,s,r,n,i,o,f,x,p,y,d,H,S,w,B,L]}set(e,s,r,n,i,o,f,x,p,y,d,H,S,w,B,L){this.Ah=e|0,this.Al=s|0,this.Bh=r|0,this.Bl=n|0,this.Ch=i|0,this.Cl=o|0,this.Dh=f|0,this.Dl=x|0,this.Eh=p|0,this.El=y|0,this.Fh=d|0,this.Fl=H|0,this.Gh=S|0,this.Gl=w|0,this.Hh=B|0,this.Hl=L|0}process(e,s){for(let b=0;b<16;b++,s+=4)k[b]=e.getUint32(s),G[b]=e.getUint32(s+=4);for(let b=16;b<80;b++){let D=k[b-15]|0,F=G[b-15]|0,nt=u.rotrSH(D,F,1)^u.rotrSH(D,F,8)^u.shrSH(D,F,7),it=u.rotrSL(D,F,1)^u.rotrSL(D,F,8)^u.shrSL(D,F,7),E=k[b-2]|0,U=G[b-2]|0,J=u.rotrSH(E,U,19)^u.rotrBH(E,U,61)^u.shrSH(E,U,6),ot=u.rotrSL(E,U,19)^u.rotrBL(E,U,61)^u.shrSL(E,U,6),z=u.add4L(it,ot,G[b-7],G[b-16]),ct=u.add4H(z,nt,J,k[b-7],k[b-16]);k[b]=ct|0,G[b]=z|0}let{Ah:r,Al:n,Bh:i,Bl:o,Ch:f,Cl:x,Dh:p,Dl:y,Eh:d,El:H,Fh:S,Fl:w,Gh:B,Gl:L,Hh:P,Hl:N}=this;for(let b=0;b<80;b++){let D=u.rotrSH(d,H,14)^u.rotrSH(d,H,18)^u.rotrBH(d,H,41),F=u.rotrSL(d,H,14)^u.rotrSL(d,H,18)^u.rotrBL(d,H,41),nt=d&S^~d&B,it=H&w^~H&L,E=u.add5L(N,F,it,Le[b],G[b]),U=u.add5H(E,P,D,nt,we[b],k[b]),J=E|0,ot=u.rotrSH(r,n,28)^u.rotrBH(r,n,34)^u.rotrBH(r,n,39),z=u.rotrSL(r,n,28)^u.rotrBL(r,n,34)^u.rotrBL(r,n,39),ct=r&i^r&f^i&f,ee=n&o^n&x^o&x;P=B|0,N=L|0,B=S|0,L=w|0,S=d|0,w=H|0,{h:d,l:H}=u.add(p|0,y|0,U|0,J|0),p=f|0,y=x|0,f=i|0,x=o|0,i=r|0,o=n|0;let Ht=u.add3L(J,z,ee);r=u.add3H(Ht,U,ot,ct),n=Ht|0}({h:r,l:n}=u.add(this.Ah|0,this.Al|0,r|0,n|0)),{h:i,l:o}=u.add(this.Bh|0,this.Bl|0,i|0,o|0),{h:f,l:x}=u.add(this.Ch|0,this.Cl|0,f|0,x|0),{h:p,l:y}=u.add(this.Dh|0,this.Dl|0,p|0,y|0),{h:d,l:H}=u.add(this.Eh|0,this.El|0,d|0,H|0),{h:S,l:w}=u.add(this.Fh|0,this.Fl|0,S|0,w|0),{h:B,l:L}=u.add(this.Gh|0,this.Gl|0,B|0,L|0),{h:P,l:N}=u.add(this.Hh|0,this.Hl|0,P|0,N|0),this.set(r,n,i,o,f,x,p,y,d,H,S,w,B,L,P,N)}roundClean(){(0,A.clean)(k,G)}destroy(){(0,A.clean)(this.buffer),this.set(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)}};l.SHA512=M;var tt=class extends M{constructor(){super(48),this.Ah=c.SHA384_IV[0]|0,this.Al=c.SHA384_IV[1]|0,this.Bh=c.SHA384_IV[2]|0,this.Bl=c.SHA384_IV[3]|0,this.Ch=c.SHA384_IV[4]|0,this.Cl=c.SHA384_IV[5]|0,this.Dh=c.SHA384_IV[6]|0,this.Dl=c.SHA384_IV[7]|0,this.Eh=c.SHA384_IV[8]|0,this.El=c.SHA384_IV[9]|0,this.Fh=c.SHA384_IV[10]|0,this.Fl=c.SHA384_IV[11]|0,this.Gh=c.SHA384_IV[12]|0,this.Gl=c.SHA384_IV[13]|0,this.Hh=c.SHA384_IV[14]|0,this.Hl=c.SHA384_IV[15]|0}};l.SHA384=tt;var _=Uint32Array.from([2352822216,424955298,1944164710,2312950998,502970286,855612546,1738396948,1479516111,258812777,2077511080,2011393907,79989058,1067287976,1780299464,286451373,2446758561]),g=Uint32Array.from([573645204,4230739756,2673172387,3360449730,596883563,1867755857,2520282905,1497426621,2519219938,2827943907,3193839141,1401305490,721525244,746961066,246885852,2177182882]),et=class extends M{constructor(){super(28),this.Ah=_[0]|0,this.Al=_[1]|0,this.Bh=_[2]|0,this.Bl=_[3]|0,this.Ch=_[4]|0,this.Cl=_[5]|0,this.Dh=_[6]|0,this.Dl=_[7]|0,this.Eh=_[8]|0,this.El=_[9]|0,this.Fh=_[10]|0,this.Fl=_[11]|0,this.Gh=_[12]|0,this.Gl=_[13]|0,this.Hh=_[14]|0,this.Hl=_[15]|0}};l.SHA512_224=et;var st=class extends M{constructor(){super(32),this.Ah=g[0]|0,this.Al=g[1]|0,this.Bh=g[2]|0,this.Bl=g[3]|0,this.Ch=g[4]|0,this.Cl=g[5]|0,this.Dh=g[6]|0,this.Dl=g[7]|0,this.Eh=g[8]|0,this.El=g[9]|0,this.Fh=g[10]|0,this.Fl=g[11]|0,this.Gh=g[12]|0,this.Gl=g[13]|0,this.Hh=g[14]|0,this.Hl=g[15]|0}};l.SHA512_256=st;l.sha256=(0,A.createHasher)(()=>new X);l.sha224=(0,A.createHasher)(()=>new $);l.sha512=(0,A.createHasher)(()=>new M);l.sha384=(0,A.createHasher)(()=>new tt);l.sha512_256=(0,A.createHasher)(()=>new st);l.sha512_224=(0,A.createHasher)(()=>new et)});var Yt=T(m=>{\"use strict\";Object.defineProperty(m,\"__esModule\",{value:!0});m.sha224=m.SHA224=m.sha256=m.SHA256=void 0;var rt=Qt();m.SHA256=rt.SHA256;m.sha256=rt.sha256;m.SHA224=rt.SHA224;m.sha224=rt.sha224});var Zt=T(v=>{\"use strict\";Object.defineProperty(v,\"__esModule\",{value:!0});v.hmac=v.HMAC=void 0;var j=K(),R=class extends j.Hash{constructor(e,s){super(),this.finished=!1,this.destroyed=!1,(0,j.ahash)(e);let r=(0,j.toBytes)(s);if(this.iHash=e.create(),typeof this.iHash.update!=\"function\")throw new Error(\"Expected instance of class which extends utils.Hash\");this.blockLen=this.iHash.blockLen,this.outputLen=this.iHash.outputLen;let n=this.blockLen,i=new Uint8Array(n);i.set(r.length>n?e.create().update(r).digest():r);for(let o=0;o<i.length;o++)i[o]^=54;this.iHash.update(i),this.oHash=e.create();for(let o=0;o<i.length;o++)i[o]^=106;this.oHash.update(i),(0,j.clean)(i)}update(e){return(0,j.aexists)(this),this.iHash.update(e),this}digestInto(e){(0,j.aexists)(this),(0,j.abytes)(e,this.outputLen),this.finished=!0,this.iHash.digestInto(e),this.oHash.update(e),this.oHash.digestInto(e),this.destroy()}digest(){let e=new Uint8Array(this.oHash.outputLen);return this.digestInto(e),e}_cloneInto(e){e||(e=Object.create(Object.getPrototypeOf(this),{}));let{oHash:s,iHash:r,finished:n,destroyed:i,blockLen:o,outputLen:f}=this;return e=e,e.finished=n,e.destroyed=i,e.blockLen=o,e.outputLen=f,e.oHash=s._cloneInto(e.oHash),e.iHash=r._cloneInto(e.iHash),e}clone(){return this._cloneInto()}destroy(){this.destroyed=!0,this.oHash.destroy(),this.iHash.destroy()}};v.HMAC=R;var Ve=(t,e,s)=>new R(t,e).update(s).digest();v.hmac=Ve;v.hmac.create=(t,e)=>new R(t,e)});var Ee=T(bt=>{var{sha256:$t}=Yt(),{hmac:me}=Zt(),{bytesToHex:te}=K();bt.hash=t=>te($t(Uint8Array.from(Buffer.from(t,\"utf8\"))));bt.mac=(t,e)=>te(me($t,Uint8Array.from(Buffer.from(t,\"utf8\")),Uint8Array.from(Buffer.from(e,\"utf8\"))))});return Ee();})();\n/*! Bundled license information:\n\n@noble/hashes/utils.js:\n  (*! noble-hashes - MIT License (c) 2022 Paul Miller (paulmillr.com) *)\n*/\n\n/* @noble/hashes 1.8.0\nThe MIT License (MIT)\n\nCopyright (c) 2022 Paul Miller (https://paulmillr.com)\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the “Software”), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in\nall copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\nTHE SOFTWARE.\n*/\n\n// Outputs: SQLite master, MQTT, shared UI state, Debug, targeted admin replies, live events.\nconst G=env.get('GROUP_ID')||'kelompok-00',ROLE=env.get('ROLE')||'master',B=`parking/${G}`,now=Date.now();\nif(!/^[A-Za-z0-9_-]{1,40}$/.test(G)||!['master','monitor'].includes(ROLE)){node.error('GROUP_ID / ROLE tidak valid');return null;}\nconst idok=x=>typeof x==='string'&&/^[A-Za-z0-9_-]{1,96}$/.test(x);\nconst labels={ENTERED:'Kendaraan masuk; slot tersimpan',EXITED:'Kendaraan keluar; slot dilepas',FULL:'Parkir penuh',DUPLICATE:'Plat sudah terdaftar',NOT_FOUND:'Plat exit tidak ditemukan',OCR_FAILED:'Plat tidak terbaca stabil',TIMEOUT:'Transaksi kedaluwarsa',ERROR:'Database bermasalah; periksa Debug',OK:'Perubahan tersimpan',CONFLICT:'Data berubah. Perbarui dan ulangi perubahan.',EXPIRED:'Perintah kedaluwarsa; silakan ulangi',INVALID:'Data tidak valid',INVALID_SLOT:'Nomor slot di luar kapasitas',SLOT_OCCUPIED:'Slot tujuan sudah terisi; pilih slot kosong',MISSING:'Data sudah tidak ditemukan',CAPACITY_BLOCKED:'Pindahkan/hapus kendaraan pada slot di atas kapasitas baru terlebih dahulu',ADMIN_ADDED:'Kendaraan ditambahkan admin',ADMIN_UPDATED:'Data/posisi kendaraan diperbarui',ADMIN_DELETED:'Kendaraan dilepas admin',CAPACITY_UPDATED:'Kapasitas diperbarui',HISTORY_UPDATED:'Catatan riwayat diperbarui',HISTORY_DELETED:'Riwayat disembunyikan'};\nfunction send(i,p){const a=[null,null,null,null,null,null];a[i]=p;node.send(a);}\nfunction parse(p){return typeof p==='string'?JSON.parse(p):p;}\n// Login dan sesi diperiksa di Node-RED. Kredensial tidak diterbitkan ke MQTT.\nconst ADMIN_USER=env.get('ADMIN_USERNAME')||'admin',ADMIN_PASS=env.get('ADMIN_PASSWORD')||'admin123';\nconst SESSION_MS=30*60*1000,authKey=parkingCrypto.hash('parking-admin-v1|'+G+'|'+ADMIN_USER+'|'+ADMIN_PASS);\nconst same=(a,b)=>{if(typeof a!=='string'||typeof b!=='string'||a.length!==b.length)return false;let d=0;for(let i=0;i<a.length;i++)d|=a.charCodeAt(i)^b.charCodeAt(i);return d===0;};\nfunction canonical(p){if(Array.isArray(p))return '['+p.map(canonical).join(',')+']';if(p&&typeof p==='object')return '{'+Object.keys(p).filter(k=>k!=='signature').sort().map(k=>JSON.stringify(k)+':'+canonical(p[k])).join(',')+'}';return JSON.stringify(p);}\nfunction signed(p){return {...p,signature:parkingCrypto.mac(authKey,canonical(p))};}\nfunction verified(p){return /^[a-f0-9]{64}$/.test(p?.signature||'')&&same(p.signature,parkingCrypto.mac(authKey,canonical(p)));}\nfunction sessions(){const s=flow.get('admin_sessions')||{};for(const t of Object.keys(s))if(s[t].expires_ms<=now)delete s[t];return s;}\nfunction sessionFor(p,touch=false){const s=sessions(),v=s[p?.session_token];if(!v||v.client_id!==p.client_id){flow.set('admin_sessions',s);return null;}if(touch)v.expires_ms=now+SESSION_MS;flow.set('admin_sessions',s);return v;}\nfunction authReply(p,value){if(!msg._client?.socketId)return;send(4,{kind:'admin_auth_reply',payload:{client_id:p.client_id,...value},_client:msg._client});}\nfunction handleAuth(){\n const p=parse(msg.payload);if(!p||!idok(p.client_id)||!msg._client?.socketId)return;\n if(msg.kind==='admin_logout'){const s=sessions();if(s[p.session_token]?.client_id===p.client_id)delete s[p.session_token];flow.set('admin_sessions',s);authReply(p,{status:'LOGGED_OUT'});return;}\n if(msg.kind==='admin_session'){const s=sessionFor(p,false);authReply(p,s?{status:'OK',expires_ms:s.expires_ms}:{status:'UNAUTHORIZED',message:'Silakan login kembali.'});return;}\n const attempts=flow.get('admin_login_attempts')||{},key=msg._client.socketId;\n for(const k of Object.keys(attempts))if(now-attempts[k].since>60000)delete attempts[k];\n const a=attempts[key]||{since:now,count:0};if(a.count>=5){authReply(p,{status:'RATE_LIMIT',message:'Terlalu banyak percobaan. Tunggu satu menit.'});return;}\n if(!same(parkingCrypto.hash(String(p.username||'')),parkingCrypto.hash(ADMIN_USER))||!same(parkingCrypto.hash(String(p.password||'')),parkingCrypto.hash(ADMIN_PASS))||!/^[a-f0-9]{64}$/.test(p.nonce||'')){\n  a.count++;attempts[key]=a;flow.set('admin_login_attempts',attempts);authReply(p,{status:'DENIED',message:'Username atau password salah.'});return;\n }\n delete attempts[key];flow.set('admin_login_attempts',attempts);\n const s=sessions(),token=parkingCrypto.mac(authKey,p.nonce+'|'+p.client_id+'|'+key+'|'+now);s[token]={client_id:p.client_id,expires_ms:now+SESSION_MS};\n // Batasi sesi yang disimpan; buang sesi paling lama bila diperlukan.\n const keys=Object.keys(s);if(keys.length>100)delete s[keys.sort((a,b)=>s[a].expires_ms-s[b].expires_ms)[0]];\n flow.set('admin_sessions',s);authReply(p,{status:'OK',session_token:token,expires_ms:s[token].expires_ms});\n}\n\nfunction sql(q,args,stage,extra={}){if(ROLE!=='master')return;let i=0;q=q.replace(/\\?/g,()=>'$p'+ ++i);if(i!==args.length)throw Error('SQL bindings');send(0,{topic:q,payload:args,_parking:{stage,...extra}});}\nfunction publish(topic,p,retain=false){send(1,{topic,payload:JSON.stringify(p),qos:'1',retain});}\nfunction plate(p){const m=/^([A-Z]{1,2})([0-9]{1,4})([A-Z]{0,3})$/.exec(String(p||'').toUpperCase().replace(/\\s+/g,''));return m?[m[1],m[2],m[3]].filter(Boolean).join(' '):null;}\nfunction render(){\n const p=flow.get('state'),broker=flow.get('broker')||'waiting',system=flow.get('master_system');\n const systemFresh=!!system&&now-(flow.get('system_received')||0)<8000&&flow.get('system_live')===true&&broker==='connected';\n const dbStatus=ROLE==='master'?(flow.get('ready')?'ready':flow.get('db_error')?'error':'waiting'):(systemFresh?system.db_status:'unknown');\n const live=!!p&&flow.get('live_packet')===true&&now-(flow.get('state_received')||0)<8000&&broker==='connected'&&dbStatus==='ready';\n send(2,{kind:'parking_state',payload:{...(p||{group_id:G,capacity:0,slots:[],history:[],health:{},db_ready:false}),broker,role:ROLE,database_status:dbStatus,sync_live:live,sync_status:live?'SINKRON / MASTER ONLINE':p?'DATA TERAKHIR / MASTER OFFLINE':'MENUNGGU DATA MASTER'}});\n}\nfunction systemStatus(){if(ROLE!=='master')return;publish(`${B}/system`,{group_id:G,db_ready:flow.get('ready')===true,db_status:flow.get('ready')?'ready':flow.get('db_error')?'error':'waiting',issued_ms:now},true);}\n\nfunction snapshot(){\n sql(`SELECT m.authority_id,m.revision,s.capacity,\n (SELECT json_group_array(json_object('slot',slot,'plate',plate,'entered_at',entered_at)) FROM(SELECT slot,plate,entered_at FROM parking_v4_active WHERE group_id=? ORDER BY slot)) slots_json,\n (SELECT json_group_array(json_object('id',id,'source',source,'request_id',request_id,'node_id',node_id,'action',action,'status',status,'plate',plate,'slot',slot,'message',message,'note',note,'created_ms',created_ms,'completed_at',completed_at)) FROM(SELECT * FROM parking_v4_events WHERE group_id=? AND deleted=0 ORDER BY id DESC LIMIT 12)) history_json,\n (SELECT COALESCE(MAX(id),0) FROM parking_v4_events WHERE group_id=?) event_cursor\n FROM parking_meta m JOIN parking_v4_settings s ON m.group_id=s.group_id WHERE m.group_id=?`,[G,G,G,G],'snapshot');\n}\nfunction events(){if(flow.get('events_pending'))return;flow.set('events_pending',true);sql('SELECT * FROM parking_v4_events WHERE group_id=? AND id>? ORDER BY id LIMIT 100',[G,flow.get('last_emitted_event')||0],'events');}\nfunction feedback(r){if(!r||r.group_id!==G||r.status==='OCR_READY')return;publish(`${B}/${r.node_id}/feedback`,{group_id:G,node_id:r.node_id,action:r.action,request_id:r.request_id,status:r.status,plate:r.plate||null,slot:r.assigned_slot,occupancy:r.occupancy_after,capacity:r.capacity_after,message:r.message||labels[r.status]||r.status});}\nfunction adminReply(p,value){publish(`${B}/admin/reply/${p.client_id}`,signed({group_id:G,client_id:p.client_id,command_id:p.command_id,operation:p.operation,...value}));}\nfunction adminError(p,status,message){adminReply(p,{status,message:message||labels[status]||status});}\nfunction routeAdmin(p){const pending=flow.get('admin_pending')||{},key=p.client_id+':'+p.command_id,m=pending[key];if(!m)return;delete pending[key];flow.set('admin_pending',pending);send(4,{kind:'admin_reply',payload:p,...(m._client?{_client:m._client}:{})});}\nfunction history(p){\n const q=String(p.query||'').toUpperCase().slice(0,80),page=Number.isInteger(p.page)?Math.max(0,Math.min(100000,p.page)):0,limit=20;\n const where=\"group_id=? AND deleted=0 AND (instr(upper(COALESCE(plate,'')),?)>0 OR instr(upper(status),?)>0 OR instr(upper(note),?)>0)\";\n sql(`SELECT (SELECT COUNT(*) FROM parking_v4_events WHERE ${where}) total,\n (SELECT json_group_array(json_object('id',id,'source',source,'node_id',node_id,'status',status,'plate',plate,'slot',slot,'note',note,'completed_at',completed_at,'created_ms',created_ms,'request_id',request_id))\n FROM (SELECT * FROM parking_v4_events WHERE ${where} ORDER BY id DESC LIMIT ? OFFSET ?)) rows_json`,[G,q,q,q,G,q,q,q,limit,page*limit],'history',{request:p,page,limit});\n}\ntry{\n if(['admin_login','admin_logout','admin_session'].includes(msg.kind)){handleAuth();return null;}\n if(msg.kind==='system'){const p=parse(msg.payload);if(msg.topic!==`${B}/system`||p?.group_id!==G||!['ready','error','waiting'].includes(p.db_status))return null;flow.set('master_system',p);flow.set('system_received',now);flow.set('system_live',msg.retain!==true);render();return null;}\n if(msg.kind==='broker'){const s=String(msg.status?.text||'waiting').toLowerCase();flow.set('broker',s.includes('disconnected')?'disconnected':s.includes('connected')?'connected':s);render();return null;}\n if(msg.kind==='state'){\n  if(msg.topic!==`${B}/state`)return null;const p=parse(msg.payload);\n  if(!p||p.group_id!==G||p.schema_version!==4||p.db_ready!==true||!Number.isInteger(p.capacity)||p.capacity<1||p.capacity>100||!Array.isArray(p.slots)||p.slots.length>p.capacity)return null;\n  if(!/^[a-f0-9]{32}$/.test(p.authority_id)||!Number.isSafeInteger(p.revision)||p.revision<0)return null;\n  if(p.slots.some(s=>!Number.isInteger(s.slot)||s.slot<1||s.slot>p.capacity||!plate(s.plate))||new Set(p.slots.map(s=>s.slot)).size!==p.slots.length||new Set(p.slots.map(s=>s.plate)).size!==p.slots.length)return null;\n  const old=flow.get('state');if(old&&old.authority_id===p.authority_id&&(p.revision<old.revision||(p.revision===old.revision&&p.issued_ms<old.issued_ms)))return null;\n  flow.set('state',{...p,occupied:p.slots.length,available:p.capacity-p.slots.length});flow.set('state_received',now);flow.set('live_packet',msg.retain!==true);render();return null;\n }\n if(msg.kind==='event'){\n  if(msg.retain||msg.topic!==`${B}/event`)return null;const p=parse(msg.payload);\n  if(!p||p.group_id!==G||!Number.isSafeInteger(p.id)||!p.authority_id||p.source!=='ocr')return null;\n  const seen=flow.get('event_seen')||{};const key=p.authority_id+':'+p.id;if(seen[key])return null;seen[key]=now;\n  for(const k of Object.keys(seen))if(now-seen[k]>120000)delete seen[k];flow.set('event_seen',seen);send(5,{kind:'parking_event',payload:p});return null;\n }\n if(msg.kind==='admin_ui'){\n  const p=parse(msg.payload);if(!p||!idok(p.client_id)||!idok(p.command_id)||!msg._client?.socketId)return null;\n  if(!sessionFor(p)){send(4,{kind:'admin_reply',payload:{client_id:p.client_id,command_id:p.command_id,operation:p.operation,status:'UNAUTHORIZED',message:'Sesi berakhir. Silakan login kembali.'},_client:msg._client});return null;}\n  const pending=flow.get('admin_pending')||{};for(const k of Object.keys(pending))if(now-pending[k].at>25000)delete pending[k];\n  pending[p.client_id+':'+p.command_id]={at:now,_client:msg._client};flow.set('admin_pending',pending);\n  const {session_token,signature,...command}=p;publish(`${B}/admin/request`,signed({...command,group_id:G,expires_ms:now+20000}));return null;\n }\n if(msg.kind==='admin_reply'){\n  const p=parse(msg.payload);if(!p||p.group_id!==G||msg.topic!==`${B}/admin/reply/${p.client_id}`||msg.retain||!verified(p))return null;routeAdmin(p);return null;\n }\n if(msg.kind==='tick'||msg.kind==='refresh'){\n  systemStatus();render();if(ROLE==='master'&&flow.get('ready')){snapshot();events();}return null;\n }\n if(ROLE!=='master')return null;\n if(msg.kind==='health'){\n  const parts=String(msg.topic).split('/'),p=parse(msg.payload),id=parts[2],suffix=parts[3];\n  if(parts.length!==4||parts[0]!=='parking'||parts[1]!==G||!['node1','node2'].includes(id)||p?.group_id!==G||p.node_id!==id||msg.retain||!['status','python_status'].includes(suffix))return null;\n  const h=flow.get('health')||{};h[id+(suffix==='python_status'?'_python':'')]={...p,received_ms:now};flow.set('health',h);return null;\n }\n if(msg.kind==='error'){\n  flow.set('ready',false);flow.set('db_error',true);flow.set('events_pending',false);systemStatus();render();node.status({fill:'red',shape:'ring',text:'SQLite error'});send(3,{payload:msg.error});\n  if(msg._parking?.result)feedback({...msg._parking.result,status:'ERROR',message:labels.ERROR});\n  if(msg._parking?.request)adminError(msg._parking.request,'ERROR');return null;\n }\n if(msg.kind==='db'){\n  const m=msg._parking||{},rows=msg.payload||[];\n  if(m.stage==='init'){sql('INSERT OR IGNORE INTO parking_meta(group_id,authority_id,revision) VALUES(?,lower(hex(randomblob(16))),0)',[G],'meta_init');return null;}\n  if(m.stage==='meta_init'){sql('INSERT OR IGNORE INTO parking_v4_settings(group_id,capacity) VALUES(?,10)',[G],'settings_init');return null;}\n  if(m.stage==='settings_init'){sql('SELECT COALESCE(MAX(id),0) last_id FROM parking_v4_events WHERE group_id=?',[G],'seed');return null;}\n  if(m.stage==='seed'){flow.set('last_emitted_event',rows[0]?.last_id||0);flow.set('ready',true);flow.set('db_error',false);systemStatus();render();node.status({fill:'green',shape:'dot',text:`master / ${G}`});snapshot();return null;}\n  if(!flow.get('ready'))return null;\n  if(m.stage==='snapshot'){\n   const r=rows[0];if(!r||r.revision<(flow.get('published_revision')??-1))return null;\n   const slots=JSON.parse(r.slots_json||'[]'),h=flow.get('health')||{},health={};\n   for(const id of ['node1','node2','node1_python','node2_python']){const v=h[id]||{};health[id]={...v,online:!!v.online&&now-(v.received_ms||0)<20000};health[id].ready=health[id].online&&v.ready===true;}\n   const hist=JSON.parse(r.history_json||'[]');for(const e of hist)e.message=e.message||labels[e.status]||e.status;\n   const state={schema_version:4,group_id:G,authority_id:r.authority_id,revision:r.revision,capacity:r.capacity,occupied:slots.length,available:r.capacity-slots.length,slots,history:hist,last:hist[0]||null,health,event_cursor:r.event_cursor,db_ready:true,issued_ms:now,updated_at:new Date(now).toISOString()};\n   flow.set('published_revision',r.revision);publish(`${B}/state`,state,true);\n  }else if(m.stage==='inserted')sql('SELECT * FROM parking_v4_requests WHERE group_id=? AND request_id=?',[G,m.request_id],'reply',{result:m.result});\n  else if(m.stage==='reply'){\n   const r=rows[0];if(r&&r.node_id===m.result.node_id&&r.action===m.result.action)feedback(r);else send(3,{payload:'Collision request_id / node / action'});snapshot();events();\n  }else if(m.stage==='events'){\n   flow.set('events_pending',false);const state=flow.get('state');\n   if(!state)return null;\n   for(const e of rows){if(e.id<=(flow.get('last_emitted_event')||0))continue;flow.set('last_emitted_event',e.id);if(e.source==='ocr')publish(`${B}/event`,{...e,group_id:G,authority_id:state.authority_id,message:e.message||labels[e.status]||e.status});}\n   if(rows.length===100)events();\n  }else if(m.stage==='admin_inserted')sql('SELECT * FROM parking_v4_commands WHERE group_id=? AND command_id=?',[G,m.request.command_id],'admin_done',{request:m.request});\n  else if(m.stage==='admin_done'){\n   const r=rows[0],p=m.request;if(r&&r.client_id===p.client_id&&r.operation===p.operation)adminReply(p,{status:r.status,message:labels[r.status]||r.status,capacity:r.capacity_after,occupied:r.occupancy_after});else adminError(p,'INVALID','ID perintah sudah digunakan untuk operasi lain');snapshot();events();\n  }else if(m.stage==='history'){const r=rows[0]||{};adminReply(m.request,{status:'OK',rows:JSON.parse(r.rows_json||'[]'),total:r.total||0,page:m.page,limit:m.limit});}\n  return null;\n }\n if(msg.kind==='admin_request'){\n  const p=parse(msg.payload);if(msg.retain||msg.topic!==`${B}/admin/request`||!p||p.group_id!==G||!idok(p.client_id)||!idok(p.command_id)||!verified(p))return null;\n  if(!flow.get('ready')){adminError(p,'ERROR');return null;}\n  if(!Number.isFinite(p.expires_ms)||p.expires_ms<=now||p.expires_ms>now+30000){adminError(p,'EXPIRED');return null;}\n  if(p.operation==='history'){history(p);return null;}\n  if(!['add','update','delete','capacity','history_note','history_delete'].includes(p.operation)||!Number.isSafeInteger(p.expected_revision)||p.expected_revision<0){adminError(p,'INVALID');return null;}\n  const target=p.target_plate?plate(p.target_plate):null,newPlate=p.plate?plate(p.plate):null;\n  const slot=p.slot===null||p.slot===''||p.slot===undefined?null:Number(p.slot),capacity=p.capacity===undefined?null:Number(p.capacity),eventid=p.event_id===undefined?null:Number(p.event_id);\n  if((['add','update'].includes(p.operation)&&!newPlate)||(['update','delete'].includes(p.operation)&&!target)||(slot!==null&&(!Number.isInteger(slot)||slot<1||slot>100))||(p.operation==='capacity'&&(!Number.isInteger(capacity)||capacity<1||capacity>100))||(['history_note','history_delete'].includes(p.operation)&&(!Number.isSafeInteger(eventid)||eventid<1))){adminError(p,'INVALID');return null;}\n  sql(`INSERT OR IGNORE INTO parking_v4_commands(group_id,command_id,client_id,operation,target_plate,new_plate,slot,capacity,event_id,note,expected_revision,created_ms,expires_ms) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)`,[G,p.command_id,p.client_id,p.operation,target,newPlate,slot,capacity,eventid,String(p.note||'').slice(0,500),p.expected_revision,now,p.expires_ms],'admin_inserted',{request:p});return null;\n }\n if(msg.kind!=='result'||!flow.get('ready'))return null;\n const p=parse(msg.payload);if(msg.retain||!p||p.group_id!==G||!idok(p.request_id)||!((p.node_id==='node1'&&p.action==='entry')||(p.node_id==='node2'&&p.action==='exit'))||msg.topic!==`${B}/${p.node_id}/ocr_result`)return null;\n if(!['READ','OCR_FAILED','CAMERA_ERROR','ERROR'].includes(p.status)||!Number.isFinite(p.expires_ms)||p.expires_ms>now+60000)return null;\n let status='OCR_FAILED',number=null,message=String(p.message||labels.OCR_FAILED).slice(0,180);\n if(p.expires_ms<=now){status='TIMEOUT';message=labels.TIMEOUT;}\n else if(p.status==='READ'){number=plate(p.plate);if(number&&Number.isFinite(p.score)&&p.score>=.7&&p.score<=1){status='OCR_READY';message=null;}else{number=null;message='Format plat atau confidence tidak valid';}}\n sql('INSERT OR IGNORE INTO parking_v4_requests(group_id,request_id,node_id,action,status,created_ms,expires_ms,plate,score,snapshot_path,message) VALUES(?,?,?,?,?,?,?,?,?,?,?)',[G,p.request_id,p.node_id,p.action,status,now,p.expires_ms,number,Number.isFinite(p.score)?p.score:null,String(p.snapshot_path||'').slice(0,400),message],'inserted',{request_id:p.request_id,result:p});\n}catch(e){node.error(e,msg);send(3,{payload:String(e)});}\nreturn null;\n",
+        "func": "var parkingCrypto=(()=>{var T=(t,e)=>()=>(e||t((e={exports:{}}).exports,e),e.exports);var pt=T(Q=>{\"use strict\";Object.defineProperty(Q,\"__esModule\",{value:!0});Q.crypto=void 0;Q.crypto=typeof globalThis==\"object\"&&\"crypto\"in globalThis?globalThis.crypto:void 0});var K=T(h=>{\"use strict\";Object.defineProperty(h,\"__esModule\",{value:!0});h.wrapXOFConstructorWithOpts=h.wrapConstructorWithOpts=h.wrapConstructor=h.Hash=h.nextTick=h.swap32IfBE=h.byteSwapIfBE=h.swap8IfBE=h.isLE=void 0;h.isBytes=yt;h.anumber=ht;h.abytes=q;h.ahash=se;h.aexists=re;h.aoutput=ne;h.u8=ie;h.u32=oe;h.clean=ce;h.createView=he;h.rotr=ae;h.rotl=fe;h.byteSwap=ft;h.byteSwap32=St;h.bytesToHex=ue;h.hexToBytes=xe;h.asyncLoop=be;h.utf8ToBytes=dt;h.bytesToUtf8=He;h.toBytes=Y;h.kdfInputToBytes=pe;h.concatBytes=Ae;h.checkOpts=ye;h.createHasher=gt;h.createOptHasher=It;h.createXOFer=Bt;h.randomBytes=Se;var W=pt();function yt(t){return t instanceof Uint8Array||ArrayBuffer.isView(t)&&t.constructor.name===\"Uint8Array\"}function ht(t){if(!Number.isSafeInteger(t)||t<0)throw new Error(\"positive integer expected, got \"+t)}function q(t,...e){if(!yt(t))throw new Error(\"Uint8Array expected\");if(e.length>0&&!e.includes(t.length))throw new Error(\"Uint8Array expected of length \"+e+\", got length=\"+t.length)}function se(t){if(typeof t!=\"function\"||typeof t.create!=\"function\")throw new Error(\"Hash should be wrapped by utils.createHasher\");ht(t.outputLen),ht(t.blockLen)}function re(t,e=!0){if(t.destroyed)throw new Error(\"Hash instance has been destroyed\");if(e&&t.finished)throw new Error(\"Hash#digest() has already been called\")}function ne(t,e){q(t);let s=e.outputLen;if(t.length<s)throw new Error(\"digestInto() expects output buffer of length at least \"+s)}function ie(t){return new Uint8Array(t.buffer,t.byteOffset,t.byteLength)}function oe(t){return new Uint32Array(t.buffer,t.byteOffset,Math.floor(t.byteLength/4))}function ce(...t){for(let e=0;e<t.length;e++)t[e].fill(0)}function he(t){return new DataView(t.buffer,t.byteOffset,t.byteLength)}function ae(t,e){return t<<32-e|t>>>e}function fe(t,e){return t<<e|t>>>32-e>>>0}h.isLE=new Uint8Array(new Uint32Array([287454020]).buffer)[0]===68;function ft(t){return t<<24&4278190080|t<<8&16711680|t>>>8&65280|t>>>24&255}h.swap8IfBE=h.isLE?t=>t:t=>ft(t);h.byteSwapIfBE=h.swap8IfBE;function St(t){for(let e=0;e<t.length;e++)t[e]=ft(t[e]);return t}h.swap32IfBE=h.isLE?t=>t:St;var _t=typeof Uint8Array.from([]).toHex==\"function\"&&typeof Uint8Array.fromHex==\"function\",de=Array.from({length:256},(t,e)=>e.toString(16).padStart(2,\"0\"));function ue(t){if(q(t),_t)return t.toHex();let e=\"\";for(let s=0;s<t.length;s++)e+=de[t[s]];return e}var C={_0:48,_9:57,A:65,F:70,a:97,f:102};function At(t){if(t>=C._0&&t<=C._9)return t-C._0;if(t>=C.A&&t<=C.F)return t-(C.A-10);if(t>=C.a&&t<=C.f)return t-(C.a-10)}function xe(t){if(typeof t!=\"string\")throw new Error(\"hex string expected, got \"+typeof t);if(_t)return Uint8Array.fromHex(t);let e=t.length,s=e/2;if(e%2)throw new Error(\"hex string expected, got unpadded hex of length \"+e);let r=new Uint8Array(s);for(let n=0,i=0;n<s;n++,i+=2){let o=At(t.charCodeAt(i)),f=At(t.charCodeAt(i+1));if(o===void 0||f===void 0){let x=t[i]+t[i+1];throw new Error('hex string expected, got non-hex character \"'+x+'\" at index '+i)}r[n]=o*16+f}return r}var le=async()=>{};h.nextTick=le;async function be(t,e,s){let r=Date.now();for(let n=0;n<t;n++){s(n);let i=Date.now()-r;i>=0&&i<e||(await(0,h.nextTick)(),r+=i)}}function dt(t){if(typeof t!=\"string\")throw new Error(\"string expected\");return new Uint8Array(new TextEncoder().encode(t))}function He(t){return new TextDecoder().decode(t)}function Y(t){return typeof t==\"string\"&&(t=dt(t)),q(t),t}function pe(t){return typeof t==\"string\"&&(t=dt(t)),q(t),t}function Ae(...t){let e=0;for(let r=0;r<t.length;r++){let n=t[r];q(n),e+=n.length}let s=new Uint8Array(e);for(let r=0,n=0;r<t.length;r++){let i=t[r];s.set(i,n),n+=i.length}return s}function ye(t,e){if(e!==void 0&&{}.toString.call(e)!==\"[object Object]\")throw new Error(\"options should be object or undefined\");return Object.assign(t,e)}var at=class{};h.Hash=at;function gt(t){let e=r=>t().update(Y(r)).digest(),s=t();return e.outputLen=s.outputLen,e.blockLen=s.blockLen,e.create=()=>t(),e}function It(t){let e=(r,n)=>t(n).update(Y(r)).digest(),s=t({});return e.outputLen=s.outputLen,e.blockLen=s.blockLen,e.create=r=>t(r),e}function Bt(t){let e=(r,n)=>t(n).update(Y(r)).digest(),s=t({});return e.outputLen=s.outputLen,e.blockLen=s.blockLen,e.create=r=>t(r),e}h.wrapConstructor=gt;h.wrapConstructorWithOpts=It;h.wrapXOFConstructorWithOpts=Bt;function Se(t=32){if(W.crypto&&typeof W.crypto.getRandomValues==\"function\")return W.crypto.getRandomValues(new Uint8Array(t));if(W.crypto&&typeof W.crypto.randomBytes==\"function\")return Uint8Array.from(W.crypto.randomBytes(t));throw new Error(\"crypto.getRandomValues must be defined\")}});var Lt=T(I=>{\"use strict\";Object.defineProperty(I,\"__esModule\",{value:!0});I.SHA512_IV=I.SHA384_IV=I.SHA224_IV=I.SHA256_IV=I.HashMD=void 0;I.setBigUint64=wt;I.Chi=_e;I.Maj=ge;var V=K();function wt(t,e,s,r){if(typeof t.setBigUint64==\"function\")return t.setBigUint64(e,s,r);let n=BigInt(32),i=BigInt(4294967295),o=Number(s>>n&i),f=Number(s&i),x=r?4:0,p=r?0:4;t.setUint32(e+x,o,r),t.setUint32(e+p,f,r)}function _e(t,e,s){return t&e^~t&s}function ge(t,e,s){return t&e^t&s^e&s}var ut=class extends V.Hash{constructor(e,s,r,n){super(),this.finished=!1,this.length=0,this.pos=0,this.destroyed=!1,this.blockLen=e,this.outputLen=s,this.padOffset=r,this.isLE=n,this.buffer=new Uint8Array(e),this.view=(0,V.createView)(this.buffer)}update(e){(0,V.aexists)(this),e=(0,V.toBytes)(e),(0,V.abytes)(e);let{view:s,buffer:r,blockLen:n}=this,i=e.length;for(let o=0;o<i;){let f=Math.min(n-this.pos,i-o);if(f===n){let x=(0,V.createView)(e);for(;n<=i-o;o+=n)this.process(x,o);continue}r.set(e.subarray(o,o+f),this.pos),this.pos+=f,o+=f,this.pos===n&&(this.process(s,0),this.pos=0)}return this.length+=e.length,this.roundClean(),this}digestInto(e){(0,V.aexists)(this),(0,V.aoutput)(e,this),this.finished=!0;let{buffer:s,view:r,blockLen:n,isLE:i}=this,{pos:o}=this;s[o++]=128,(0,V.clean)(this.buffer.subarray(o)),this.padOffset>n-o&&(this.process(r,0),o=0);for(let d=o;d<n;d++)s[d]=0;wt(r,n-8,BigInt(this.length*8),i),this.process(r,0);let f=(0,V.createView)(e),x=this.outputLen;if(x%4)throw new Error(\"_sha2: outputLen should be aligned to 32bit\");let p=x/4,y=this.get();if(p>y.length)throw new Error(\"_sha2: outputLen bigger than state\");for(let d=0;d<p;d++)f.setUint32(4*d,y[d],i)}digest(){let{buffer:e,outputLen:s}=this;this.digestInto(e);let r=e.slice(0,s);return this.destroy(),r}_cloneInto(e){e||(e=new this.constructor),e.set(...this.get());let{blockLen:s,buffer:r,length:n,finished:i,destroyed:o,pos:f}=this;return e.destroyed=o,e.finished=i,e.length=n,e.pos=f,n%s&&e.buffer.set(r),e}clone(){return this._cloneInto()}};I.HashMD=ut;I.SHA256_IV=Uint32Array.from([1779033703,3144134277,1013904242,2773480762,1359893119,2600822924,528734635,1541459225]);I.SHA224_IV=Uint32Array.from([3238371032,914150663,812702999,4144912697,4290775857,1750603025,1694076839,3204075428]);I.SHA384_IV=Uint32Array.from([3418070365,3238371032,1654270250,914150663,2438529370,812702999,355462360,4144912697,1731405415,4290775857,2394180231,1750603025,3675008525,1694076839,1203062813,3204075428]);I.SHA512_IV=Uint32Array.from([1779033703,4089235720,3144134277,2227873595,1013904242,4271175723,2773480762,1595750129,1359893119,2917565137,2600822924,725511199,528734635,4215389547,1541459225,327033209])});var Jt=T(a=>{\"use strict\";Object.defineProperty(a,\"__esModule\",{value:!0});a.toBig=a.shrSL=a.shrSH=a.rotrSL=a.rotrSH=a.rotrBL=a.rotrBH=a.rotr32L=a.rotr32H=a.rotlSL=a.rotlSH=a.rotlBL=a.rotlBH=a.add5L=a.add5H=a.add4L=a.add4H=a.add3L=a.add3H=void 0;a.add=Wt;a.fromBig=lt;a.split=Vt;var Z=BigInt(2**32-1),xt=BigInt(32);function lt(t,e=!1){return e?{h:Number(t&Z),l:Number(t>>xt&Z)}:{h:Number(t>>xt&Z)|0,l:Number(t&Z)|0}}function Vt(t,e=!1){let s=t.length,r=new Uint32Array(s),n=new Uint32Array(s);for(let i=0;i<s;i++){let{h:o,l:f}=lt(t[i],e);[r[i],n[i]]=[o,f]}return[r,n]}var mt=(t,e)=>BigInt(t>>>0)<<xt|BigInt(e>>>0);a.toBig=mt;var Et=(t,e,s)=>t>>>s;a.shrSH=Et;var Ut=(t,e,s)=>t<<32-s|e>>>s;a.shrSL=Ut;var Ct=(t,e,s)=>t>>>s|e<<32-s;a.rotrSH=Ct;var Dt=(t,e,s)=>t<<32-s|e>>>s;a.rotrSL=Dt;var Ft=(t,e,s)=>t<<64-s|e>>>s-32;a.rotrBH=Ft;var Tt=(t,e,s)=>t>>>s-32|e<<64-s;a.rotrBL=Tt;var Ot=(t,e)=>e;a.rotr32H=Ot;var kt=(t,e)=>t;a.rotr32L=kt;var Gt=(t,e,s)=>t<<s|e>>>32-s;a.rotlSH=Gt;var Mt=(t,e,s)=>e<<s|t>>>32-s;a.rotlSL=Mt;var jt=(t,e,s)=>e<<s-32|t>>>64-s;a.rotlBH=jt;var vt=(t,e,s)=>t<<s-32|e>>>64-s;a.rotlBL=vt;function Wt(t,e,s,r){let n=(e>>>0)+(r>>>0);return{h:t+s+(n/2**32|0)|0,l:n|0}}var qt=(t,e,s)=>(t>>>0)+(e>>>0)+(s>>>0);a.add3L=qt;var Pt=(t,e,s,r)=>e+s+r+(t/2**32|0)|0;a.add3H=Pt;var Nt=(t,e,s,r)=>(t>>>0)+(e>>>0)+(s>>>0)+(r>>>0);a.add4L=Nt;var Kt=(t,e,s,r,n)=>e+s+r+n+(t/2**32|0)|0;a.add4H=Kt;var Xt=(t,e,s,r,n)=>(t>>>0)+(e>>>0)+(s>>>0)+(r>>>0)+(n>>>0);a.add5L=Xt;var Rt=(t,e,s,r,n,i)=>e+s+r+n+i+(t/2**32|0)|0;a.add5H=Rt;var Ie={fromBig:lt,split:Vt,toBig:mt,shrSH:Et,shrSL:Ut,rotrSH:Ct,rotrSL:Dt,rotrBH:Ft,rotrBL:Tt,rotr32H:Ot,rotr32L:kt,rotlSH:Gt,rotlSL:Mt,rotlBH:jt,rotlBL:vt,add:Wt,add3L:qt,add3H:Pt,add4L:Nt,add4H:Kt,add5H:Rt,add5L:Xt};a.default=Ie});var Qt=T(l=>{\"use strict\";Object.defineProperty(l,\"__esModule\",{value:!0});l.sha512_224=l.sha512_256=l.sha384=l.sha512=l.sha224=l.sha256=l.SHA512_256=l.SHA512_224=l.SHA384=l.SHA512=l.SHA224=l.SHA256=void 0;var c=Lt(),u=Jt(),A=K(),Be=Uint32Array.from([1116352408,1899447441,3049323471,3921009573,961987163,1508970993,2453635748,2870763221,3624381080,310598401,607225278,1426881987,1925078388,2162078206,2614888103,3248222580,3835390401,4022224774,264347078,604807628,770255983,1249150122,1555081692,1996064986,2554220882,2821834349,2952996808,3210313671,3336571891,3584528711,113926993,338241895,666307205,773529912,1294757372,1396182291,1695183700,1986661051,2177026350,2456956037,2730485921,2820302411,3259730800,3345764771,3516065817,3600352804,4094571909,275423344,430227734,506948616,659060556,883997877,958139571,1322822218,1537002063,1747873779,1955562222,2024104815,2227730452,2361852424,2428436474,2756734187,3204031479,3329325298]),O=new Uint32Array(64),X=class extends c.HashMD{constructor(e=32){super(64,e,8,!1),this.A=c.SHA256_IV[0]|0,this.B=c.SHA256_IV[1]|0,this.C=c.SHA256_IV[2]|0,this.D=c.SHA256_IV[3]|0,this.E=c.SHA256_IV[4]|0,this.F=c.SHA256_IV[5]|0,this.G=c.SHA256_IV[6]|0,this.H=c.SHA256_IV[7]|0}get(){let{A:e,B:s,C:r,D:n,E:i,F:o,G:f,H:x}=this;return[e,s,r,n,i,o,f,x]}set(e,s,r,n,i,o,f,x){this.A=e|0,this.B=s|0,this.C=r|0,this.D=n|0,this.E=i|0,this.F=o|0,this.G=f|0,this.H=x|0}process(e,s){for(let d=0;d<16;d++,s+=4)O[d]=e.getUint32(s,!1);for(let d=16;d<64;d++){let H=O[d-15],S=O[d-2],w=(0,A.rotr)(H,7)^(0,A.rotr)(H,18)^H>>>3,B=(0,A.rotr)(S,17)^(0,A.rotr)(S,19)^S>>>10;O[d]=B+O[d-7]+w+O[d-16]|0}let{A:r,B:n,C:i,D:o,E:f,F:x,G:p,H:y}=this;for(let d=0;d<64;d++){let H=(0,A.rotr)(f,6)^(0,A.rotr)(f,11)^(0,A.rotr)(f,25),S=y+H+(0,c.Chi)(f,x,p)+Be[d]+O[d]|0,B=((0,A.rotr)(r,2)^(0,A.rotr)(r,13)^(0,A.rotr)(r,22))+(0,c.Maj)(r,n,i)|0;y=p,p=x,x=f,f=o+S|0,o=i,i=n,n=r,r=S+B|0}r=r+this.A|0,n=n+this.B|0,i=i+this.C|0,o=o+this.D|0,f=f+this.E|0,x=x+this.F|0,p=p+this.G|0,y=y+this.H|0,this.set(r,n,i,o,f,x,p,y)}roundClean(){(0,A.clean)(O)}destroy(){this.set(0,0,0,0,0,0,0,0),(0,A.clean)(this.buffer)}};l.SHA256=X;var $=class extends X{constructor(){super(28),this.A=c.SHA224_IV[0]|0,this.B=c.SHA224_IV[1]|0,this.C=c.SHA224_IV[2]|0,this.D=c.SHA224_IV[3]|0,this.E=c.SHA224_IV[4]|0,this.F=c.SHA224_IV[5]|0,this.G=c.SHA224_IV[6]|0,this.H=c.SHA224_IV[7]|0}};l.SHA224=$;var zt=u.split([\"0x428a2f98d728ae22\",\"0x7137449123ef65cd\",\"0xb5c0fbcfec4d3b2f\",\"0xe9b5dba58189dbbc\",\"0x3956c25bf348b538\",\"0x59f111f1b605d019\",\"0x923f82a4af194f9b\",\"0xab1c5ed5da6d8118\",\"0xd807aa98a3030242\",\"0x12835b0145706fbe\",\"0x243185be4ee4b28c\",\"0x550c7dc3d5ffb4e2\",\"0x72be5d74f27b896f\",\"0x80deb1fe3b1696b1\",\"0x9bdc06a725c71235\",\"0xc19bf174cf692694\",\"0xe49b69c19ef14ad2\",\"0xefbe4786384f25e3\",\"0x0fc19dc68b8cd5b5\",\"0x240ca1cc77ac9c65\",\"0x2de92c6f592b0275\",\"0x4a7484aa6ea6e483\",\"0x5cb0a9dcbd41fbd4\",\"0x76f988da831153b5\",\"0x983e5152ee66dfab\",\"0xa831c66d2db43210\",\"0xb00327c898fb213f\",\"0xbf597fc7beef0ee4\",\"0xc6e00bf33da88fc2\",\"0xd5a79147930aa725\",\"0x06ca6351e003826f\",\"0x142929670a0e6e70\",\"0x27b70a8546d22ffc\",\"0x2e1b21385c26c926\",\"0x4d2c6dfc5ac42aed\",\"0x53380d139d95b3df\",\"0x650a73548baf63de\",\"0x766a0abb3c77b2a8\",\"0x81c2c92e47edaee6\",\"0x92722c851482353b\",\"0xa2bfe8a14cf10364\",\"0xa81a664bbc423001\",\"0xc24b8b70d0f89791\",\"0xc76c51a30654be30\",\"0xd192e819d6ef5218\",\"0xd69906245565a910\",\"0xf40e35855771202a\",\"0x106aa07032bbd1b8\",\"0x19a4c116b8d2d0c8\",\"0x1e376c085141ab53\",\"0x2748774cdf8eeb99\",\"0x34b0bcb5e19b48a8\",\"0x391c0cb3c5c95a63\",\"0x4ed8aa4ae3418acb\",\"0x5b9cca4f7763e373\",\"0x682e6ff3d6b2b8a3\",\"0x748f82ee5defb2fc\",\"0x78a5636f43172f60\",\"0x84c87814a1f0ab72\",\"0x8cc702081a6439ec\",\"0x90befffa23631e28\",\"0xa4506cebde82bde9\",\"0xbef9a3f7b2c67915\",\"0xc67178f2e372532b\",\"0xca273eceea26619c\",\"0xd186b8c721c0c207\",\"0xeada7dd6cde0eb1e\",\"0xf57d4f7fee6ed178\",\"0x06f067aa72176fba\",\"0x0a637dc5a2c898a6\",\"0x113f9804bef90dae\",\"0x1b710b35131c471b\",\"0x28db77f523047d84\",\"0x32caab7b40c72493\",\"0x3c9ebe0a15c9bebc\",\"0x431d67c49c100d4c\",\"0x4cc5d4becb3e42b6\",\"0x597f299cfc657e2a\",\"0x5fcb6fab3ad6faec\",\"0x6c44198c4a475817\"].map(t=>BigInt(t))),we=zt[0],Le=zt[1],k=new Uint32Array(80),G=new Uint32Array(80),M=class extends c.HashMD{constructor(e=64){super(128,e,16,!1),this.Ah=c.SHA512_IV[0]|0,this.Al=c.SHA512_IV[1]|0,this.Bh=c.SHA512_IV[2]|0,this.Bl=c.SHA512_IV[3]|0,this.Ch=c.SHA512_IV[4]|0,this.Cl=c.SHA512_IV[5]|0,this.Dh=c.SHA512_IV[6]|0,this.Dl=c.SHA512_IV[7]|0,this.Eh=c.SHA512_IV[8]|0,this.El=c.SHA512_IV[9]|0,this.Fh=c.SHA512_IV[10]|0,this.Fl=c.SHA512_IV[11]|0,this.Gh=c.SHA512_IV[12]|0,this.Gl=c.SHA512_IV[13]|0,this.Hh=c.SHA512_IV[14]|0,this.Hl=c.SHA512_IV[15]|0}get(){let{Ah:e,Al:s,Bh:r,Bl:n,Ch:i,Cl:o,Dh:f,Dl:x,Eh:p,El:y,Fh:d,Fl:H,Gh:S,Gl:w,Hh:B,Hl:L}=this;return[e,s,r,n,i,o,f,x,p,y,d,H,S,w,B,L]}set(e,s,r,n,i,o,f,x,p,y,d,H,S,w,B,L){this.Ah=e|0,this.Al=s|0,this.Bh=r|0,this.Bl=n|0,this.Ch=i|0,this.Cl=o|0,this.Dh=f|0,this.Dl=x|0,this.Eh=p|0,this.El=y|0,this.Fh=d|0,this.Fl=H|0,this.Gh=S|0,this.Gl=w|0,this.Hh=B|0,this.Hl=L|0}process(e,s){for(let b=0;b<16;b++,s+=4)k[b]=e.getUint32(s),G[b]=e.getUint32(s+=4);for(let b=16;b<80;b++){let D=k[b-15]|0,F=G[b-15]|0,nt=u.rotrSH(D,F,1)^u.rotrSH(D,F,8)^u.shrSH(D,F,7),it=u.rotrSL(D,F,1)^u.rotrSL(D,F,8)^u.shrSL(D,F,7),E=k[b-2]|0,U=G[b-2]|0,J=u.rotrSH(E,U,19)^u.rotrBH(E,U,61)^u.shrSH(E,U,6),ot=u.rotrSL(E,U,19)^u.rotrBL(E,U,61)^u.shrSL(E,U,6),z=u.add4L(it,ot,G[b-7],G[b-16]),ct=u.add4H(z,nt,J,k[b-7],k[b-16]);k[b]=ct|0,G[b]=z|0}let{Ah:r,Al:n,Bh:i,Bl:o,Ch:f,Cl:x,Dh:p,Dl:y,Eh:d,El:H,Fh:S,Fl:w,Gh:B,Gl:L,Hh:P,Hl:N}=this;for(let b=0;b<80;b++){let D=u.rotrSH(d,H,14)^u.rotrSH(d,H,18)^u.rotrBH(d,H,41),F=u.rotrSL(d,H,14)^u.rotrSL(d,H,18)^u.rotrBL(d,H,41),nt=d&S^~d&B,it=H&w^~H&L,E=u.add5L(N,F,it,Le[b],G[b]),U=u.add5H(E,P,D,nt,we[b],k[b]),J=E|0,ot=u.rotrSH(r,n,28)^u.rotrBH(r,n,34)^u.rotrBH(r,n,39),z=u.rotrSL(r,n,28)^u.rotrBL(r,n,34)^u.rotrBL(r,n,39),ct=r&i^r&f^i&f,ee=n&o^n&x^o&x;P=B|0,N=L|0,B=S|0,L=w|0,S=d|0,w=H|0,{h:d,l:H}=u.add(p|0,y|0,U|0,J|0),p=f|0,y=x|0,f=i|0,x=o|0,i=r|0,o=n|0;let Ht=u.add3L(J,z,ee);r=u.add3H(Ht,U,ot,ct),n=Ht|0}({h:r,l:n}=u.add(this.Ah|0,this.Al|0,r|0,n|0)),{h:i,l:o}=u.add(this.Bh|0,this.Bl|0,i|0,o|0),{h:f,l:x}=u.add(this.Ch|0,this.Cl|0,f|0,x|0),{h:p,l:y}=u.add(this.Dh|0,this.Dl|0,p|0,y|0),{h:d,l:H}=u.add(this.Eh|0,this.El|0,d|0,H|0),{h:S,l:w}=u.add(this.Fh|0,this.Fl|0,S|0,w|0),{h:B,l:L}=u.add(this.Gh|0,this.Gl|0,B|0,L|0),{h:P,l:N}=u.add(this.Hh|0,this.Hl|0,P|0,N|0),this.set(r,n,i,o,f,x,p,y,d,H,S,w,B,L,P,N)}roundClean(){(0,A.clean)(k,G)}destroy(){(0,A.clean)(this.buffer),this.set(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)}};l.SHA512=M;var tt=class extends M{constructor(){super(48),this.Ah=c.SHA384_IV[0]|0,this.Al=c.SHA384_IV[1]|0,this.Bh=c.SHA384_IV[2]|0,this.Bl=c.SHA384_IV[3]|0,this.Ch=c.SHA384_IV[4]|0,this.Cl=c.SHA384_IV[5]|0,this.Dh=c.SHA384_IV[6]|0,this.Dl=c.SHA384_IV[7]|0,this.Eh=c.SHA384_IV[8]|0,this.El=c.SHA384_IV[9]|0,this.Fh=c.SHA384_IV[10]|0,this.Fl=c.SHA384_IV[11]|0,this.Gh=c.SHA384_IV[12]|0,this.Gl=c.SHA384_IV[13]|0,this.Hh=c.SHA384_IV[14]|0,this.Hl=c.SHA384_IV[15]|0}};l.SHA384=tt;var _=Uint32Array.from([2352822216,424955298,1944164710,2312950998,502970286,855612546,1738396948,1479516111,258812777,2077511080,2011393907,79989058,1067287976,1780299464,286451373,2446758561]),g=Uint32Array.from([573645204,4230739756,2673172387,3360449730,596883563,1867755857,2520282905,1497426621,2519219938,2827943907,3193839141,1401305490,721525244,746961066,246885852,2177182882]),et=class extends M{constructor(){super(28),this.Ah=_[0]|0,this.Al=_[1]|0,this.Bh=_[2]|0,this.Bl=_[3]|0,this.Ch=_[4]|0,this.Cl=_[5]|0,this.Dh=_[6]|0,this.Dl=_[7]|0,this.Eh=_[8]|0,this.El=_[9]|0,this.Fh=_[10]|0,this.Fl=_[11]|0,this.Gh=_[12]|0,this.Gl=_[13]|0,this.Hh=_[14]|0,this.Hl=_[15]|0}};l.SHA512_224=et;var st=class extends M{constructor(){super(32),this.Ah=g[0]|0,this.Al=g[1]|0,this.Bh=g[2]|0,this.Bl=g[3]|0,this.Ch=g[4]|0,this.Cl=g[5]|0,this.Dh=g[6]|0,this.Dl=g[7]|0,this.Eh=g[8]|0,this.El=g[9]|0,this.Fh=g[10]|0,this.Fl=g[11]|0,this.Gh=g[12]|0,this.Gl=g[13]|0,this.Hh=g[14]|0,this.Hl=g[15]|0}};l.SHA512_256=st;l.sha256=(0,A.createHasher)(()=>new X);l.sha224=(0,A.createHasher)(()=>new $);l.sha512=(0,A.createHasher)(()=>new M);l.sha384=(0,A.createHasher)(()=>new tt);l.sha512_256=(0,A.createHasher)(()=>new st);l.sha512_224=(0,A.createHasher)(()=>new et)});var Yt=T(m=>{\"use strict\";Object.defineProperty(m,\"__esModule\",{value:!0});m.sha224=m.SHA224=m.sha256=m.SHA256=void 0;var rt=Qt();m.SHA256=rt.SHA256;m.sha256=rt.sha256;m.SHA224=rt.SHA224;m.sha224=rt.sha224});var Zt=T(v=>{\"use strict\";Object.defineProperty(v,\"__esModule\",{value:!0});v.hmac=v.HMAC=void 0;var j=K(),R=class extends j.Hash{constructor(e,s){super(),this.finished=!1,this.destroyed=!1,(0,j.ahash)(e);let r=(0,j.toBytes)(s);if(this.iHash=e.create(),typeof this.iHash.update!=\"function\")throw new Error(\"Expected instance of class which extends utils.Hash\");this.blockLen=this.iHash.blockLen,this.outputLen=this.iHash.outputLen;let n=this.blockLen,i=new Uint8Array(n);i.set(r.length>n?e.create().update(r).digest():r);for(let o=0;o<i.length;o++)i[o]^=54;this.iHash.update(i),this.oHash=e.create();for(let o=0;o<i.length;o++)i[o]^=106;this.oHash.update(i),(0,j.clean)(i)}update(e){return(0,j.aexists)(this),this.iHash.update(e),this}digestInto(e){(0,j.aexists)(this),(0,j.abytes)(e,this.outputLen),this.finished=!0,this.iHash.digestInto(e),this.oHash.update(e),this.oHash.digestInto(e),this.destroy()}digest(){let e=new Uint8Array(this.oHash.outputLen);return this.digestInto(e),e}_cloneInto(e){e||(e=Object.create(Object.getPrototypeOf(this),{}));let{oHash:s,iHash:r,finished:n,destroyed:i,blockLen:o,outputLen:f}=this;return e=e,e.finished=n,e.destroyed=i,e.blockLen=o,e.outputLen=f,e.oHash=s._cloneInto(e.oHash),e.iHash=r._cloneInto(e.iHash),e}clone(){return this._cloneInto()}destroy(){this.destroyed=!0,this.oHash.destroy(),this.iHash.destroy()}};v.HMAC=R;var Ve=(t,e,s)=>new R(t,e).update(s).digest();v.hmac=Ve;v.hmac.create=(t,e)=>new R(t,e)});var Ee=T(bt=>{var{sha256:$t}=Yt(),{hmac:me}=Zt(),{bytesToHex:te}=K();bt.hash=t=>te($t(Uint8Array.from(Buffer.from(t,\"utf8\"))));bt.mac=(t,e)=>te(me($t,Uint8Array.from(Buffer.from(t,\"utf8\")),Uint8Array.from(Buffer.from(e,\"utf8\"))))});return Ee();})();\n/*! Bundled license information:\n\n@noble/hashes/utils.js:\n  (*! noble-hashes - MIT License (c) 2022 Paul Miller (paulmillr.com) *)\n*/\n\n/* @noble/hashes 1.8.0\nThe MIT License (MIT)\n\nCopyright (c) 2022 Paul Miller (https://paulmillr.com)\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the “Software”), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in\nall copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\nTHE SOFTWARE.\n*/\n\n// Outputs: SQLite master, MQTT, shared UI state, Debug, targeted admin replies, live events.\nconst C=flow.get('parking_config');if(!C)return null;\nif(msg.config_key&&msg.config_key!==C.config_key)return null;\nif(msg._parking?.config_key&&msg._parking.config_key!==C.config_key)return null;\nconst G=C.group_id,ROLE=C.role,B='parking/'+G,T=C.topics,now=Date.now();\nconst idok=x=>typeof x==='string'&&/^[A-Za-z0-9_-]{1,96}$/.test(x);\nconst labels={ENTERED:'Kendaraan masuk; slot tersimpan',EXITED:'Kendaraan keluar; slot dilepas',FULL:'Parkir penuh',DUPLICATE:'Plat sudah terdaftar',NOT_FOUND:'Plat exit tidak ditemukan',OCR_FAILED:'Plat tidak terbaca stabil',TIMEOUT:'Transaksi kedaluwarsa',ERROR:'Database bermasalah; periksa Debug',OK:'Perubahan tersimpan',CONFLICT:'Data berubah. Perbarui dan ulangi perubahan.',EXPIRED:'Perintah kedaluwarsa; silakan ulangi',INVALID:'Data tidak valid',INVALID_SLOT:'Nomor slot di luar kapasitas',SLOT_OCCUPIED:'Slot tujuan sudah terisi; pilih slot kosong',MISSING:'Data sudah tidak ditemukan',CAPACITY_BLOCKED:'Pindahkan/hapus kendaraan pada slot di atas kapasitas baru terlebih dahulu',ADMIN_ADDED:'Kendaraan ditambahkan admin',ADMIN_UPDATED:'Data/posisi kendaraan diperbarui',ADMIN_DELETED:'Kendaraan dilepas admin',CAPACITY_UPDATED:'Kapasitas diperbarui',HISTORY_UPDATED:'Catatan riwayat diperbarui',HISTORY_DELETED:'Riwayat disembunyikan'};\nfunction send(i,p){const a=[null,null,null,null,null,null];a[i]=p;node.send(a);}\nfunction parse(p){return typeof p==='string'?JSON.parse(p):p;}\n// Login dan sesi diperiksa di Node-RED. Kredensial tidak diterbitkan ke MQTT.\nconst ADMIN_USER=C.admin_username,ADMIN_PASS=C.admin_password;\nconst SESSION_MS=30*60*1000,authKey=parkingCrypto.hash('parking-admin-v1|'+G+'|'+ADMIN_USER+'|'+ADMIN_PASS);\nconst same=(a,b)=>{if(typeof a!=='string'||typeof b!=='string'||a.length!==b.length)return false;let d=0;for(let i=0;i<a.length;i++)d|=a.charCodeAt(i)^b.charCodeAt(i);return d===0;};\nfunction canonical(p){if(Array.isArray(p))return '['+p.map(canonical).join(',')+']';if(p&&typeof p==='object')return '{'+Object.keys(p).filter(k=>k!=='signature').sort().map(k=>JSON.stringify(k)+':'+canonical(p[k])).join(',')+'}';return JSON.stringify(p);}\nfunction signed(p){return {...p,signature:parkingCrypto.mac(authKey,canonical(p))};}\nfunction verified(p){return /^[a-f0-9]{64}$/.test(p?.signature||'')&&same(p.signature,parkingCrypto.mac(authKey,canonical(p)));}\nfunction sessions(){const s=flow.get('admin_sessions')||{};for(const t of Object.keys(s))if(s[t].expires_ms<=now)delete s[t];return s;}\nfunction sessionFor(p,touch=false){const s=sessions(),v=s[p?.session_token];if(!v||v.client_id!==p.client_id){flow.set('admin_sessions',s);return null;}if(touch)v.expires_ms=now+SESSION_MS;flow.set('admin_sessions',s);return v;}\nfunction authReply(p,value){if(!msg._client?.socketId)return;send(4,{kind:'admin_auth_reply',payload:{client_id:p.client_id,...value},_client:msg._client});}\nfunction handleAuth(){\n const p=parse(msg.payload);if(!p||!idok(p.client_id)||!msg._client?.socketId)return;\n if(msg.kind==='admin_logout'){const s=sessions();if(s[p.session_token]?.client_id===p.client_id)delete s[p.session_token];flow.set('admin_sessions',s);authReply(p,{status:'LOGGED_OUT'});return;}\n if(msg.kind==='admin_session'){const s=sessionFor(p,false);authReply(p,s?{status:'OK',expires_ms:s.expires_ms}:{status:'UNAUTHORIZED',message:'Silakan login kembali.'});return;}\n const attempts=flow.get('admin_login_attempts')||{},key=msg._client.socketId;\n for(const k of Object.keys(attempts))if(now-attempts[k].since>60000)delete attempts[k];\n const a=attempts[key]||{since:now,count:0};if(a.count>=5){authReply(p,{status:'RATE_LIMIT',message:'Terlalu banyak percobaan. Tunggu satu menit.'});return;}\n if(!same(parkingCrypto.hash(String(p.username||'')),parkingCrypto.hash(ADMIN_USER))||!same(parkingCrypto.hash(String(p.password||'')),parkingCrypto.hash(ADMIN_PASS))||!/^[a-f0-9]{64}$/.test(p.nonce||'')){\n  a.count++;attempts[key]=a;flow.set('admin_login_attempts',attempts);authReply(p,{status:'DENIED',message:'Username atau password salah.'});return;\n }\n delete attempts[key];flow.set('admin_login_attempts',attempts);\n const s=sessions(),token=parkingCrypto.mac(authKey,p.nonce+'|'+p.client_id+'|'+key+'|'+now);s[token]={client_id:p.client_id,expires_ms:now+SESSION_MS};\n // Batasi sesi yang disimpan; buang sesi paling lama bila diperlukan.\n const keys=Object.keys(s);if(keys.length>100)delete s[keys.sort((a,b)=>s[a].expires_ms-s[b].expires_ms)[0]];\n flow.set('admin_sessions',s);authReply(p,{status:'OK',session_token:token,expires_ms:s[token].expires_ms});\n}\n\nfunction sql(q,args,stage,extra={}){if(ROLE!=='master')return;let i=0;q=q.replace(/\\?/g,()=>'$p'+ ++i);if(i!==args.length)throw Error('SQL bindings');send(0,{topic:q,payload:args,_parking:{stage,...extra,config_key:C.config_key}});}\nfunction publish(topic,p,retain=false){send(1,{topic,payload:JSON.stringify(p),qos:'1',retain,config_key:C.config_key});}\nfunction plate(p){const m=/^([A-Z]{1,2})([0-9]{1,4})([A-Z]{0,3})$/.exec(String(p||'').toUpperCase().replace(/\\s+/g,''));return m?[m[1],m[2],m[3]].filter(Boolean).join(' '):null;}\nfunction render(){\n const p=flow.get('state'),broker=flow.get('broker')||'waiting',system=flow.get('master_system');\n const systemFresh=!!system&&now-(flow.get('system_received')||0)<8000&&flow.get('system_live')===true&&broker==='connected';\n const dbStatus=ROLE==='master'?(flow.get('ready')?'ready':flow.get('db_error')?'error':'waiting'):(systemFresh?system.db_status:'unknown');\n const live=!!p&&flow.get('live_packet')===true&&now-(flow.get('state_received')||0)<8000&&broker==='connected'&&dbStatus==='ready';\n send(2,{kind:'parking_state',payload:{...(p||{group_id:G,capacity:0,slots:[],history:[],health:{},db_ready:false}),broker,role:ROLE,node_id:C.node_id,database_status:dbStatus,sync_live:live,sync_status:live?'SINKRON / MASTER ONLINE':p?'DATA TERAKHIR / MASTER OFFLINE':'MENUNGGU DATA MASTER'}});\n}\nfunction systemStatus(){if(ROLE!=='master')return;publish(T.system,{group_id:G,db_ready:flow.get('ready')===true,db_status:flow.get('ready')?'ready':flow.get('db_error')?'error':'waiting',issued_ms:now},true);}\n\nfunction snapshot(){\n if(flow.get('snapshot_pending')){flow.set('snapshot_dirty',true);return;}flow.set('snapshot_pending',true);\n sql(`SELECT m.authority_id,m.revision,s.capacity,\n (SELECT json_group_array(json_object('slot',slot,'plate',plate,'entered_at',entered_at)) FROM(SELECT slot,plate,entered_at FROM parking_v4_active WHERE group_id=? ORDER BY slot)) slots_json,\n (SELECT json_group_array(json_object('id',id,'source',source,'request_id',request_id,'node_id',node_id,'action',action,'status',status,'plate',plate,'slot',slot,'message',message,'note',note,'created_ms',created_ms,'completed_at',completed_at)) FROM(SELECT * FROM parking_v4_events WHERE group_id=? AND deleted=0 ORDER BY id DESC LIMIT 12)) history_json,\n (SELECT COALESCE(MAX(id),0) FROM parking_v4_events WHERE group_id=?) event_cursor\n FROM parking_meta m JOIN parking_v4_settings s ON m.group_id=s.group_id WHERE m.group_id=?`,[G,G,G,G],'snapshot');\n}\nfunction events(){if(flow.get('events_pending'))return;flow.set('events_pending',true);sql('SELECT * FROM parking_v4_events WHERE group_id=? AND id>? ORDER BY id LIMIT 100',[G,flow.get('last_emitted_event')||0],'events');}\nfunction feedback(r){if(!r||r.group_id!==G||r.status==='OCR_READY')return;publish(T.nodes[r.node_id]?.feedback,{group_id:G,node_id:r.node_id,action:r.action,request_id:r.request_id,status:r.status,plate:r.plate||null,slot:r.assigned_slot,occupancy:r.occupancy_after,capacity:r.capacity_after,message:r.message||labels[r.status]||r.status});}\nfunction adminReply(p,value){const t=T.nodes[p.reply_node];if(!t)return;publish(t.adminReply,signed({group_id:G,reply_node:p.reply_node,client_id:p.client_id,command_id:p.command_id,operation:p.operation,...value}));}\nfunction adminError(p,status,message){adminReply(p,{status,message:message||labels[status]||status});}\nfunction routeAdmin(p){const pending=flow.get('admin_pending')||{},key=p.client_id+':'+p.command_id,m=pending[key];if(!m)return;delete pending[key];flow.set('admin_pending',pending);send(4,{kind:'admin_reply',payload:p,...(m._client?{_client:m._client}:{})});}\nfunction history(p){\n const q=String(p.query||'').toUpperCase().slice(0,80),page=Number.isInteger(p.page)?Math.max(0,Math.min(100000,p.page)):0,limit=20;\n const where=\"group_id=? AND deleted=0 AND (instr(upper(COALESCE(plate,'')),?)>0 OR instr(upper(status),?)>0 OR instr(upper(note),?)>0)\";\n sql(`SELECT (SELECT COUNT(*) FROM parking_v4_events WHERE ${where}) total,\n (SELECT json_group_array(json_object('id',id,'source',source,'node_id',node_id,'status',status,'plate',plate,'slot',slot,'note',note,'completed_at',completed_at,'created_ms',created_ms,'request_id',request_id))\n FROM (SELECT * FROM parking_v4_events WHERE ${where} ORDER BY id DESC LIMIT ? OFFSET ?)) rows_json`,[G,q,q,q,G,q,q,q,limit,page*limit],'history',{request:p,page,limit});\n}\ntry{\n if(['admin_login','admin_logout','admin_session'].includes(msg.kind)){handleAuth();return null;}\n if(msg.kind==='system'){const p=parse(msg.payload);if(msg.topic!==T.system||p?.group_id!==G||!['ready','error','waiting'].includes(p.db_status))return null;flow.set('master_system',p);flow.set('system_received',now);flow.set('system_live',msg.retain!==true);render();return null;}\n if(msg.kind==='broker'){const s=String(msg.status?.text||'waiting').toLowerCase();flow.set('broker',s.includes('disconnected')?'disconnected':s.includes('connected')?'connected':s);render();return null;}\n if(msg.kind==='state'){\n  if(msg.topic!==T.state)return null;const p=parse(msg.payload);\n  if(!p||p.group_id!==G||p.schema_version!==4||p.db_ready!==true||!Number.isInteger(p.capacity)||p.capacity<1||p.capacity>100||!Array.isArray(p.slots)||p.slots.length>p.capacity)return null;\n  if(!/^[a-f0-9]{32}$/.test(p.authority_id)||!Number.isSafeInteger(p.revision)||p.revision<0)return null;\n  if(p.slots.some(s=>!Number.isInteger(s.slot)||s.slot<1||s.slot>p.capacity||!plate(s.plate))||new Set(p.slots.map(s=>s.slot)).size!==p.slots.length||new Set(p.slots.map(s=>s.plate)).size!==p.slots.length)return null;\n  if(ROLE==='master'&&flow.get('master_authority')&&p.authority_id!==flow.get('master_authority')){node.warn('Ada lebih dari satu master untuk '+G+'. Gunakan satu node1/master saja.');return null;}\n  const old=flow.get('state');if(old&&old.authority_id===p.authority_id&&(p.revision<old.revision||(p.revision===old.revision&&p.issued_ms<old.issued_ms)))return null;\n  flow.set('state',{...p,occupied:p.slots.length,available:p.capacity-p.slots.length});flow.set('state_received',now);flow.set('live_packet',msg.retain!==true);render();return null;\n }\n if(msg.kind==='event'){\n  if(msg.retain||msg.topic!==T.event)return null;const p=parse(msg.payload);\n  if(!p||p.group_id!==G||!Number.isSafeInteger(p.id)||!p.authority_id||p.source!=='ocr')return null;\n  const seen=flow.get('event_seen')||{};const key=p.authority_id+':'+p.id;if(seen[key])return null;seen[key]=now;\n  for(const k of Object.keys(seen))if(now-seen[k]>120000)delete seen[k];flow.set('event_seen',seen);send(5,{kind:'parking_event',payload:p});return null;\n }\n if(msg.kind==='admin_ui'){\n  const p=parse(msg.payload);if(!p||!idok(p.client_id)||!idok(p.command_id)||!msg._client?.socketId)return null;\n  if(!sessionFor(p)){send(4,{kind:'admin_reply',payload:{client_id:p.client_id,command_id:p.command_id,operation:p.operation,status:'UNAUTHORIZED',message:'Sesi berakhir. Silakan login kembali.'},_client:msg._client});return null;}\n  const pending=flow.get('admin_pending')||{};for(const k of Object.keys(pending))if(now-pending[k].at>25000)delete pending[k];\n  pending[p.client_id+':'+p.command_id]={at:now,_client:msg._client};flow.set('admin_pending',pending);\n  const {session_token,signature,...command}=p;publish(T.nodes[C.node_id].adminRequest,signed({...command,group_id:G,reply_node:C.node_id,expires_ms:now+20000}));return null;\n }\n if(msg.kind==='admin_reply'){\n  const p=parse(msg.payload);if(!p||p.group_id!==G||p.reply_node!==C.node_id||msg.topic!==T.nodes[C.node_id].adminReply||msg.retain||!verified(p))return null;routeAdmin(p);return null;\n }\n if(msg.kind==='tick'||msg.kind==='refresh'){\n  systemStatus();render();if(ROLE==='master'&&flow.get('ready')){snapshot();events();}return null;\n }\n if(ROLE!=='master')return null;\n if(msg.kind==='health'){\n  const parts=String(msg.topic).split('/'),p=parse(msg.payload),id=parts[2],suffix=parts[3];\n  if(parts.length!==4||parts[0]!=='parking'||parts[1]!==G||!['node1','node2'].includes(id)||p?.group_id!==G||p.node_id!==id||msg.retain||!['status','python_status'].includes(suffix))return null;\n  const h=flow.get('health')||{};h[id+(suffix==='python_status'?'_python':'')]={...p,received_ms:now};flow.set('health',h);return null;\n }\n if(msg.kind==='error'){\n  if(msg._parking?.stage==='rollback')return null;\n  flow.set('snapshot_pending',false);flow.set('snapshot_dirty',false);\n  sql('ROLLBACK',[],'rollback');\n  flow.set('ready',false);flow.set('db_error',true);flow.set('events_pending',false);systemStatus();render();node.status({fill:'red',shape:'ring',text:'SQLite error'});send(3,{payload:msg.error});\n  if(msg._parking?.result)feedback({...msg._parking.result,status:'ERROR',message:labels.ERROR});\n  if(msg._parking?.request)adminError(msg._parking.request,'ERROR');return null;\n }\n if(msg.kind==='db'){\n  const m=msg._parking||{},rows=msg.payload||[];\n  if(m.stage==='init'){sql('INSERT OR IGNORE INTO parking_meta(group_id,authority_id,revision) VALUES(?,lower(hex(randomblob(16))),0)',[G],'meta_init');return null;}\n  if(m.stage==='meta_init'){sql('INSERT OR IGNORE INTO parking_v4_settings(group_id,capacity) VALUES(?,10)',[G],'settings_init');return null;}\n  if(m.stage==='settings_init'){sql('SELECT COALESCE(MAX(id),0) last_id FROM parking_v4_events WHERE group_id=?',[G],'seed');return null;}\n  if(m.stage==='seed'){flow.set('last_emitted_event',rows[0]?.last_id||0);flow.set('ready',true);flow.set('db_error',false);systemStatus();render();node.status({fill:'green',shape:'dot',text:`master / ${G}`});snapshot();return null;}\n  if(!flow.get('ready'))return null;\n  if(m.stage==='snapshot'){\n   flow.set('snapshot_pending',false);const again=flow.get('snapshot_dirty');flow.set('snapshot_dirty',false);\n   const r=rows[0];if(!r||r.revision<(flow.get('published_revision')??-1))return null;\n   flow.set('master_authority',r.authority_id);const slots=JSON.parse(r.slots_json||'[]'),h=flow.get('health')||{},health={};\n   for(const id of ['node1','node2','node1_python','node2_python']){const v=h[id]||{};health[id]={...v,online:!!v.online&&now-(v.received_ms||0)<20000};health[id].ready=health[id].online&&v.ready===true;}\n   const hist=JSON.parse(r.history_json||'[]');for(const e of hist)e.message=e.message||labels[e.status]||e.status;\n   const state={schema_version:4,group_id:G,authority_id:r.authority_id,revision:r.revision,capacity:r.capacity,occupied:slots.length,available:r.capacity-slots.length,slots,history:hist,last:hist[0]||null,health,event_cursor:r.event_cursor,db_ready:true,issued_ms:now,updated_at:new Date(now).toISOString()};\n   flow.set('published_revision',r.revision);publish(T.state,state,true);if(again)snapshot();\n  }else if(m.stage==='inserted')sql('SELECT * FROM parking_v4_requests WHERE group_id=? AND request_id=?',[G,m.request_id],'reply',{result:m.result});\n  else if(m.stage==='reply'){\n   const r=rows[0];if(r&&r.node_id===m.result.node_id&&r.action===m.result.action)feedback(r);else send(3,{payload:'Collision request_id / node / action'});snapshot();events();\n  }else if(m.stage==='events'){\n   flow.set('events_pending',false);const state=flow.get('state');\n   if(!state)return null;\n   for(const e of rows){if(e.id<=(flow.get('last_emitted_event')||0))continue;flow.set('last_emitted_event',e.id);if(e.source==='ocr')publish(T.event,{...e,group_id:G,authority_id:state.authority_id,message:e.message||labels[e.status]||e.status});}\n   if(rows.length===100)events();\n  }else if(m.stage==='admin_inserted')sql('SELECT * FROM parking_v4_commands WHERE group_id=? AND command_id=?',[G,m.request.command_id],'admin_done',{request:m.request});\n  else if(m.stage==='admin_done'){\n   const r=rows[0],p=m.request;if(r&&r.client_id===p.client_id&&r.operation===p.operation)adminReply(p,{status:r.status,message:labels[r.status]||r.status,capacity:r.capacity_after,occupied:r.occupancy_after});else adminError(p,'INVALID','ID perintah sudah digunakan untuk operasi lain');snapshot();events();\n  }else if(m.stage==='history'){const r=rows[0]||{};adminReply(m.request,{status:'OK',rows:JSON.parse(r.rows_json||'[]'),total:r.total||0,page:m.page,limit:m.limit});}\n  return null;\n }\n if(msg.kind==='admin_request'){\n  const p=parse(msg.payload);if(msg.retain||!p||p.group_id!==G||!T.nodes[p.reply_node]||msg.topic!==T.nodes[p.reply_node].adminRequest||!idok(p.client_id)||!idok(p.command_id)||!verified(p))return null;\n  if(!flow.get('ready')){adminError(p,'ERROR');return null;}\n  if(!Number.isFinite(p.expires_ms)||p.expires_ms<=now||p.expires_ms>now+30000){adminError(p,'EXPIRED');return null;}\n  if(p.operation==='history'){history(p);return null;}\n  if(!['add','update','delete','capacity','history_note','history_delete'].includes(p.operation)||!Number.isSafeInteger(p.expected_revision)||p.expected_revision<0){adminError(p,'INVALID');return null;}\n  const target=p.target_plate?plate(p.target_plate):null,newPlate=p.plate?plate(p.plate):null;\n  const slot=p.slot===null||p.slot===''||p.slot===undefined?null:Number(p.slot),capacity=p.capacity===undefined?null:Number(p.capacity),eventid=p.event_id===undefined?null:Number(p.event_id);\n  if((['add','update'].includes(p.operation)&&!newPlate)||(['update','delete'].includes(p.operation)&&!target)||(slot!==null&&(!Number.isInteger(slot)||slot<1||slot>100))||(p.operation==='capacity'&&(!Number.isInteger(capacity)||capacity<1||capacity>100))||(['history_note','history_delete'].includes(p.operation)&&(!Number.isSafeInteger(eventid)||eventid<1))){adminError(p,'INVALID');return null;}\n  sql(`INSERT OR IGNORE INTO parking_v4_commands(group_id,command_id,client_id,operation,target_plate,new_plate,slot,capacity,event_id,note,expected_revision,created_ms,expires_ms) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)`,[G,p.command_id,p.client_id,p.operation,target,newPlate,slot,capacity,eventid,String(p.note||'').slice(0,500),p.expected_revision,now,p.expires_ms],'admin_inserted',{request:p});return null;\n }\n if(msg.kind!=='result'||!flow.get('ready'))return null;\n const p=parse(msg.payload);if(msg.retain||!p||p.group_id!==G||!idok(p.request_id)||!((p.node_id==='node1'&&p.action==='entry')||(p.node_id==='node2'&&p.action==='exit'))||msg.topic!==T.nodes[p.node_id]?.result)return null;\n if(!['READ','OCR_FAILED','CAMERA_ERROR','ERROR'].includes(p.status)||!Number.isFinite(p.expires_ms)||p.expires_ms>now+60000)return null;\n let status='OCR_FAILED',number=null,message=String(p.message||labels.OCR_FAILED).slice(0,180);\n if(p.expires_ms<=now){status='TIMEOUT';message=labels.TIMEOUT;}\n else if(p.status==='READ'){number=plate(p.plate);if(number&&Number.isFinite(p.score)&&p.score>=.7&&p.score<=1){status='OCR_READY';message=null;}else{number=null;message='Format plat atau confidence tidak valid';}}\n sql('INSERT OR IGNORE INTO parking_v4_requests(group_id,request_id,node_id,action,status,created_ms,expires_ms,plate,score,snapshot_path,message) VALUES(?,?,?,?,?,?,?,?,?,?,?)',[G,p.request_id,p.node_id,p.action,status,now,p.expires_ms,number,Number.isFinite(p.score)?p.score:null,String(p.snapshot_path||'').slice(0,400),message],'inserted',{request_id:p.request_id,result:p});\n}catch(e){node.error(e,msg);send(3,{payload:String(e)});}\nreturn null;\n",
         "outputs": 6,
         "timeout": 0,
         "noerr": 0,
-        "initialize": "flow.set(\"ready\",false);flow.set(\"db_error\",false);flow.set(\"admin_sessions\",{});flow.set(\"admin_login_attempts\",{});flow.set(\"master_system\",null);flow.set(\"health\",{});flow.set(\"broker\",\"waiting\");flow.set(\"state\",null);flow.set(\"published_revision\",-1);flow.set(\"events_pending\",false);flow.set(\"event_seen\",{});flow.set(\"admin_pending\",{});",
+        "initialize": "flow.set(\"ready\",false);flow.set(\"snapshot_pending\",false);flow.set(\"events_pending\",false);",
         "finalize": "",
         "libs": [],
-        "x": 560,
-        "y": 280,
+        "x": 970,
+        "y": 490,
         "wires": [
             [
-                "94962829181ab1a7"
+                "0c913823d2d6da94"
             ],
             [
-                "a88a19434704d194"
+                "ff1a936988d944df"
             ],
             [
-                "c2c363021f7efe24",
-                "1d2637c8679b94d1",
-                "0d1a777c41914d0f"
+                "6b838ca6efb3b149"
             ],
             [
-                "72851bca15aae28a"
+                "ddb13a10727f290b"
             ],
             [
-                "1d2637c8679b94d1"
+                "2b70904f4ca44b30"
             ],
             [
-                "0d1a777c41914d0f"
+                "4d48530a01e7fe65"
             ]
         ]
     },
     {
-        "id": "94962829181ab1a7",
+        "id": "a75938cb9e2162ea",
         "type": "sqlite",
-        "z": "205b93c675cd169a",
+        "z": "0bd030bfd44f393b",
+        "g": "8798913023d3c50d",
         "mydb": "b6942c_db",
         "sqlquery": "msg.topic",
         "sql": "",
-        "name": "Parameterized parking SQL",
-        "x": 820,
-        "y": 200,
+        "name": "SQL transaksi",
+        "x": 320,
+        "y": 800,
         "wires": [
             [
-                "732d40ac87c1e426"
+                "d0f814f1a1bcaf2e"
             ]
         ]
     },
     {
-        "id": "732d40ac87c1e426",
+        "id": "d0f814f1a1bcaf2e",
         "type": "function",
-        "z": "205b93c675cd169a",
-        "name": "db_return",
+        "z": "0bd030bfd44f393b",
+        "g": "8798913023d3c50d",
+        "name": "Hasil SQL",
         "func": "msg.kind=\"db\";return msg;",
         "outputs": 1,
         "timeout": 0,
@@ -119,19 +261,20 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1040,
-        "y": 260,
+        "x": 520,
+        "y": 800,
         "wires": [
             [
-                "74765ac958168d41"
+                "9125a7b1e7d2c710"
             ]
         ]
     },
     {
-        "id": "a88a19434704d194",
+        "id": "14be7e0e634febb2",
         "type": "mqtt out",
-        "z": "205b93c675cd169a",
-        "name": "Feedback dan snapshot MQTT",
+        "z": "0bd030bfd44f393b",
+        "g": "c74d3bc3bd1d51b7",
+        "name": "MQTT TX • feedback / state",
         "topic": "",
         "qos": "1",
         "retain": "",
@@ -141,97 +284,16 @@
         "correl": "",
         "expiry": "",
         "broker": "b6942c_broker",
-        "x": 830,
-        "y": 260,
+        "x": 620,
+        "y": 550,
         "wires": []
     },
     {
-        "id": "3977e0da9cc3d143",
-        "type": "mqtt in",
-        "z": "205b93c675cd169a",
-        "name": "Hasil OCR Python",
-        "topic": "parking/+/+/ocr_result",
-        "qos": "1",
-        "datatype": "auto-detect",
-        "broker": "b6942c_broker",
-        "nl": false,
-        "rap": true,
-        "rh": 0,
-        "inputs": 0,
-        "x": 150,
-        "y": 160,
-        "wires": [
-            [
-                "43fda07ff3eb84c9"
-            ]
-        ]
-    },
-    {
-        "id": "43fda07ff3eb84c9",
-        "type": "function",
-        "z": "205b93c675cd169a",
-        "name": "result_kind",
-        "func": "msg.kind=\"result\";return msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 330,
-        "y": 160,
-        "wires": [
-            [
-                "74765ac958168d41"
-            ]
-        ]
-    },
-    {
-        "id": "76c038b9eb5efff9",
-        "type": "mqtt in",
-        "z": "205b93c675cd169a",
-        "name": "Status perangkat",
-        "topic": "parking/+/+/+",
-        "qos": "1",
-        "datatype": "auto-detect",
-        "broker": "b6942c_broker",
-        "nl": false,
-        "rap": true,
-        "rh": 0,
-        "inputs": 0,
-        "x": 140,
-        "y": 220,
-        "wires": [
-            [
-                "8d38f5e35945d7f2"
-            ]
-        ]
-    },
-    {
-        "id": "8d38f5e35945d7f2",
-        "type": "function",
-        "z": "205b93c675cd169a",
-        "name": "health_kind",
-        "func": "msg.kind=\"health\";return msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 330,
-        "y": 220,
-        "wires": [
-            [
-                "74765ac958168d41"
-            ]
-        ]
-    },
-    {
-        "id": "8e3fcdceaf065a9b",
+        "id": "ade91fa81e92dc16",
         "type": "inject",
-        "z": "205b93c675cd169a",
-        "name": "Refresh dashboard setiap detik",
+        "z": "0bd030bfd44f393b",
+        "g": "0240ab171e4869f6",
+        "name": "Heartbeat 1 detik + startup",
         "props": [
             {
                 "p": "kind",
@@ -241,100 +303,107 @@
         ],
         "repeat": "1",
         "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
+        "once": true,
+        "onceDelay": 0.2,
         "topic": "",
-        "x": 220,
-        "y": 380,
+        "x": 210,
+        "y": 220,
         "wires": [
             [
-                "74765ac958168d41"
+                "68099c65accb313e"
             ]
         ]
     },
     {
-        "id": "82898cf7b4a505f9",
+        "id": "df22081efeb10868",
         "type": "function",
-        "z": "205b93c675cd169a",
+        "z": "0bd030bfd44f393b",
+        "g": "0240ab171e4869f6",
         "name": "init_sql",
-        "func": "if(env.get(\"ROLE\")!==\"master\")return null;msg.topic=\"PRAGMA journal_mode=WAL;\\nPRAGMA busy_timeout=5000;\\nBEGIN IMMEDIATE;\\nPRAGMA journal_mode=WAL;\\nPRAGMA busy_timeout=5000;\\nCREATE TABLE IF NOT EXISTS parking_v2_requests (\\n group_id TEXT NOT NULL,\\n request_id TEXT NOT NULL,\\n node_id TEXT NOT NULL CHECK(node_id IN ('node1','node2')),\\n action TEXT NOT NULL CHECK(action IN ('entry','exit')),\\n status TEXT NOT NULL,\\n created_ms INTEGER NOT NULL,\\n expires_ms INTEGER NOT NULL,\\n plate TEXT,\\n score REAL,\\n snapshot_path TEXT,\\n message TEXT,\\n completed_at TEXT,\\n occupancy_after INTEGER,\\n PRIMARY KEY(group_id,request_id)\\n);\\nCREATE TABLE IF NOT EXISTS parking_v2_active (\\n group_id TEXT NOT NULL,\\n slot INTEGER NOT NULL CHECK(slot BETWEEN 1 AND 10),\\n plate TEXT NOT NULL,\\n entered_at TEXT NOT NULL,\\n entry_request_id TEXT NOT NULL,\\n PRIMARY KEY(group_id,slot),\\n UNIQUE(group_id,plate),\\n UNIQUE(group_id,entry_request_id)\\n);\\nCREATE INDEX IF NOT EXISTS idx_parking_v2_created ON parking_v2_requests(group_id,created_ms);\\n\\nCREATE TABLE IF NOT EXISTS parking_meta(group_id TEXT PRIMARY KEY,authority_id TEXT NOT NULL,revision INTEGER NOT NULL DEFAULT 0);\\nDROP TRIGGER IF EXISTS parking_v2_apply;\\nDROP TRIGGER IF EXISTS parking_v3_revision;\\nCREATE TABLE IF NOT EXISTS parking_v4_settings(group_id TEXT PRIMARY KEY,capacity INTEGER NOT NULL DEFAULT 10 CHECK(capacity BETWEEN 1 AND 100));\\nCREATE TABLE IF NOT EXISTS parking_v4_numbers(n INTEGER PRIMARY KEY);\\nWITH RECURSIVE nums(n) AS(SELECT 1 UNION ALL SELECT n+1 FROM nums WHERE n<100) INSERT OR IGNORE INTO parking_v4_numbers SELECT n FROM nums;\\nCREATE TABLE IF NOT EXISTS parking_v4_active(\\n group_id TEXT NOT NULL,slot INTEGER NOT NULL CHECK(slot BETWEEN 1 AND 100),plate TEXT NOT NULL,entered_at TEXT NOT NULL,entry_request_id TEXT NOT NULL,\\n PRIMARY KEY(group_id,slot),UNIQUE(group_id,plate),UNIQUE(group_id,entry_request_id));\\nCREATE TABLE IF NOT EXISTS parking_v4_requests(\\n group_id TEXT NOT NULL,request_id TEXT NOT NULL,node_id TEXT NOT NULL,action TEXT NOT NULL,status TEXT NOT NULL,\\n created_ms INTEGER NOT NULL,expires_ms INTEGER NOT NULL,plate TEXT,score REAL,snapshot_path TEXT,message TEXT,\\n completed_at TEXT,occupancy_after INTEGER,assigned_slot INTEGER,capacity_after INTEGER,PRIMARY KEY(group_id,request_id));\\nCREATE TABLE IF NOT EXISTS parking_v4_events(\\n id INTEGER PRIMARY KEY AUTOINCREMENT,group_id TEXT NOT NULL,event_key TEXT NOT NULL,source TEXT NOT NULL,request_id TEXT,node_id TEXT,action TEXT,\\n status TEXT NOT NULL,plate TEXT,slot INTEGER,message TEXT,occupancy_after INTEGER,capacity_after INTEGER,created_ms INTEGER NOT NULL,completed_at TEXT,\\n note TEXT NOT NULL DEFAULT '',deleted INTEGER NOT NULL DEFAULT 0,UNIQUE(group_id,event_key));\\nCREATE INDEX IF NOT EXISTS idx_parking_v4_event ON parking_v4_events(group_id,id DESC);\\nCREATE TABLE IF NOT EXISTS parking_v4_commands(\\n group_id TEXT NOT NULL,command_id TEXT NOT NULL,client_id TEXT NOT NULL,operation TEXT NOT NULL,target_plate TEXT,new_plate TEXT,slot INTEGER,capacity INTEGER,event_id INTEGER,note TEXT,\\n expected_revision INTEGER NOT NULL,status TEXT NOT NULL DEFAULT 'PENDING',message TEXT,created_ms INTEGER NOT NULL,expires_ms INTEGER NOT NULL,\\n completed_at TEXT,occupancy_after INTEGER,capacity_after INTEGER,PRIMARY KEY(group_id,command_id));\\nCREATE TABLE IF NOT EXISTS parking_v4_migrations(name TEXT PRIMARY KEY);\\nINSERT OR IGNORE INTO parking_v4_settings SELECT group_id,10 FROM parking_v2_active WHERE NOT EXISTS(SELECT 1 FROM parking_v4_migrations WHERE name='v3_import');\\nINSERT OR IGNORE INTO parking_v4_settings SELECT group_id,10 FROM parking_v2_requests WHERE NOT EXISTS(SELECT 1 FROM parking_v4_migrations WHERE name='v3_import');\\nINSERT OR IGNORE INTO parking_meta SELECT group_id,lower(hex(randomblob(16))),0 FROM parking_v4_settings;\\nINSERT OR IGNORE INTO parking_v4_active SELECT * FROM parking_v2_active WHERE NOT EXISTS(SELECT 1 FROM parking_v4_migrations WHERE name='v3_import');\\nINSERT OR IGNORE INTO parking_v4_requests(group_id,request_id,node_id,action,status,created_ms,expires_ms,plate,score,snapshot_path,message,completed_at,occupancy_after,capacity_after)\\n SELECT group_id,request_id,node_id,action,status,created_ms,expires_ms,plate,score,snapshot_path,message,completed_at,occupancy_after,10 FROM parking_v2_requests\\n WHERE NOT EXISTS(SELECT 1 FROM parking_v4_migrations WHERE name='v3_import');\\nINSERT OR IGNORE INTO parking_v4_events(group_id,event_key,source,request_id,node_id,action,status,plate,message,occupancy_after,capacity_after,created_ms,completed_at)\\n SELECT group_id,'ocr:'||request_id,'ocr',request_id,node_id,action,status,plate,message,occupancy_after,10,created_ms,completed_at FROM parking_v2_requests\\n WHERE NOT EXISTS(SELECT 1 FROM parking_v4_migrations WHERE name='v3_import') ORDER BY created_ms,request_id;\\nINSERT OR IGNORE INTO parking_v4_migrations VALUES('v3_import');\\nCREATE TRIGGER IF NOT EXISTS parking_v4_apply AFTER INSERT ON parking_v4_requests\\nBEGIN\\n UPDATE parking_v4_requests SET status=CASE\\n  WHEN NEW.status<>'OCR_READY' THEN NEW.status\\n  WHEN NOT EXISTS(SELECT 1 FROM parking_v4_settings WHERE group_id=NEW.group_id) THEN 'ERROR'\\n  WHEN NEW.action='entry' AND EXISTS(SELECT 1 FROM parking_v4_active WHERE group_id=NEW.group_id AND plate=NEW.plate) THEN 'DUPLICATE'\\n  WHEN NEW.action='entry' AND (SELECT COUNT(*) FROM parking_v4_active WHERE group_id=NEW.group_id)>=(SELECT capacity FROM parking_v4_settings WHERE group_id=NEW.group_id) THEN 'FULL'\\n  WHEN NEW.action='entry' THEN 'ENTERED'\\n  WHEN EXISTS(SELECT 1 FROM parking_v4_active WHERE group_id=NEW.group_id AND plate=NEW.plate) THEN 'EXITED'\\n  ELSE 'NOT_FOUND' END,\\n assigned_slot=(SELECT slot FROM parking_v4_active WHERE group_id=NEW.group_id AND plate=NEW.plate)\\n WHERE group_id=NEW.group_id AND request_id=NEW.request_id;\\n INSERT INTO parking_v4_active(group_id,slot,plate,entered_at,entry_request_id)\\n SELECT NEW.group_id,n,NEW.plate,strftime('%Y-%m-%dT%H:%M:%fZ','now'),NEW.request_id FROM parking_v4_numbers\\n WHERE n<=(SELECT capacity FROM parking_v4_settings WHERE group_id=NEW.group_id)\\n AND NOT EXISTS(SELECT 1 FROM parking_v4_active WHERE group_id=NEW.group_id AND slot=n)\\n AND (SELECT status FROM parking_v4_requests WHERE group_id=NEW.group_id AND request_id=NEW.request_id)='ENTERED' ORDER BY random() LIMIT 1;\\n UPDATE parking_v4_requests SET assigned_slot=(SELECT slot FROM parking_v4_active WHERE group_id=NEW.group_id AND plate=NEW.plate)\\n WHERE group_id=NEW.group_id AND request_id=NEW.request_id AND status='ENTERED';\\n DELETE FROM parking_v4_active WHERE group_id=NEW.group_id AND plate=NEW.plate\\n AND (SELECT status FROM parking_v4_requests WHERE group_id=NEW.group_id AND request_id=NEW.request_id)='EXITED';\\n UPDATE parking_v4_requests SET completed_at=strftime('%Y-%m-%dT%H:%M:%fZ','now'),\\n occupancy_after=(SELECT COUNT(*) FROM parking_v4_active WHERE group_id=NEW.group_id),\\n capacity_after=(SELECT capacity FROM parking_v4_settings WHERE group_id=NEW.group_id)\\n WHERE group_id=NEW.group_id AND request_id=NEW.request_id;\\n UPDATE parking_meta SET revision=revision+1 WHERE group_id=NEW.group_id;\\n INSERT INTO parking_v4_events(group_id,event_key,source,request_id,node_id,action,status,plate,slot,message,occupancy_after,capacity_after,created_ms,completed_at)\\n SELECT group_id,'ocr:'||request_id,'ocr',request_id,node_id,action,status,plate,assigned_slot,message,occupancy_after,capacity_after,created_ms,completed_at\\n FROM parking_v4_requests WHERE group_id=NEW.group_id AND request_id=NEW.request_id;\\nEND;\\nCREATE TRIGGER IF NOT EXISTS parking_v4_admin_apply AFTER INSERT ON parking_v4_commands\\nBEGIN\\n UPDATE parking_v4_commands SET status=CASE\\n  WHEN NEW.expected_revision<>(SELECT revision FROM parking_meta WHERE group_id=NEW.group_id) THEN 'CONFLICT'\\n  WHEN NEW.expires_ms<CAST((julianday('now')-2440587.5)*86400000 AS INTEGER) THEN 'EXPIRED'\\n  WHEN NEW.operation='capacity' AND (NEW.capacity IS NULL OR NEW.capacity NOT BETWEEN 1 AND 100) THEN 'INVALID'\\n  WHEN NEW.operation='capacity' AND EXISTS(SELECT 1 FROM parking_v4_active WHERE group_id=NEW.group_id AND slot>NEW.capacity) THEN 'CAPACITY_BLOCKED'\\n  WHEN NEW.operation IN('update','delete') AND NOT EXISTS(SELECT 1 FROM parking_v4_active WHERE group_id=NEW.group_id AND plate=NEW.target_plate) THEN 'MISSING'\\n  WHEN NEW.operation IN('add','update') AND (NEW.new_plate IS NULL OR length(NEW.new_plate)<3) THEN 'INVALID'\\n  WHEN NEW.operation IN('add','update') AND EXISTS(SELECT 1 FROM parking_v4_active WHERE group_id=NEW.group_id AND plate=NEW.new_plate AND (NEW.operation='add' OR plate<>NEW.target_plate)) THEN 'DUPLICATE'\\n  WHEN NEW.operation IN('add','update') AND NEW.slot IS NOT NULL AND (NEW.slot<1 OR NEW.slot>(SELECT capacity FROM parking_v4_settings WHERE group_id=NEW.group_id)) THEN 'INVALID_SLOT'\\n  WHEN NEW.operation IN('add','update') AND NEW.slot IS NOT NULL AND EXISTS(SELECT 1 FROM parking_v4_active WHERE group_id=NEW.group_id AND slot=NEW.slot AND (NEW.operation='add' OR plate<>NEW.target_plate)) THEN 'SLOT_OCCUPIED'\\n  WHEN NEW.operation='add' AND (SELECT count(*) FROM parking_v4_active WHERE group_id=NEW.group_id)>=(SELECT capacity FROM parking_v4_settings WHERE group_id=NEW.group_id) THEN 'FULL'\\n  WHEN NEW.operation IN('history_note','history_delete') AND NOT EXISTS(SELECT 1 FROM parking_v4_events WHERE group_id=NEW.group_id AND id=NEW.event_id AND deleted=0) THEN 'MISSING'\\n  WHEN NEW.operation NOT IN('add','update','delete','capacity','history_note','history_delete') THEN 'INVALID'\\n  ELSE 'PENDING' END WHERE group_id=NEW.group_id AND command_id=NEW.command_id;\\n INSERT INTO parking_v4_active(group_id,slot,plate,entered_at,entry_request_id)\\n SELECT NEW.group_id,n,NEW.new_plate,strftime('%Y-%m-%dT%H:%M:%fZ','now'),'admin-'||NEW.command_id FROM parking_v4_numbers\\n WHERE (SELECT status FROM parking_v4_commands WHERE group_id=NEW.group_id AND command_id=NEW.command_id)='PENDING'\\n AND NEW.operation='add' AND n<=(SELECT capacity FROM parking_v4_settings WHERE group_id=NEW.group_id)\\n AND (NEW.slot IS NULL OR n=NEW.slot) AND NOT EXISTS(SELECT 1 FROM parking_v4_active WHERE group_id=NEW.group_id AND slot=n) ORDER BY random() LIMIT 1;\\n UPDATE parking_v4_active SET plate=NEW.new_plate,slot=COALESCE(NEW.slot,slot)\\n WHERE group_id=NEW.group_id AND plate=NEW.target_plate AND NEW.operation='update'\\n AND (SELECT status FROM parking_v4_commands WHERE group_id=NEW.group_id AND command_id=NEW.command_id)='PENDING';\\n DELETE FROM parking_v4_active WHERE group_id=NEW.group_id AND plate=NEW.target_plate AND NEW.operation='delete'\\n AND (SELECT status FROM parking_v4_commands WHERE group_id=NEW.group_id AND command_id=NEW.command_id)='PENDING';\\n UPDATE parking_v4_settings SET capacity=NEW.capacity WHERE group_id=NEW.group_id AND NEW.operation='capacity'\\n AND (SELECT status FROM parking_v4_commands WHERE group_id=NEW.group_id AND command_id=NEW.command_id)='PENDING';\\n UPDATE parking_v4_events SET note=COALESCE(NEW.note,'') WHERE group_id=NEW.group_id AND id=NEW.event_id AND NEW.operation='history_note'\\n AND (SELECT status FROM parking_v4_commands WHERE group_id=NEW.group_id AND command_id=NEW.command_id)='PENDING';\\n UPDATE parking_v4_events SET deleted=1 WHERE group_id=NEW.group_id AND id=NEW.event_id AND NEW.operation='history_delete'\\n AND (SELECT status FROM parking_v4_commands WHERE group_id=NEW.group_id AND command_id=NEW.command_id)='PENDING';\\n UPDATE parking_meta SET revision=revision+1 WHERE group_id=NEW.group_id\\n AND (SELECT status FROM parking_v4_commands WHERE group_id=NEW.group_id AND command_id=NEW.command_id)='PENDING';\\n UPDATE parking_v4_commands SET status=CASE WHEN status='PENDING' THEN 'OK' ELSE status END,\\n completed_at=strftime('%Y-%m-%dT%H:%M:%fZ','now'),occupancy_after=(SELECT count(*) FROM parking_v4_active WHERE group_id=NEW.group_id),\\n capacity_after=(SELECT capacity FROM parking_v4_settings WHERE group_id=NEW.group_id)\\n WHERE group_id=NEW.group_id AND command_id=NEW.command_id;\\n INSERT INTO parking_v4_events(group_id,event_key,source,request_id,node_id,action,status,plate,slot,message,occupancy_after,capacity_after,created_ms,completed_at)\\n SELECT group_id,'admin:'||command_id,'admin',command_id,'admin',operation,\\n CASE operation WHEN 'add' THEN 'ADMIN_ADDED' WHEN 'update' THEN 'ADMIN_UPDATED' WHEN 'delete' THEN 'ADMIN_DELETED'\\n WHEN 'capacity' THEN 'CAPACITY_UPDATED' WHEN 'history_note' THEN 'HISTORY_UPDATED' ELSE 'HISTORY_DELETED' END,\\n COALESCE(new_plate,target_plate),(SELECT slot FROM parking_v4_active WHERE group_id=NEW.group_id AND plate=NEW.new_plate),\\n 'Perubahan dari halaman admin',occupancy_after,capacity_after,created_ms,completed_at\\n FROM parking_v4_commands WHERE group_id=NEW.group_id AND command_id=NEW.command_id AND status='OK';\\nEND;\\nCOMMIT;\\n\";msg._parking={stage:\"init\"};return msg;",
+        "func": "const C=flow.get(\"parking_config\");if(!C||C.role!==\"master\"||msg.config_key!==C.config_key)return null;msg.topic=\"PRAGMA journal_mode=WAL;\\nPRAGMA busy_timeout=5000;\\nBEGIN IMMEDIATE;\\nPRAGMA journal_mode=WAL;\\nPRAGMA busy_timeout=5000;\\nCREATE TABLE IF NOT EXISTS parking_v2_requests (\\n group_id TEXT NOT NULL,\\n request_id TEXT NOT NULL,\\n node_id TEXT NOT NULL CHECK(node_id IN ('node1','node2')),\\n action TEXT NOT NULL CHECK(action IN ('entry','exit')),\\n status TEXT NOT NULL,\\n created_ms INTEGER NOT NULL,\\n expires_ms INTEGER NOT NULL,\\n plate TEXT,\\n score REAL,\\n snapshot_path TEXT,\\n message TEXT,\\n completed_at TEXT,\\n occupancy_after INTEGER,\\n PRIMARY KEY(group_id,request_id)\\n);\\nCREATE TABLE IF NOT EXISTS parking_v2_active (\\n group_id TEXT NOT NULL,\\n slot INTEGER NOT NULL CHECK(slot BETWEEN 1 AND 10),\\n plate TEXT NOT NULL,\\n entered_at TEXT NOT NULL,\\n entry_request_id TEXT NOT NULL,\\n PRIMARY KEY(group_id,slot),\\n UNIQUE(group_id,plate),\\n UNIQUE(group_id,entry_request_id)\\n);\\nCREATE INDEX IF NOT EXISTS idx_parking_v2_created ON parking_v2_requests(group_id,created_ms);\\n\\nCREATE TABLE IF NOT EXISTS parking_meta(group_id TEXT PRIMARY KEY,authority_id TEXT NOT NULL,revision INTEGER NOT NULL DEFAULT 0);\\nDROP TRIGGER IF EXISTS parking_v2_apply;\\nDROP TRIGGER IF EXISTS parking_v3_revision;\\nCREATE TABLE IF NOT EXISTS parking_v4_settings(group_id TEXT PRIMARY KEY,capacity INTEGER NOT NULL DEFAULT 10 CHECK(capacity BETWEEN 1 AND 100));\\nCREATE TABLE IF NOT EXISTS parking_v4_numbers(n INTEGER PRIMARY KEY);\\nWITH RECURSIVE nums(n) AS(SELECT 1 UNION ALL SELECT n+1 FROM nums WHERE n<100) INSERT OR IGNORE INTO parking_v4_numbers SELECT n FROM nums;\\nCREATE TABLE IF NOT EXISTS parking_v4_active(\\n group_id TEXT NOT NULL,slot INTEGER NOT NULL CHECK(slot BETWEEN 1 AND 100),plate TEXT NOT NULL,entered_at TEXT NOT NULL,entry_request_id TEXT NOT NULL,\\n PRIMARY KEY(group_id,slot),UNIQUE(group_id,plate),UNIQUE(group_id,entry_request_id));\\nCREATE TABLE IF NOT EXISTS parking_v4_requests(\\n group_id TEXT NOT NULL,request_id TEXT NOT NULL,node_id TEXT NOT NULL,action TEXT NOT NULL,status TEXT NOT NULL,\\n created_ms INTEGER NOT NULL,expires_ms INTEGER NOT NULL,plate TEXT,score REAL,snapshot_path TEXT,message TEXT,\\n completed_at TEXT,occupancy_after INTEGER,assigned_slot INTEGER,capacity_after INTEGER,PRIMARY KEY(group_id,request_id));\\nCREATE TABLE IF NOT EXISTS parking_v4_events(\\n id INTEGER PRIMARY KEY AUTOINCREMENT,group_id TEXT NOT NULL,event_key TEXT NOT NULL,source TEXT NOT NULL,request_id TEXT,node_id TEXT,action TEXT,\\n status TEXT NOT NULL,plate TEXT,slot INTEGER,message TEXT,occupancy_after INTEGER,capacity_after INTEGER,created_ms INTEGER NOT NULL,completed_at TEXT,\\n note TEXT NOT NULL DEFAULT '',deleted INTEGER NOT NULL DEFAULT 0,UNIQUE(group_id,event_key));\\nCREATE INDEX IF NOT EXISTS idx_parking_v4_event ON parking_v4_events(group_id,id DESC);\\nCREATE TABLE IF NOT EXISTS parking_v4_commands(\\n group_id TEXT NOT NULL,command_id TEXT NOT NULL,client_id TEXT NOT NULL,operation TEXT NOT NULL,target_plate TEXT,new_plate TEXT,slot INTEGER,capacity INTEGER,event_id INTEGER,note TEXT,\\n expected_revision INTEGER NOT NULL,status TEXT NOT NULL DEFAULT 'PENDING',message TEXT,created_ms INTEGER NOT NULL,expires_ms INTEGER NOT NULL,\\n completed_at TEXT,occupancy_after INTEGER,capacity_after INTEGER,PRIMARY KEY(group_id,command_id));\\nCREATE TABLE IF NOT EXISTS parking_v4_migrations(name TEXT PRIMARY KEY);\\nINSERT OR IGNORE INTO parking_v4_settings SELECT group_id,10 FROM parking_v2_active WHERE NOT EXISTS(SELECT 1 FROM parking_v4_migrations WHERE name='v3_import');\\nINSERT OR IGNORE INTO parking_v4_settings SELECT group_id,10 FROM parking_v2_requests WHERE NOT EXISTS(SELECT 1 FROM parking_v4_migrations WHERE name='v3_import');\\nINSERT OR IGNORE INTO parking_meta SELECT group_id,lower(hex(randomblob(16))),0 FROM parking_v4_settings;\\nINSERT OR IGNORE INTO parking_v4_active SELECT * FROM parking_v2_active WHERE NOT EXISTS(SELECT 1 FROM parking_v4_migrations WHERE name='v3_import');\\nINSERT OR IGNORE INTO parking_v4_requests(group_id,request_id,node_id,action,status,created_ms,expires_ms,plate,score,snapshot_path,message,completed_at,occupancy_after,capacity_after)\\n SELECT group_id,request_id,node_id,action,status,created_ms,expires_ms,plate,score,snapshot_path,message,completed_at,occupancy_after,10 FROM parking_v2_requests\\n WHERE NOT EXISTS(SELECT 1 FROM parking_v4_migrations WHERE name='v3_import');\\nINSERT OR IGNORE INTO parking_v4_events(group_id,event_key,source,request_id,node_id,action,status,plate,message,occupancy_after,capacity_after,created_ms,completed_at)\\n SELECT group_id,'ocr:'||request_id,'ocr',request_id,node_id,action,status,plate,message,occupancy_after,10,created_ms,completed_at FROM parking_v2_requests\\n WHERE NOT EXISTS(SELECT 1 FROM parking_v4_migrations WHERE name='v3_import') ORDER BY created_ms,request_id;\\nINSERT OR IGNORE INTO parking_v4_migrations VALUES('v3_import');\\nCREATE TRIGGER IF NOT EXISTS parking_v4_apply AFTER INSERT ON parking_v4_requests\\nBEGIN\\n UPDATE parking_v4_requests SET status=CASE\\n  WHEN NEW.status<>'OCR_READY' THEN NEW.status\\n  WHEN NOT EXISTS(SELECT 1 FROM parking_v4_settings WHERE group_id=NEW.group_id) THEN 'ERROR'\\n  WHEN NEW.action='entry' AND EXISTS(SELECT 1 FROM parking_v4_active WHERE group_id=NEW.group_id AND plate=NEW.plate) THEN 'DUPLICATE'\\n  WHEN NEW.action='entry' AND (SELECT COUNT(*) FROM parking_v4_active WHERE group_id=NEW.group_id)>=(SELECT capacity FROM parking_v4_settings WHERE group_id=NEW.group_id) THEN 'FULL'\\n  WHEN NEW.action='entry' THEN 'ENTERED'\\n  WHEN EXISTS(SELECT 1 FROM parking_v4_active WHERE group_id=NEW.group_id AND plate=NEW.plate) THEN 'EXITED'\\n  ELSE 'NOT_FOUND' END,\\n assigned_slot=(SELECT slot FROM parking_v4_active WHERE group_id=NEW.group_id AND plate=NEW.plate)\\n WHERE group_id=NEW.group_id AND request_id=NEW.request_id;\\n INSERT INTO parking_v4_active(group_id,slot,plate,entered_at,entry_request_id)\\n SELECT NEW.group_id,n,NEW.plate,strftime('%Y-%m-%dT%H:%M:%fZ','now'),NEW.request_id FROM parking_v4_numbers\\n WHERE n<=(SELECT capacity FROM parking_v4_settings WHERE group_id=NEW.group_id)\\n AND NOT EXISTS(SELECT 1 FROM parking_v4_active WHERE group_id=NEW.group_id AND slot=n)\\n AND (SELECT status FROM parking_v4_requests WHERE group_id=NEW.group_id AND request_id=NEW.request_id)='ENTERED' ORDER BY random() LIMIT 1;\\n UPDATE parking_v4_requests SET assigned_slot=(SELECT slot FROM parking_v4_active WHERE group_id=NEW.group_id AND plate=NEW.plate)\\n WHERE group_id=NEW.group_id AND request_id=NEW.request_id AND status='ENTERED';\\n DELETE FROM parking_v4_active WHERE group_id=NEW.group_id AND plate=NEW.plate\\n AND (SELECT status FROM parking_v4_requests WHERE group_id=NEW.group_id AND request_id=NEW.request_id)='EXITED';\\n UPDATE parking_v4_requests SET completed_at=strftime('%Y-%m-%dT%H:%M:%fZ','now'),\\n occupancy_after=(SELECT COUNT(*) FROM parking_v4_active WHERE group_id=NEW.group_id),\\n capacity_after=(SELECT capacity FROM parking_v4_settings WHERE group_id=NEW.group_id)\\n WHERE group_id=NEW.group_id AND request_id=NEW.request_id;\\n UPDATE parking_meta SET revision=revision+1 WHERE group_id=NEW.group_id;\\n INSERT INTO parking_v4_events(group_id,event_key,source,request_id,node_id,action,status,plate,slot,message,occupancy_after,capacity_after,created_ms,completed_at)\\n SELECT group_id,'ocr:'||request_id,'ocr',request_id,node_id,action,status,plate,assigned_slot,message,occupancy_after,capacity_after,created_ms,completed_at\\n FROM parking_v4_requests WHERE group_id=NEW.group_id AND request_id=NEW.request_id;\\nEND;\\nCREATE TRIGGER IF NOT EXISTS parking_v4_admin_apply AFTER INSERT ON parking_v4_commands\\nBEGIN\\n UPDATE parking_v4_commands SET status=CASE\\n  WHEN NEW.expected_revision<>(SELECT revision FROM parking_meta WHERE group_id=NEW.group_id) THEN 'CONFLICT'\\n  WHEN NEW.expires_ms<CAST((julianday('now')-2440587.5)*86400000 AS INTEGER) THEN 'EXPIRED'\\n  WHEN NEW.operation='capacity' AND (NEW.capacity IS NULL OR NEW.capacity NOT BETWEEN 1 AND 100) THEN 'INVALID'\\n  WHEN NEW.operation='capacity' AND EXISTS(SELECT 1 FROM parking_v4_active WHERE group_id=NEW.group_id AND slot>NEW.capacity) THEN 'CAPACITY_BLOCKED'\\n  WHEN NEW.operation IN('update','delete') AND NOT EXISTS(SELECT 1 FROM parking_v4_active WHERE group_id=NEW.group_id AND plate=NEW.target_plate) THEN 'MISSING'\\n  WHEN NEW.operation IN('add','update') AND (NEW.new_plate IS NULL OR length(NEW.new_plate)<3) THEN 'INVALID'\\n  WHEN NEW.operation IN('add','update') AND EXISTS(SELECT 1 FROM parking_v4_active WHERE group_id=NEW.group_id AND plate=NEW.new_plate AND (NEW.operation='add' OR plate<>NEW.target_plate)) THEN 'DUPLICATE'\\n  WHEN NEW.operation IN('add','update') AND NEW.slot IS NOT NULL AND (NEW.slot<1 OR NEW.slot>(SELECT capacity FROM parking_v4_settings WHERE group_id=NEW.group_id)) THEN 'INVALID_SLOT'\\n  WHEN NEW.operation IN('add','update') AND NEW.slot IS NOT NULL AND EXISTS(SELECT 1 FROM parking_v4_active WHERE group_id=NEW.group_id AND slot=NEW.slot AND (NEW.operation='add' OR plate<>NEW.target_plate)) THEN 'SLOT_OCCUPIED'\\n  WHEN NEW.operation='add' AND (SELECT count(*) FROM parking_v4_active WHERE group_id=NEW.group_id)>=(SELECT capacity FROM parking_v4_settings WHERE group_id=NEW.group_id) THEN 'FULL'\\n  WHEN NEW.operation IN('history_note','history_delete') AND NOT EXISTS(SELECT 1 FROM parking_v4_events WHERE group_id=NEW.group_id AND id=NEW.event_id AND deleted=0) THEN 'MISSING'\\n  WHEN NEW.operation NOT IN('add','update','delete','capacity','history_note','history_delete') THEN 'INVALID'\\n  ELSE 'PENDING' END WHERE group_id=NEW.group_id AND command_id=NEW.command_id;\\n INSERT INTO parking_v4_active(group_id,slot,plate,entered_at,entry_request_id)\\n SELECT NEW.group_id,n,NEW.new_plate,strftime('%Y-%m-%dT%H:%M:%fZ','now'),'admin-'||NEW.command_id FROM parking_v4_numbers\\n WHERE (SELECT status FROM parking_v4_commands WHERE group_id=NEW.group_id AND command_id=NEW.command_id)='PENDING'\\n AND NEW.operation='add' AND n<=(SELECT capacity FROM parking_v4_settings WHERE group_id=NEW.group_id)\\n AND (NEW.slot IS NULL OR n=NEW.slot) AND NOT EXISTS(SELECT 1 FROM parking_v4_active WHERE group_id=NEW.group_id AND slot=n) ORDER BY random() LIMIT 1;\\n UPDATE parking_v4_active SET plate=NEW.new_plate,slot=COALESCE(NEW.slot,slot)\\n WHERE group_id=NEW.group_id AND plate=NEW.target_plate AND NEW.operation='update'\\n AND (SELECT status FROM parking_v4_commands WHERE group_id=NEW.group_id AND command_id=NEW.command_id)='PENDING';\\n DELETE FROM parking_v4_active WHERE group_id=NEW.group_id AND plate=NEW.target_plate AND NEW.operation='delete'\\n AND (SELECT status FROM parking_v4_commands WHERE group_id=NEW.group_id AND command_id=NEW.command_id)='PENDING';\\n UPDATE parking_v4_settings SET capacity=NEW.capacity WHERE group_id=NEW.group_id AND NEW.operation='capacity'\\n AND (SELECT status FROM parking_v4_commands WHERE group_id=NEW.group_id AND command_id=NEW.command_id)='PENDING';\\n UPDATE parking_v4_events SET note=COALESCE(NEW.note,'') WHERE group_id=NEW.group_id AND id=NEW.event_id AND NEW.operation='history_note'\\n AND (SELECT status FROM parking_v4_commands WHERE group_id=NEW.group_id AND command_id=NEW.command_id)='PENDING';\\n UPDATE parking_v4_events SET deleted=1 WHERE group_id=NEW.group_id AND id=NEW.event_id AND NEW.operation='history_delete'\\n AND (SELECT status FROM parking_v4_commands WHERE group_id=NEW.group_id AND command_id=NEW.command_id)='PENDING';\\n UPDATE parking_meta SET revision=revision+1 WHERE group_id=NEW.group_id\\n AND (SELECT status FROM parking_v4_commands WHERE group_id=NEW.group_id AND command_id=NEW.command_id)='PENDING';\\n UPDATE parking_v4_commands SET status=CASE WHEN status='PENDING' THEN 'OK' ELSE status END,\\n completed_at=strftime('%Y-%m-%dT%H:%M:%fZ','now'),occupancy_after=(SELECT count(*) FROM parking_v4_active WHERE group_id=NEW.group_id),\\n capacity_after=(SELECT capacity FROM parking_v4_settings WHERE group_id=NEW.group_id)\\n WHERE group_id=NEW.group_id AND command_id=NEW.command_id;\\n INSERT INTO parking_v4_events(group_id,event_key,source,request_id,node_id,action,status,plate,slot,message,occupancy_after,capacity_after,created_ms,completed_at)\\n SELECT group_id,'admin:'||command_id,'admin',command_id,'admin',operation,\\n CASE operation WHEN 'add' THEN 'ADMIN_ADDED' WHEN 'update' THEN 'ADMIN_UPDATED' WHEN 'delete' THEN 'ADMIN_DELETED'\\n WHEN 'capacity' THEN 'CAPACITY_UPDATED' WHEN 'history_note' THEN 'HISTORY_UPDATED' ELSE 'HISTORY_DELETED' END,\\n COALESCE(new_plate,target_plate),(SELECT slot FROM parking_v4_active WHERE group_id=NEW.group_id AND plate=NEW.new_plate),\\n 'Perubahan dari halaman admin',occupancy_after,capacity_after,created_ms,completed_at\\n FROM parking_v4_commands WHERE group_id=NEW.group_id AND command_id=NEW.command_id AND status='OK';\\nEND;\\nCOMMIT;\\n\";msg._parking={stage:\"init\",config_key:C.config_key};return msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 400,
-        "y": 500,
+        "x": 970,
+        "y": 180,
         "wires": [
             [
-                "aba5b7e4bbbfa15c"
+                "b0a440b8cfd188a7"
             ]
         ]
     },
     {
-        "id": "16657c8e0920d3e1",
+        "id": "04f012dbc3075bc2",
         "type": "inject",
-        "z": "205b93c675cd169a",
-        "name": "Initialize schema (also click after fixing DB)",
+        "z": "0bd030bfd44f393b",
+        "g": "0240ab171e4869f6",
+        "name": "Terapkan / pulihkan DB",
         "props": [
             {
-                "p": "payload"
+                "p": "kind",
+                "v": "configure",
+                "vt": "str"
             }
         ],
         "repeat": "",
         "crontab": "",
-        "once": true,
-        "onceDelay": 1,
+        "once": false,
+        "onceDelay": 0.5,
         "topic": "",
         "payload": "",
-        "payloadType": "date",
-        "x": 180,
-        "y": 500,
+        "payloadType": "str",
+        "x": 250,
+        "y": 160,
         "wires": [
             [
-                "82898cf7b4a505f9"
+                "68099c65accb313e"
             ]
         ]
     },
     {
-        "id": "aba5b7e4bbbfa15c",
+        "id": "b0a440b8cfd188a7",
         "type": "sqlite",
-        "z": "205b93c675cd169a",
+        "z": "0bd030bfd44f393b",
+        "g": "0240ab171e4869f6",
         "mydb": "b6942c_db",
         "sqlquery": "batch",
         "sql": "",
-        "name": "SQLite init otomatis",
-        "x": 690,
-        "y": 500,
+        "name": "Init database",
+        "x": 1190,
+        "y": 180,
         "wires": [
             [
-                "732d40ac87c1e426"
+                "b37b21988442fce3"
             ]
         ]
     },
     {
-        "id": "fa025f8a2f7ac0cf",
+        "id": "6cb6cea10bc6f201",
         "type": "catch",
-        "z": "205b93c675cd169a",
-        "name": "SQLite failures",
+        "z": "0bd030bfd44f393b",
+        "g": "8798913023d3c50d",
+        "name": "Error SQLite",
         "scope": [
-            "94962829181ab1a7",
-            "aba5b7e4bbbfa15c"
+            "a75938cb9e2162ea",
+            "b0a440b8cfd188a7"
         ],
         "uncaught": false,
-        "x": 760,
-        "y": 560,
+        "x": 240,
+        "y": 910,
         "wires": [
             [
-                "86d667a211bbc906"
+                "17e9c5446f015e76"
             ]
         ]
     },
     {
-        "id": "86d667a211bbc906",
+        "id": "17e9c5446f015e76",
         "type": "function",
-        "z": "205b93c675cd169a",
+        "z": "0bd030bfd44f393b",
+        "g": "8798913023d3c50d",
         "name": "error_kind",
         "func": "msg.kind=\"error\";return msg;",
         "outputs": 1,
@@ -343,35 +412,37 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1000,
-        "y": 560,
+        "x": 480,
+        "y": 910,
         "wires": [
             [
-                "74765ac958168d41"
+                "63773c22a7eadbb9"
             ]
         ]
     },
     {
-        "id": "2651682056290c4b",
+        "id": "d9af96f9d161d0c3",
         "type": "status",
-        "z": "205b93c675cd169a",
-        "name": "MQTT connection",
+        "z": "0bd030bfd44f393b",
+        "g": "0240ab171e4869f6",
+        "name": "Status koneksi MQTT",
         "scope": [
-            "a88a19434704d194",
-            "3977e0da9cc3d143"
+            "701eb2fb0d6f311b",
+            "14be7e0e634febb2"
         ],
-        "x": 150,
-        "y": 300,
+        "x": 190,
+        "y": 280,
         "wires": [
             [
-                "44c57053dfdd991b"
+                "911454803a6c8d50"
             ]
         ]
     },
     {
-        "id": "44c57053dfdd991b",
+        "id": "911454803a6c8d50",
         "type": "function",
-        "z": "205b93c675cd169a",
+        "z": "0bd030bfd44f393b",
+        "g": "0240ab171e4869f6",
         "name": "broker_kind",
         "func": "msg.kind=\"broker\";return msg;",
         "outputs": 1,
@@ -380,19 +451,20 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 340,
-        "y": 300,
+        "x": 420,
+        "y": 280,
         "wires": [
             [
-                "74765ac958168d41"
+                "68099c65accb313e"
             ]
         ]
     },
     {
-        "id": "72851bca15aae28a",
+        "id": "492ee36bb58fde73",
         "type": "debug",
-        "z": "205b93c675cd169a",
-        "name": "Parking diagnostic",
+        "z": "0bd030bfd44f393b",
+        "g": "8fbe56614b6d1fc5",
+        "name": "Diagnostik parkir",
         "active": true,
         "tosidebar": true,
         "console": false,
@@ -401,87 +473,39 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1250,
-        "y": 340,
+        "x": 1020,
+        "y": 890,
         "wires": []
     },
     {
-        "id": "bc3e486b850a3001",
-        "type": "comment",
-        "z": "205b93c675cd169a",
-        "name": "GROUP_ID dan ROLE • satu master • /main dan /admin",
-        "info": "Satu master per GROUP_ID. Entry ROLE=master, exit ROLE=monitor. Kapasitas 1–100 di Admin. Slot masuk acak diputuskan master. Import pada kedua laptop dan nonaktifkan flow lama. Migrasi v3 dilakukan otomatis; gunakan database yang sama. Identitas 2 orang diedit di node template Identitas. SweetAlert2 dan gambar mobil tertanam dalam JSON. Login admin/admin123; ubah ADMIN_USERNAME/ADMIN_PASSWORD sama pada kedua laptop. Sesi 30 menit. Status sidebar khusus halaman pemantauan parkir; tidak tampil di Admin atau dashboard lain. Revisi sidebar-page-only-1.",
-        "x": 240,
-        "y": 80,
-        "wires": []
-    },
-    {
-        "id": "48b6271c757b1ea8",
-        "type": "mqtt in",
-        "z": "205b93c675cd169a",
-        "name": "Snapshot sinkron semua dashboard",
-        "topic": "parking/+/state",
-        "qos": "1",
-        "datatype": "json",
-        "broker": "b6942c_broker",
-        "nl": false,
-        "rap": true,
-        "rh": 0,
-        "inputs": 0,
-        "x": 200,
-        "y": 440,
-        "wires": [
-            [
-                "c7162bbd91e2a6ba"
-            ]
-        ]
-    },
-    {
-        "id": "c7162bbd91e2a6ba",
+        "id": "32dc3227d76d7f37",
         "type": "function",
-        "z": "205b93c675cd169a",
-        "name": "state_kind",
-        "func": "msg.kind=\"state\";return msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 440,
-        "y": 500,
-        "wires": [
-            [
-                "74765ac958168d41"
-            ]
-        ]
-    },
-    {
-        "id": "ff10cb1cc1f837c3",
-        "type": "function",
-        "z": "205b93c675cd169a",
-        "name": "Validasi pesan Dashboard",
+        "z": "0bd030bfd44f393b",
+        "g": "abf1d399145a12bc",
+        "name": "Validasi UI",
         "func": "if(!['refresh','admin_login','admin_logout','admin_session','admin_ui'].includes(msg.kind)||!msg._client?.socketId)return null;return {kind:msg.kind,payload:msg.payload,_client:msg._client};",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 690,
-        "y": 660,
+        "x": 1850,
+        "y": 1130,
         "wires": [
             [
-                "74765ac958168d41"
+                "af3d77c70cc61175"
             ]
         ]
     },
     {
-        "id": "1d2637c8679b94d1",
+        "id": "8841dc008b6bd499",
         "type": "ui-template",
-        "z": "205b93c675cd169a",
-        "group": "a0062baf5e041705",
+        "z": "0bd030bfd44f393b",
+        "g": "abf1d399145a12bc",
+        "group": "40c4fc37de18d0f4",
         "page": "",
         "ui": "",
-        "name": "Admin kapasitas, kendaraan dan riwayat",
+        "name": "Admin • login dan CRUD",
         "order": 1,
         "width": 12,
         "height": 0,
@@ -492,22 +516,23 @@
         "resendOnRefresh": false,
         "templateScope": "local",
         "className": "",
-        "x": 960,
-        "y": 500,
+        "x": 1670,
+        "y": 900,
         "wires": [
             [
-                "ff10cb1cc1f837c3"
+                "32dc3227d76d7f37"
             ]
         ]
     },
     {
-        "id": "ad1988fde3508f18",
+        "id": "2ed9394875a1d94e",
         "type": "ui-template",
-        "z": "205b93c675cd169a",
-        "group": "2071b85bf4ae1d3b",
+        "z": "0bd030bfd44f393b",
+        "g": "abf1d399145a12bc",
+        "group": "fd533d7d42729641",
         "page": "",
         "ui": "",
-        "name": "Identitas 2 orang — edit manual di template",
+        "name": "Tim • edit 2 identitas",
         "order": 1,
         "width": 12,
         "height": 0,
@@ -518,22 +543,21 @@
         "resendOnRefresh": false,
         "templateScope": "local",
         "className": "",
-        "x": 970,
-        "y": 380,
+        "x": 1650,
+        "y": 700,
         "wires": [
-            [
-                "ff10cb1cc1f837c3"
-            ]
+            []
         ]
     },
     {
-        "id": "0d1a777c41914d0f",
+        "id": "ecfbca25269f7c84",
         "type": "ui-template",
-        "z": "205b93c675cd169a",
+        "z": "0bd030bfd44f393b",
+        "g": "abf1d399145a12bc",
         "group": "",
-        "page": "f1cbede1a5403376",
+        "page": "0baf648530bc0f16",
         "ui": "",
-        "name": "Status khusus halaman parkir + SweetAlert2",
+        "name": "Status parkir + SweetAlert2",
         "order": 1,
         "width": 12,
         "height": 0,
@@ -544,179 +568,434 @@
         "resendOnRefresh": false,
         "templateScope": "widget:page",
         "className": "",
-        "x": 970,
-        "y": 320,
+        "x": 1670,
+        "y": 1000,
         "wires": [
             [
-                "ff10cb1cc1f837c3"
+                "32dc3227d76d7f37"
             ]
         ]
     },
     {
-        "id": "ae381422dc712469",
+        "id": "68099c65accb313e",
+        "type": "function",
+        "z": "0bd030bfd44f393b",
+        "g": "0240ab171e4869f6",
+        "name": "KONFIGURASI PARKIR — UBAH DI SINI",
+        "func": "// UBAH HANYA BAGIAN INI, lalu Deploy (Full).\nconst SETTINGS = {\n    GROUP_ID: 'kelompok-00',\n    NODE_ID: 'node1',          // node1 = entry/master; node2 = exit/monitor\n    ADMIN_USERNAME: 'admin',\n    ADMIN_PASSWORD: 'admin123'\n};\n// Semua topik masuk/keluar dibentuk di sini. Tidak memakai wildcard.\nconst G=SETTINGS.GROUP_ID,L=SETTINGS.NODE_ID;\nif(!/^[A-Za-z0-9_-]{1,40}$/.test(G)||!['node1','node2'].includes(L)||!SETTINGS.ADMIN_USERNAME||!SETTINGS.ADMIN_PASSWORD){\n    flow.set('parking_config',null);flow.set('ready',false);\n    const previous=context.get('subscribed')||[];\n    node.send([{action:'unsubscribe',topic:true},null,null]);\n    context.set('subscribed',[]);context.set('fingerprint',null);\n    node.status({fill:'red',shape:'ring',text:'Konfigurasi tidak valid'});node.error('GROUP_ID harus huruf/angka/_/-, NODE_ID node1 atau node2. Kredensial tidak boleh kosong.');return null;\n}\nconst B='parking/'+G,role=L==='node1'?'master':'monitor';\nconst topics={state:B+'/state',system:B+'/system',event:B+'/event',nodes:{}};\nfor(const id of ['node1','node2'])topics.nodes[id]={\n    capture:B+'/'+id+'/capture',result:B+'/'+id+'/ocr_result',\n    feedback:B+'/'+id+'/feedback',status:B+'/'+id+'/status',python:B+'/'+id+'/python_status',\n    adminRequest:B+'/'+id+'/admin/request',adminReply:B+'/'+id+'/admin/reply'\n};\nconst inbound={};\ninbound[topics.state]='state';inbound[topics.system]='system';inbound[topics.event]='event';\ninbound[topics.nodes[L].adminReply]='admin_reply';\nif(role==='master')for(const id of ['node1','node2']){\n    const t=topics.nodes[id];inbound[t.result]='result';inbound[t.status]='health';inbound[t.python]='health';inbound[t.adminRequest]='admin_request';\n}\nconst subscriptions=Object.keys(inbound),publishTopics=[topics.state,topics.system,topics.event];\nfor(const t of Object.values(topics.nodes))publishTopics.push(t.feedback,t.adminRequest,t.adminReply);\nconst fingerprint=JSON.stringify(SETTINGS),changed=context.get('fingerprint')!==fingerprint||!flow.get('parking_config')||msg.kind==='configure';\nlet C=flow.get('parking_config');\nif(changed){\n    const previous=context.get('subscribed')||[];\n    node.send([{action:'unsubscribe',topic:true},null,null]);\n    C={group_id:G,node_id:L,role,admin_username:SETTINGS.ADMIN_USERNAME,admin_password:SETTINGS.ADMIN_PASSWORD,topics,inbound,publish_topics:publishTopics,config_key:Date.now().toString(36)+'_'+Math.random().toString(36).slice(2)};\n    flow.set('parking_config',C);context.set('fingerprint',fingerprint);context.set('subscribed',subscriptions);\n    for(const [k,v] of Object.entries({ready:false,db_error:false,health:{},state:null,live_packet:false,state_received:0,master_system:null,system_received:0,system_live:false,published_revision:-1,master_authority:null,events_pending:false,snapshot_pending:false,snapshot_dirty:false,event_seen:{},admin_pending:{},admin_sessions:{},admin_login_attempts:{},last_emitted_event:0}))flow.set(k,v);\n}\nconst text=String(msg.status?.text||'').toLowerCase();\nconst connected=msg.kind==='broker'&&text.includes('connected')&&!text.includes('disconnected');\nconst reconnected=connected&&context.get('broker_connected')!==true;\nif(msg.kind==='broker')context.set('broker_connected',connected);\nif(changed||reconnected){node.send([{action:'unsubscribe',topic:true},null,null]);node.send([{action:'subscribe',topic:subscriptions.map(topic=>({topic,qos:1}))},null,null]);}\nif(changed||msg.kind==='configure')node.send([null,{kind:'initialize',config_key:C.config_key},null]);\nnode.status({fill:'green',shape:'dot',text:G+' / '+L+' / '+role+' / '+subscriptions.length+' topik'});\n// Hindari inisialisasi ganda ketika konfigurasi menerima sinyal awal.\nreturn [null,null,['tick','broker'].includes(msg.kind)?msg:{kind:'refresh'}];\n",
+        "outputs": 3,
+        "noerr": 0,
+        "initialize": "context.set('fingerprint',null);context.set('broker_connected',false);",
+        "finalize": "",
+        "libs": [],
+        "x": 680,
+        "y": 180,
+        "wires": [
+            [
+                "24d57fda6eac99b4"
+            ],
+            [
+                "df22081efeb10868"
+            ],
+            [
+                "5f009e5718a46001"
+            ]
+        ]
+    },
+    {
+        "id": "701eb2fb0d6f311b",
         "type": "mqtt in",
-        "z": "205b93c675cd169a",
-        "name": "MQTT system",
-        "topic": "parking/+/system",
+        "z": "0bd030bfd44f393b",
+        "g": "c74d3bc3bd1d51b7",
+        "name": "MQTT RX • topik persis",
+        "topic": "",
         "qos": "1",
-        "datatype": "json",
+        "datatype": "utf8",
         "broker": "b6942c_broker",
         "nl": false,
         "rap": true,
         "rh": 0,
-        "inputs": 0,
-        "x": 170,
-        "y": 600,
+        "inputs": 1,
+        "x": 280,
+        "y": 410,
         "wires": [
             [
-                "5ad911d004b2aba7"
+                "5608223d344b06d9"
             ]
         ]
     },
     {
-        "id": "5ad911d004b2aba7",
+        "id": "5608223d344b06d9",
         "type": "function",
-        "z": "205b93c675cd169a",
-        "name": "system_kind",
-        "func": "msg.kind=\"system\";return msg;",
+        "z": "0bd030bfd44f393b",
+        "g": "c74d3bc3bd1d51b7",
+        "name": "Validasi group / node",
+        "func": "const C=flow.get('parking_config');if(!C)return null;\nconst kind=C.inbound[msg.topic];if(!kind)return null;\nlet p=msg.payload;\ntry{if(Buffer.isBuffer(p))p=p.toString('utf8');if(typeof p==='string')p=JSON.parse(p);}catch(_){node.warn('JSON tidak valid pada '+msg.topic);return null;}\nif(!p||typeof p!=='object'||Array.isArray(p)||p.group_id!==C.group_id)return null;\nif(['result','health'].includes(kind)){\n    if(!['node1','node2'].includes(p.node_id))return null;\n    const t=C.topics.nodes[p.node_id];\n    if(kind==='result'&&msg.topic!==t.result)return null;\n    if(kind==='health'&&![t.status,t.python].includes(msg.topic))return null;\n}\nif(kind==='admin_request'&&(!C.topics.nodes[p.reply_node]||msg.topic!==C.topics.nodes[p.reply_node].adminRequest))return null;\nif(kind==='admin_reply'&&(p.reply_node!==C.node_id||msg.topic!==C.topics.nodes[C.node_id].adminReply))return null;\nreturn {kind,topic:msg.topic,payload:p,retain:msg.retain===true,qos:msg.qos,config_key:C.config_key};\n",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 420,
-        "y": 600,
+        "x": 600,
+        "y": 410,
         "wires": [
             [
-                "74765ac958168d41"
+                "e1b0d78e15464f54"
             ]
         ]
     },
     {
-        "id": "55e791b08f0cf0fa",
-        "type": "mqtt in",
-        "z": "205b93c675cd169a",
-        "name": "MQTT event",
-        "topic": "parking/+/event",
-        "qos": "1",
-        "datatype": "json",
-        "broker": "b6942c_broker",
-        "nl": false,
-        "rap": true,
-        "rh": 0,
-        "inputs": 0,
-        "x": 170,
-        "y": 600,
-        "wires": [
-            [
-                "225f018b3bea8b7d"
-            ]
-        ]
-    },
-    {
-        "id": "225f018b3bea8b7d",
+        "id": "a42b3324bf4ad6f9",
         "type": "function",
-        "z": "205b93c675cd169a",
-        "name": "event_kind",
-        "func": "msg.kind=\"event\";return msg;",
+        "z": "0bd030bfd44f393b",
+        "g": "c74d3bc3bd1d51b7",
+        "name": "Validasi topik TX",
+        "func": "const C=flow.get('parking_config');\nif(!C||msg.config_key!==C.config_key||!C.publish_topics.includes(msg.topic))return null;\n// Node MQTT out tidak memiliki topik tetap; hanya menerima topik persis dari konfigurasi.\nreturn {topic:msg.topic,payload:msg.payload,qos:'1',retain:msg.retain===true};\n",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 420,
-        "y": 600,
+        "x": 350,
+        "y": 550,
         "wires": [
             [
-                "74765ac958168d41"
+                "14be7e0e634febb2"
             ]
         ]
     },
     {
-        "id": "fc9e51b8700d5457",
-        "type": "mqtt in",
-        "z": "205b93c675cd169a",
-        "name": "MQTT admin_request",
-        "topic": "parking/+/admin/request",
-        "qos": "1",
-        "datatype": "json",
-        "broker": "b6942c_broker",
-        "nl": false,
-        "rap": true,
-        "rh": 0,
-        "inputs": 0,
-        "x": 160,
-        "y": 600,
+        "id": "e1b0d78e15464f54",
+        "type": "link in",
+        "z": "0bd030bfd44f393b",
+        "g": "b7bcc01645275c0e",
+        "name": "MASUK CONTROLLER",
+        "links": [
+            "732083cde7d863b7",
+            "9125a7b1e7d2c710",
+            "63773c22a7eadbb9",
+            "af3d77c70cc61175",
+            "5f009e5718a46001"
+        ],
+        "x": 790,
+        "y": 480,
         "wires": [
             [
-                "3b477be1e541b39d"
+                "9eeb5a62827814b3"
             ]
         ]
     },
     {
-        "id": "3b477be1e541b39d",
-        "type": "function",
-        "z": "205b93c675cd169a",
-        "name": "admin_request_kind",
-        "func": "msg.kind=\"admin_request\";return msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 420,
-        "y": 600,
+        "id": "0c913823d2d6da94",
+        "type": "link out",
+        "z": "0bd030bfd44f393b",
+        "g": "b7bcc01645275c0e",
+        "name": "SQL →",
+        "mode": "link",
+        "links": [
+            "e68a23e6042fbe3c"
+        ],
+        "x": 1140,
+        "y": 410,
+        "wires": []
+    },
+    {
+        "id": "ff1a936988d944df",
+        "type": "link out",
+        "z": "0bd030bfd44f393b",
+        "g": "b7bcc01645275c0e",
+        "name": "MQTT →",
+        "mode": "link",
+        "links": [
+            "e2aacb70338d84a1"
+        ],
+        "x": 1140,
+        "y": 450,
+        "wires": []
+    },
+    {
+        "id": "6b838ca6efb3b149",
+        "type": "link out",
+        "z": "0bd030bfd44f393b",
+        "g": "b7bcc01645275c0e",
+        "name": "STATE UI →",
+        "mode": "link",
+        "links": [
+            "25e16a6082124ac0"
+        ],
+        "x": 1140,
+        "y": 490,
+        "wires": []
+    },
+    {
+        "id": "ddb13a10727f290b",
+        "type": "link out",
+        "z": "0bd030bfd44f393b",
+        "g": "b7bcc01645275c0e",
+        "name": "DEBUG →",
+        "mode": "link",
+        "links": [
+            "29fad769291d794b"
+        ],
+        "x": 1140,
+        "y": 530,
+        "wires": []
+    },
+    {
+        "id": "2b70904f4ca44b30",
+        "type": "link out",
+        "z": "0bd030bfd44f393b",
+        "g": "b7bcc01645275c0e",
+        "name": "ADMIN REPLY →",
+        "mode": "link",
+        "links": [
+            "99754186fdd7b3eb"
+        ],
+        "x": 1140,
+        "y": 570,
+        "wires": []
+    },
+    {
+        "id": "4d48530a01e7fe65",
+        "type": "link out",
+        "z": "0bd030bfd44f393b",
+        "g": "b7bcc01645275c0e",
+        "name": "EVENT UI →",
+        "mode": "link",
+        "links": [
+            "3c0c4a02d1c1a8d5"
+        ],
+        "x": 1140,
+        "y": 610,
+        "wires": []
+    },
+    {
+        "id": "e68a23e6042fbe3c",
+        "type": "link in",
+        "z": "0bd030bfd44f393b",
+        "g": "8798913023d3c50d",
+        "name": "← SQL",
+        "links": [
+            "0c913823d2d6da94"
+        ],
+        "x": 130,
+        "y": 800,
         "wires": [
             [
-                "74765ac958168d41"
+                "a75938cb9e2162ea"
             ]
         ]
     },
     {
-        "id": "6e42d9dd06f99e16",
-        "type": "mqtt in",
-        "z": "205b93c675cd169a",
-        "name": "MQTT admin_reply",
-        "topic": "parking/+/admin/reply/+",
-        "qos": "1",
-        "datatype": "json",
-        "broker": "b6942c_broker",
-        "nl": false,
-        "rap": true,
-        "rh": 0,
-        "inputs": 0,
+        "id": "e2aacb70338d84a1",
+        "type": "link in",
+        "z": "0bd030bfd44f393b",
+        "g": "c74d3bc3bd1d51b7",
+        "name": "← MQTT",
+        "links": [
+            "ff1a936988d944df"
+        ],
         "x": 150,
-        "y": 540,
+        "y": 550,
         "wires": [
             [
-                "508953bb210c7d9e"
+                "a42b3324bf4ad6f9"
             ]
         ]
     },
     {
-        "id": "508953bb210c7d9e",
+        "id": "25e16a6082124ac0",
+        "type": "link in",
+        "z": "0bd030bfd44f393b",
+        "g": "abf1d399145a12bc",
+        "name": "← STATE",
+        "links": [
+            "6b838ca6efb3b149"
+        ],
+        "x": 1460,
+        "y": 800,
+        "wires": [
+            [
+                "55d71da76978814f",
+                "8841dc008b6bd499",
+                "ecfbca25269f7c84"
+            ]
+        ]
+    },
+    {
+        "id": "99754186fdd7b3eb",
+        "type": "link in",
+        "z": "0bd030bfd44f393b",
+        "g": "abf1d399145a12bc",
+        "name": "← ADMIN",
+        "links": [
+            "2b70904f4ca44b30"
+        ],
+        "x": 1460,
+        "y": 900,
+        "wires": [
+            [
+                "8841dc008b6bd499"
+            ]
+        ]
+    },
+    {
+        "id": "3c0c4a02d1c1a8d5",
+        "type": "link in",
+        "z": "0bd030bfd44f393b",
+        "g": "abf1d399145a12bc",
+        "name": "← EVENT",
+        "links": [
+            "4d48530a01e7fe65"
+        ],
+        "x": 1460,
+        "y": 1000,
+        "wires": [
+            [
+                "ecfbca25269f7c84"
+            ]
+        ]
+    },
+    {
+        "id": "29fad769291d794b",
+        "type": "link in",
+        "z": "0bd030bfd44f393b",
+        "g": "8fbe56614b6d1fc5",
+        "name": "← DIAGNOSTIK",
+        "links": [
+            "ddb13a10727f290b"
+        ],
+        "x": 790,
+        "y": 890,
+        "wires": [
+            [
+                "492ee36bb58fde73"
+            ]
+        ]
+    },
+    {
+        "id": "b37b21988442fce3",
         "type": "function",
-        "z": "205b93c675cd169a",
-        "name": "admin_reply_kind",
-        "func": "msg.kind=\"admin_reply\";return msg;",
+        "z": "0bd030bfd44f393b",
+        "g": "0240ab171e4869f6",
+        "name": "init → db_return",
+        "func": "msg.kind='db';return msg;",
         "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
         "libs": [],
-        "x": 420,
-        "y": 600,
+        "x": 1190,
+        "y": 250,
         "wires": [
             [
-                "74765ac958168d41"
+                "732083cde7d863b7"
             ]
         ]
     },
     {
-        "id": "8f28f8d03c3281bc",
+        "id": "732083cde7d863b7",
+        "type": "link out",
+        "z": "0bd030bfd44f393b",
+        "g": "0240ab171e4869f6",
+        "name": "INIT ↩ CONTROLLER",
+        "mode": "link",
+        "links": [
+            "e1b0d78e15464f54"
+        ],
+        "x": 1360,
+        "y": 250,
+        "wires": []
+    },
+    {
+        "id": "9125a7b1e7d2c710",
+        "type": "link out",
+        "z": "0bd030bfd44f393b",
+        "g": "8798913023d3c50d",
+        "name": "DB ↩ CONTROLLER",
+        "mode": "link",
+        "links": [
+            "e1b0d78e15464f54"
+        ],
+        "x": 640,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "63773c22a7eadbb9",
+        "type": "link out",
+        "z": "0bd030bfd44f393b",
+        "g": "8798913023d3c50d",
+        "name": "ERROR ↩ CONTROLLER",
+        "mode": "link",
+        "links": [
+            "e1b0d78e15464f54"
+        ],
+        "x": 640,
+        "y": 910,
+        "wires": []
+    },
+    {
+        "id": "af3d77c70cc61175",
+        "type": "link out",
+        "z": "0bd030bfd44f393b",
+        "g": "abf1d399145a12bc",
+        "name": "UI ↩ CONTROLLER",
+        "mode": "link",
+        "links": [
+            "e1b0d78e15464f54"
+        ],
+        "x": 2010,
+        "y": 1130,
+        "wires": []
+    },
+    {
+        "id": "24d57fda6eac99b4",
+        "type": "link out",
+        "z": "0bd030bfd44f393b",
+        "g": "0240ab171e4869f6",
+        "name": "SUBSCRIBE → MQTT RX",
+        "mode": "link",
+        "links": [
+            "cd7708c8c2796322"
+        ],
+        "x": 910,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "cd7708c8c2796322",
+        "type": "link in",
+        "z": "0bd030bfd44f393b",
+        "g": "c74d3bc3bd1d51b7",
+        "name": "← SUBSCRIBE",
+        "links": [
+            "24d57fda6eac99b4"
+        ],
+        "x": 130,
+        "y": 410,
+        "wires": [
+            [
+                "701eb2fb0d6f311b"
+            ]
+        ]
+    },
+    {
+        "id": "5f009e5718a46001",
+        "type": "link out",
+        "z": "0bd030bfd44f393b",
+        "g": "0240ab171e4869f6",
+        "name": "CONFIG ↩ CONTROLLER",
+        "mode": "link",
+        "links": [
+            "e1b0d78e15464f54"
+        ],
+        "x": 910,
+        "y": 310,
+        "wires": []
+    },
+    {
+        "id": "c3f5b0a4e884a090",
         "type": "ui-group",
         "name": "Smart Parking",
-        "page": "f1cbede1a5403376",
+        "page": "0baf648530bc0f16",
         "width": 12,
         "height": 1,
         "order": 2,
@@ -750,10 +1029,10 @@
         "willTopic": ""
     },
     {
-        "id": "a0062baf5e041705",
+        "id": "40c4fc37de18d0f4",
         "type": "ui-group",
         "name": "Administrasi parkir",
-        "page": "4e39c1aa838b2f42",
+        "page": "6d2821db5f77225c",
         "width": 12,
         "height": 1,
         "order": 1,
@@ -764,26 +1043,25 @@
         "groupType": "default"
     },
     {
-        "id": "2071b85bf4ae1d3b",
+        "id": "fd533d7d42729641",
         "type": "ui-group",
-        "name": "Tim Kelompok",
-        "page": "f1cbede1a5403376",
+        "name": "Tim Pengembang",
+        "page": "0baf648530bc0f16",
         "width": 12,
         "height": 1,
         "order": 1,
         "showTitle": false,
         "className": "",
-        "visible": "true",
-        "disabled": "false",
-        "groupType": "default",
-        "tab": ""
+        "visible": true,
+        "disabled": false,
+        "groupType": "default"
     },
     {
-        "id": "f1cbede1a5403376",
+        "id": "0baf648530bc0f16",
         "type": "ui-page",
         "name": "Smart Parking",
         "ui": "0df8b8a20bb13f1b",
-        "path": "/main-parking",
+        "path": "/main",
         "icon": "parking",
         "layout": "grid",
         "theme": "b6942c_theme",
@@ -811,7 +1089,7 @@
         "disabled": "false"
     },
     {
-        "id": "4e39c1aa838b2f42",
+        "id": "6d2821db5f77225c",
         "type": "ui-page",
         "name": "Admin Parkir",
         "ui": "0df8b8a20bb13f1b",
@@ -882,7 +1160,7 @@
         }
     },
     {
-        "id": "ae3d6dd8c474634c",
+        "id": "43f524e0855e0ada",
         "type": "global-config",
         "env": [],
         "modules": {
