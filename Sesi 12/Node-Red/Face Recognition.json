@@ -1,0 +1,974 @@
+[
+    {
+        "id": "36f6efbc65098d6c",
+        "type": "tab",
+        "label": "Face Security Dashboard 2.0",
+        "disabled": false,
+        "info": "FlowFuse Dashboard 2.0 untuk sistem keamanan pengenalan wajah."
+    },
+    {
+        "id": "763d45f984b099df",
+        "type": "group",
+        "z": "36f6efbc65098d6c",
+        "name": "01 • KONFIGURASI / STARTUP",
+        "style": {
+            "label": true,
+            "color": "#0f766e"
+        },
+        "nodes": [
+            "035b6f13be557f18",
+            "96f3364bf234408f",
+            "a92ff49e115c3bc8",
+            "263feecef98512a9",
+            "0753109cbcdf7caf",
+            "219e7e762770222b",
+            "75fc31c93418ecee"
+        ],
+        "x": -26,
+        "y": 24,
+        "w": 987,
+        "h": 162
+    },
+    {
+        "id": "f97393d89b90b7e6",
+        "type": "group",
+        "z": "36f6efbc65098d6c",
+        "name": "02 • MQTT RX / STATUS ",
+        "style": {
+            "label": true,
+            "color": "#2563eb"
+        },
+        "nodes": [
+            "d5d2c6c958878717",
+            "89987b02525431c7",
+            "88f20cc2131f8a6b",
+            "3fe0a52926779868",
+            "b61659f12a1d12a8",
+            "3ebf6759ed012616",
+            "9707fa3329f41997",
+            "18ec9bb57c0e5583",
+            "e1f7066e3bfc78f4",
+            "d739a69279c83748",
+            "cb827524ffc8809a"
+        ],
+        "x": 59,
+        "y": 204,
+        "w": 1072,
+        "h": 282
+    },
+    {
+        "id": "6398c0f471fcd067",
+        "type": "group",
+        "z": "36f6efbc65098d6c",
+        "name": "03 • SQLITE / CONTROLLER / CRUD",
+        "style": {
+            "label": true,
+            "color": "#7c3aed"
+        },
+        "nodes": [
+            "ba469777e6a22140",
+            "221072d08dd62af1",
+            "e0321e1ee663b9b2",
+            "cc3b96545e92e8be",
+            "cd8416d649eeb0ad",
+            "1c332f7da8c3a6d6",
+            "d2a2128ccd1aa951",
+            "fc77222b6233a4a8",
+            "17994132b8632f1b",
+            "44be3a6747b3239d",
+            "82083b827e19386b",
+            "84eb047f561381cd",
+            "931131a431d194c3",
+            "c4e2e7932067432d"
+        ],
+        "x": 69,
+        "y": 504,
+        "w": 1257,
+        "h": 272
+    },
+    {
+        "id": "d3305a4203530bb7",
+        "type": "group",
+        "z": "36f6efbc65098d6c",
+        "name": "04 • FLOWFUSE DASHBOARD 2.0",
+        "style": {
+            "label": true,
+            "color": "#ea580c"
+        },
+        "nodes": [
+            "8205d06393215cf2",
+            "774020af83b39a3d",
+            "92a5f9daa6c74f59",
+            "0a7b91ed9dacdda7",
+            "463ea38f28822c27"
+        ],
+        "x": 69,
+        "y": 819,
+        "w": 852,
+        "h": 142
+    },
+    {
+        "id": "087b90b2de1eb60e",
+        "type": "comment",
+        "z": "36f6efbc65098d6c",
+        "name": "WAJIB: UBAH KONFIGURASI, PERIKSA MQTT BROKER, LALU DEPLOY FULL",
+        "info": "Samakan id_group dan node_id dengan python/config.json dan esp32/include/app_config.h. Login default admin / admin123. Broker MQTT berada pada config node MQTT Face Recognition.",
+        "x": 500,
+        "y": 20,
+        "wires": []
+    },
+    {
+        "id": "035b6f13be557f18",
+        "type": "inject",
+        "z": "36f6efbc65098d6c",
+        "g": "763d45f984b099df",
+        "name": "Konfigurasi saat startup",
+        "props": [
+            {
+                "p": "kind",
+                "v": "configure",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "0.5",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 135,
+        "y": 85,
+        "wires": [
+            [
+                "96f3364bf234408f"
+            ]
+        ]
+    },
+    {
+        "id": "a92ff49e115c3bc8",
+        "type": "inject",
+        "z": "36f6efbc65098d6c",
+        "g": "763d45f984b099df",
+        "name": "Refresh UI 2 detik",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "2",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "1.5",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 110,
+        "y": 140,
+        "wires": [
+            [
+                "1c332f7da8c3a6d6"
+            ]
+        ]
+    },
+    {
+        "id": "96f3364bf234408f",
+        "type": "function",
+        "z": "36f6efbc65098d6c",
+        "g": "763d45f984b099df",
+        "name": "KONFIGURASI FACE SECURITY — UBAH DI SINI",
+        "func": "// Ubah nilai pada SETTINGS, lalu Deploy Full.\nconst SETTINGS = {\n    id_group: 'kelompok-00',\n    node_id: 'node-00',\n    admin_username: 'admin',\n    admin_password: 'admin123'\n};\n\nconst validId = /^[A-Za-z0-9_-]{1,40}$/;\nif (!validId.test(SETTINGS.id_group) || !validId.test(SETTINGS.node_id) ||\n    !SETTINGS.admin_username || !SETTINGS.admin_password) {\n    global.set('faceConfig', null);\n    node.status({fill:'red',shape:'ring',text:'konfigurasi tidak valid'});\n    node.error('Periksa id_group, node_id, username, dan password admin.');\n    return [[{action:'unsubscribe',topic:true}], null, null];\n}\n\nconst base = SETTINGS.id_group + '/' + SETTINGS.node_id;\nconst topics = {\n    face_status: base + '/face/status',\n    face_register: base + '/face/register',\n    face_profiles: base + '/face/profiles',\n    esp_status: base + '/esp32/status',\n    camera_status: base + '/camera/status'\n};\nconst subscriptions = [\n    topics.face_status,\n    topics.face_register,\n    topics.esp_status,\n    topics.camera_status\n];\nconst fingerprint = JSON.stringify(SETTINGS);\nconst changed = context.get('fingerprint') !== fingerprint ||\n                !global.get('faceConfig') || msg.kind === 'configure';\n\nif (changed) {\n    global.set('faceConfig', {...SETTINGS, topics});\n    context.set('fingerprint', fingerprint);\n    flow.set('adminSessions', {});\n    flow.set('adminAttempts', {});\n    flow.set('pendingFace', {});\n    flow.set('lastFaceEvent', {state:'idle', face_ids:[]});\n}\n\nconst statusText = String(msg.status?.text || '').toLowerCase();\nconst connected = statusText.includes('connected') &&\n                  !statusText.includes('disconnected');\nconst reconnected = connected && context.get('brokerConnected') !== true;\nif (msg.status) context.set('brokerConnected', connected);\n\nlet mqttMessages = null;\nif (changed || reconnected) {\n    mqttMessages = [\n        {action:'unsubscribe', topic:true},\n        {action:'subscribe', topic:subscriptions.map(topic => ({topic,qos:1}))}\n    ];\n}\n\nconst init = changed ? {\n    op:'init',\n    payload:[],\n    topic:`CREATE TABLE IF NOT EXISTS users (\n      face_id TEXT PRIMARY KEY,\n      nama TEXT NOT NULL,\n      nim TEXT NOT NULL,\n      kelas TEXT NOT NULL,\n      foto_base64 TEXT DEFAULT '',\n      status TEXT NOT NULL DEFAULT 'idle',\n      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP\n    )`\n} : null;\nconst refresh = changed ? {kind:'refresh'} : null;\nnode.status({fill:'green',shape:'dot',text:SETTINGS.id_group+' / '+SETTINGS.node_id});\nreturn [mqttMessages, init, refresh];\n",
+        "outputs": 3,
+        "noerr": 0,
+        "initialize": "context.set('fingerprint',null);context.set('brokerConnected',false);",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 100,
+        "wires": [
+            [
+                "263feecef98512a9"
+            ],
+            [
+                "0753109cbcdf7caf"
+            ],
+            [
+                "219e7e762770222b"
+            ]
+        ]
+    },
+    {
+        "id": "d5d2c6c958878717",
+        "type": "mqtt in",
+        "z": "36f6efbc65098d6c",
+        "g": "f97393d89b90b7e6",
+        "name": "MQTT RX • topik eksplisit",
+        "topic": "",
+        "qos": "1",
+        "datatype": "utf8",
+        "broker": "2f32e19093ef6a92",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 1,
+        "x": 270,
+        "y": 280,
+        "wires": [
+            [
+                "89987b02525431c7"
+            ]
+        ]
+    },
+    {
+        "id": "89987b02525431c7",
+        "type": "function",
+        "z": "36f6efbc65098d6c",
+        "g": "f97393d89b90b7e6",
+        "name": "Validasi group / node / topik",
+        "func": "const c=global.get('faceConfig');if(!c)return null;const b=c.id_group+'/'+c.node_id+'/';let p=msg.payload;try{if(typeof p==='string')p=JSON.parse(p)}catch(e){node.warn('JSON MQTT tidak valid');return null}if(p.id_group&&p.id_group!==c.id_group)return null;if(p.node_id&&p.node_id!==c.node_id)return null;msg.payload=p;if(msg.topic===b+'face/status')return[msg,null,null,null];if(msg.topic===b+'face/register')return[null,msg,null,null];if(msg.topic===b+'esp32/status')return[null,null,msg,null];if(msg.topic===b+'camera/status')return[null,null,null,msg];return null;",
+        "outputs": 4,
+        "x": 500,
+        "y": 280,
+        "wires": [
+            [
+                "88f20cc2131f8a6b"
+            ],
+            [
+                "3fe0a52926779868"
+            ],
+            [
+                "b61659f12a1d12a8"
+            ],
+            [
+                "3ebf6759ed012616"
+            ]
+        ]
+    },
+    {
+        "id": "88f20cc2131f8a6b",
+        "type": "function",
+        "z": "36f6efbc65098d6c",
+        "g": "f97393d89b90b7e6",
+        "name": "Face status → SQL",
+        "func": "const p=msg.payload||{};\nflow.set('lastFaceAt',Date.now());\nflow.set('lastCameraAt',Date.now());\nflow.set('lastFaceEvent',{\n    state:p.state||'idle',\n    face_id:p.face_id||'',\n    face_ids:Array.isArray(p.face_ids)?p.face_ids:[],\n    confidence:Number(p.confidence)||0,\n    reason:p.reason||null,\n    timestamp:p.timestamp||new Date().toISOString()\n});\nif(!Array.isArray(p.users)||!p.users.length){\n    msg.op='refresh';\n    msg.topic='SELECT * FROM users ORDER BY nama COLLATE NOCASE';\n    msg.payload=[];\n    return msg;\n}\nconst cases=[],holders=[],caseValues=[],faceIds=[];\np.users.forEach((u)=>{\n    if(!u||!u.face_id||!['idle','available','unavailable'].includes(u.status))return;\n    const faceId=String(u.face_id).trim();\n    if(!faceId)return;\n    cases.push('WHEN ? THEN ?');\n    holders.push('?');\n    caseValues.push(faceId,u.status);\n    faceIds.push(faceId);\n});\nif(!holders.length)return null;\nmsg.op='status_update';\nmsg.topic=`UPDATE users SET status=CASE face_id ${cases.join(' ')} ELSE status END, updated_at=CURRENT_TIMESTAMP WHERE face_id IN (${holders.join(',')})`;\nmsg.payload=[...caseValues,...faceIds];\ndelete msg.params;\nreturn msg;\n",
+        "outputs": 1,
+        "x": 770,
+        "y": 245,
+        "wires": [
+            [
+                "d739a69279c83748"
+            ]
+        ]
+    },
+    {
+        "id": "3fe0a52926779868",
+        "type": "function",
+        "z": "36f6efbc65098d6c",
+        "g": "f97393d89b90b7e6",
+        "name": "Pending face_id",
+        "func": "const p=msg.payload||{};if(p.face_id)flow.set('pendingFace',{face_id:p.face_id,confidence:p.confidence||0,received_at:Date.now()});msg.op='refresh';msg.topic='SELECT * FROM users ORDER BY nama COLLATE NOCASE';return msg;",
+        "outputs": 1,
+        "x": 770,
+        "y": 295,
+        "wires": [
+            [
+                "d739a69279c83748"
+            ]
+        ]
+    },
+    {
+        "id": "b61659f12a1d12a8",
+        "type": "function",
+        "z": "36f6efbc65098d6c",
+        "g": "f97393d89b90b7e6",
+        "name": "Heartbeat ESP32",
+        "func": "if((msg.payload?.state||'').toLowerCase()==='online')flow.set('lastEsp32At',Date.now());return null;",
+        "outputs": 0,
+        "x": 760,
+        "y": 345,
+        "wires": []
+    },
+    {
+        "id": "3ebf6759ed012616",
+        "type": "function",
+        "z": "36f6efbc65098d6c",
+        "g": "f97393d89b90b7e6",
+        "name": "Status kamera/Python",
+        "func": "flow.set('lastCameraAt',(msg.payload?.state||'').toLowerCase()==='online'?Date.now():0);return null;",
+        "outputs": 0,
+        "x": 770,
+        "y": 395,
+        "wires": []
+    },
+    {
+        "id": "9707fa3329f41997",
+        "type": "status",
+        "z": "36f6efbc65098d6c",
+        "g": "f97393d89b90b7e6",
+        "name": "Status koneksi MQTT",
+        "scope": [
+            "d5d2c6c958878717"
+        ],
+        "x": 760,
+        "y": 445,
+        "wires": [
+            [
+                "18ec9bb57c0e5583",
+                "cb827524ffc8809a"
+            ]
+        ]
+    },
+    {
+        "id": "18ec9bb57c0e5583",
+        "type": "function",
+        "z": "36f6efbc65098d6c",
+        "g": "f97393d89b90b7e6",
+        "name": "Simpan status broker",
+        "func": "const s=global.get('faceSystem')||{};s.mqtt=msg.status?.fill==='green';global.set('faceSystem',s);return null;",
+        "outputs": 0,
+        "x": 1000,
+        "y": 405,
+        "wires": []
+    },
+    {
+        "id": "1c332f7da8c3a6d6",
+        "type": "function",
+        "z": "36f6efbc65098d6c",
+        "g": "6398c0f471fcd067",
+        "name": "Minta snapshot SQLite",
+        "func": "msg.op='refresh';msg.topic='SELECT * FROM users ORDER BY nama COLLATE NOCASE';msg.payload=[];delete msg.params;return msg;",
+        "outputs": 1,
+        "x": 330,
+        "y": 545,
+        "wires": [
+            [
+                "c4e2e7932067432d"
+            ]
+        ]
+    },
+    {
+        "id": "e0321e1ee663b9b2",
+        "type": "function",
+        "z": "36f6efbc65098d6c",
+        "g": "6398c0f471fcd067",
+        "name": "Login admin + validasi CRUD",
+        "func": "const p=msg.kind?msg:(msg.payload||{});\nconst c=global.get('faceConfig');\nconst now=Date.now();\nconst SESSION_MS=8*60*60*1000;\nlet sessions=flow.get('adminSessions')||{};\nfor(const token of Object.keys(sessions))if(sessions[token].expires_ms<=now)delete sessions[token];\nflow.set('adminSessions',sessions);\n\nfunction response(value){\n    return [null,{payload:value}];\n}\nfunction clientOK(value){\n    return typeof value==='string'&&/^[A-Za-z0-9_-]{8,100}$/.test(value);\n}\nfunction tokenOK(value){\n    const s=sessions[value];\n    return !!s&&s.expires_ms>now&&s.client_id===p.client_id;\n}\nfunction token(){\n    return Array.from({length:4},()=>Math.random().toString(36).slice(2)).join('')+\n           now.toString(36);\n}\n\nif(p.kind==='login'){\n    if(!c||!clientOK(p.client_id))return response({kind:'auth',status:'ERROR',client_id:p.client_id||'',message:'Konfigurasi belum siap'});\n    let attempts=flow.get('adminAttempts')||{};\n    const a=attempts[p.client_id]||{count:0,blocked_until:0};\n    if(a.blocked_until>now)return response({kind:'auth',status:'ERROR',client_id:p.client_id,message:'Terlalu banyak percobaan. Tunggu satu menit.'});\n    if(String(p.username)!==c.admin_username||String(p.password)!==c.admin_password){\n        a.count++;\n        if(a.count>=5){a.count=0;a.blocked_until=now+60000;}\n        attempts[p.client_id]=a;flow.set('adminAttempts',attempts);\n        return response({kind:'auth',status:'ERROR',client_id:p.client_id,message:'Username atau password salah'});\n    }\n    delete attempts[p.client_id];flow.set('adminAttempts',attempts);\n    const t=token();\n    sessions[t]={client_id:p.client_id,expires_ms:now+SESSION_MS};\n    flow.set('adminSessions',sessions);\n    return response({kind:'auth',status:'OK',client_id:p.client_id,session_token:t,expires_ms:now+SESSION_MS});\n}\nif(p.kind==='session'){\n    const ok=clientOK(p.client_id)&&tokenOK(p.session_token);\n    return response({kind:'auth',status:ok?'OK':'UNAUTHORIZED',client_id:p.client_id||'',session_token:ok?p.session_token:'',expires_ms:ok?sessions[p.session_token].expires_ms:0,message:ok?'':'Sesi berakhir. Silakan login kembali.'});\n}\nif(p.kind==='logout'){\n    if(p.session_token)delete sessions[p.session_token];\n    flow.set('adminSessions',sessions);\n    return response({kind:'auth',status:'LOGGED_OUT',client_id:p.client_id||''});\n}\nif(p.kind==='refresh'){\n    msg.op='refresh';msg.topic='SELECT * FROM users ORDER BY nama COLLATE NOCASE';msg.payload=[];\n    delete msg.params;\n    return[msg,null];\n}\nif(!['create','update','delete'].includes(p.kind))return null;\nif(!clientOK(p.client_id)||!tokenOK(p.session_token)){\n    return response({kind:'feedback',ok:false,unauthorized:true,client_id:p.client_id||'',message:'Sesi admin berakhir. Silakan login kembali.'});\n}\nif(p.kind==='delete'){\n    const faceId=String(p.face_id||'').trim();\n    if(!faceId)return response({kind:'feedback',ok:false,client_id:p.client_id,message:'face_id tidak valid'});\n    msg.op='delete';msg.face_id=faceId;msg.client_id=p.client_id;\n    msg.topic='DELETE FROM users WHERE face_id=?';msg.payload=[faceId];\n    delete msg.params;\n    return[msg,null];\n}\nconst u=p.user||{};\nconst faceId=String(u.face_id||'').trim();\nconst nama=String(u.nama||'').trim();\nconst nim=String(u.nim||'').trim();\nconst kelas=String(u.kelas||'').trim();\nconst foto=String(u.foto_base64||'').slice(0,2100000);\nif(!faceId||!nama||!nim||!kelas)return response({kind:'feedback',ok:false,client_id:p.client_id,message:'Face ID, nama, NIM, dan kelas wajib diisi'});\nif(!/^FACE-[A-Z0-9_-]{1,20}$/.test(faceId))return response({kind:'feedback',ok:false,client_id:p.client_id,message:'Format face_id tidak valid'});\nmsg.op=p.kind;msg.face_id=faceId;msg.client_id=p.client_id;\nif(p.kind==='create'){\n    msg.topic=\"INSERT INTO users(face_id,nama,nim,kelas,foto_base64,status,updated_at) VALUES(?,?,?,?,?,'idle',CURRENT_TIMESTAMP)\";\n    msg.payload=[faceId,nama.slice(0,100),nim.slice(0,30),kelas.slice(0,30),foto];\n}else{\n    msg.topic='UPDATE users SET nama=?,nim=?,kelas=?,foto_base64=?,updated_at=CURRENT_TIMESTAMP WHERE face_id=?';\n    msg.payload=[nama.slice(0,100),nim.slice(0,30),kelas.slice(0,30),foto,faceId];\n}\ndelete msg.params;\nreturn[msg,null];\n",
+        "outputs": 2,
+        "x": 330,
+        "y": 665,
+        "wires": [
+            [
+                "c4e2e7932067432d"
+            ],
+            [
+                "84eb047f561381cd"
+            ]
+        ]
+    },
+    {
+        "id": "ba469777e6a22140",
+        "type": "sqlite",
+        "z": "36f6efbc65098d6c",
+        "g": "6398c0f471fcd067",
+        "mydb": "sqlite-db",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "SQLite users",
+        "x": 800,
+        "y": 585,
+        "wires": [
+            [
+                "221072d08dd62af1"
+            ]
+        ]
+    },
+    {
+        "id": "221072d08dd62af1",
+        "type": "function",
+        "z": "36f6efbc65098d6c",
+        "g": "6398c0f471fcd067",
+        "name": "Hasil SQL → state UI",
+        "func": "const op=msg.op||'';\nconst c=global.get('faceConfig')||{id_group:'kelompok-00',node_id:'node-00',topics:{face_profiles:'kelompok-00/node-00/face/profiles'}};\nconst system=global.get('faceSystem')||{};\nsystem.sqlite=true;system.nodered=true;\nsystem.esp32=Date.now()-(flow.get('lastEsp32At')||0)<15000;\nsystem.camera=Date.now()-(flow.get('lastCameraAt')||0)<70000;\nglobal.set('faceSystem',system);\nif(op==='init'||op==='status_update'||['create','update','delete'].includes(op)){\n    if(op==='create'&&flow.get('pendingFace')?.face_id===msg.face_id)flow.set('pendingFace',{});\n    const refresh={op:'refresh',topic:'SELECT * FROM users ORDER BY nama COLLATE NOCASE',payload:[]};\n    const feedback=['create','update','delete'].includes(op)?{payload:{kind:'feedback',ok:true,client_id:msg.client_id||'',message:op==='delete'?'Pengguna berhasil dihapus':'Data pengguna berhasil disimpan'}}:null;\n    return[refresh,null,null,feedback];\n}\nif(op!=='refresh')return null;\nconst users=Array.isArray(msg.payload)?msg.payload:[];\nconst state={kind:'state',users,pending:flow.get('pendingFace')||{},system,config:c,last_face:flow.get('lastFaceEvent')||{state:'idle',face_ids:[]},updated_at:new Date().toISOString()};\nconst profiles={};users.forEach(u=>profiles[u.face_id]=u.nama);\nconst encoded=JSON.stringify(profiles);\nlet profileMsg=null;\nif(flow.get('profilesHash')!==encoded){\n    flow.set('profilesHash',encoded);\n    profileMsg={topic:c.topics?.face_profiles||c.id_group+'/'+c.node_id+'/face/profiles',payload:JSON.stringify({profiles,updated_at:new Date().toISOString()}),qos:1,retain:true};\n}\nreturn[null,{payload:state},profileMsg,null];\n",
+        "outputs": 4,
+        "x": 1000,
+        "y": 585,
+        "wires": [
+            [
+                "931131a431d194c3"
+            ],
+            [
+                "82083b827e19386b"
+            ],
+            [
+                "d2a2128ccd1aa951"
+            ],
+            [
+                "84eb047f561381cd"
+            ]
+        ]
+    },
+    {
+        "id": "cc3b96545e92e8be",
+        "type": "catch",
+        "z": "36f6efbc65098d6c",
+        "g": "6398c0f471fcd067",
+        "name": "Error SQLite",
+        "scope": [
+            "ba469777e6a22140"
+        ],
+        "uncaught": false,
+        "x": 790,
+        "y": 735,
+        "wires": [
+            [
+                "cd8416d649eeb0ad"
+            ]
+        ]
+    },
+    {
+        "id": "cd8416d649eeb0ad",
+        "type": "function",
+        "z": "36f6efbc65098d6c",
+        "g": "6398c0f471fcd067",
+        "name": "Respons error database",
+        "func": "const s=global.get('faceSystem')||{};s.sqlite=false;global.set('faceSystem',s);\nconst text=String(msg.error?.message||'');\nconst message=text.includes('UNIQUE')?'face_id sudah terdaftar':text.includes('locked')?'SQLite sedang terkunci; coba kembali':'Operasi database gagal: '+text;\nmsg.payload={kind:'feedback',ok:false,client_id:msg.client_id||'',message};return msg;\n",
+        "outputs": 1,
+        "x": 1000,
+        "y": 735,
+        "wires": [
+            [
+                "84eb047f561381cd"
+            ]
+        ]
+    },
+    {
+        "id": "8205d06393215cf2",
+        "type": "ui-template",
+        "z": "36f6efbc65098d6c",
+        "g": "d3305a4203530bb7",
+        "group": "64707dc203a1c686",
+        "page": "",
+        "ui": "",
+        "name": "Dashboard • pengguna dan status",
+        "order": 1,
+        "width": 12,
+        "height": 0,
+        "head": "",
+        "format": "<template>\n <section class=\"fs-dashboard\">\n  <header class=\"fs-heading\">\n   <div><div class=\"fs-brand-icon\">◎</div><span>FACE RECOGNITION · {{ state.config?.id_group || 'MENUNGGU' }}</span><h1>Pemantauan pengguna</h1><p>Deteksi wajah real-time, status akses, dan kesehatan sistem</p></div>\n   <button @click=\"send({kind:'refresh'})\">Perbarui</button>\n  </header>\n  <div class=\"fs-layout\">\n   <main>\n    <div class=\"fs-metrics\">\n     <article><span>TERSEDIA</span><strong>{{ counts.available }}</strong><small>terdeteksi kamera</small></article>\n     <article><span>TIDAK TERSEDIA</span><strong>{{ counts.unavailable }}</strong><small>tidak berada di frame</small></article>\n     <article><span>STANDBY</span><strong>{{ counts.idle }}</strong><small>belum ada deteksi</small></article>\n    </div>\n    <div class=\"fs-section-title\"><div><h2>Pengguna terdaftar</h2><p>Status diperbarui setelah hasil pengenalan stabil</p></div><b>{{ state.users.length }} pengguna</b></div>\n    <div class=\"fs-user-grid\">\n     <article v-for=\"user in state.users\" :key=\"user.face_id\" class=\"fs-user\" :class=\"'fs-'+user.status\">\n      <img v-if=\"user.foto_base64\" :src=\"user.foto_base64\" :alt=\"user.nama\" @error=\"photoError\">\n      <div v-else class=\"fs-avatar\">{{ initials(user.nama) }}</div>\n      <div class=\"fs-user-body\"><small>{{ user.face_id }}</small><h3>{{ user.nama }}</h3><p>NIM <b>{{ user.nim }}</b></p><p>Kelas <b>{{ user.kelas }}</b></p><span>{{ statusLabel(user.status) }}</span></div>\n     </article>\n     <div v-if=\"!state.users.length\" class=\"fs-empty\">Belum ada pengguna. Lakukan registrasi melalui halaman Admin.</div>\n    </div>\n   </main>\n   <aside class=\"fs-side\">\n    <div class=\"fs-side-title\">STATUS SISTEM <span>{{ state.config?.node_id || '—' }}</span></div>\n    <div class=\"fs-overall\" :class=\"allOnline?'fs-online':'fs-offline'\"><i></i>{{ allOnline?'SISTEM SIAP':'PERIKSA SISTEM' }}</div>\n    <dl><div v-for=\"item in systems\" :key=\"item.key\"><dt><i class=\"fs-status-icon\">{{ item.icon }}</i>{{ item.label }}</dt><dd :class=\"item.ok?'fs-online':'fs-offline'\">{{ item.ok?'TERHUBUNG':'TERPUTUS' }}</dd></div></dl>\n    <section class=\"fs-last\"><span>STATUS WAJAH TERAKHIR</span><strong>{{ state.last_face?.state || 'idle' }}</strong><small>{{ (state.last_face?.face_ids || []).join(', ') || state.last_face?.face_id || 'Tidak ada wajah aktif' }}</small></section>\n    <small class=\"fs-note\">Pembaruan {{ time(state.updated_at) }}<br>State change + heartbeat MQTT</small>\n   </aside>\n  </div>\n </section>\n</template>\n<script>\nexport default {\n data(){return {state:{users:[],system:{},config:{},last_face:{},updated_at:null},fallback:'data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\"%3E%3Crect width=\"120\" height=\"120\" fill=\"%23e8eef1\"/%3E%3Ccircle cx=\"60\" cy=\"43\" r=\"24\" fill=\"%2393a6af\"/%3E%3Cpath d=\"M18 120v-18a42 42 0 0 1 84 0v18\" fill=\"%2393a6af\"/%3E%3C/svg%3E'}},\n computed:{counts(){const c={available:0,unavailable:0,idle:0};for(const u of this.state.users||[])c[u.status]=(c[u.status]||0)+1;return c},systems(){const s=this.state.system||{};return[{key:'mqtt',icon:'⇄',label:'MQTT broker',ok:!!s.mqtt},{key:'sqlite',icon:'▤',label:'SQLite',ok:!!s.sqlite},{key:'esp32',icon:'▣',label:'ESP32',ok:!!s.esp32},{key:'camera',icon:'◉',label:'Kamera / Python',ok:!!s.camera},{key:'nodered',icon:'⌘',label:'Node-RED',ok:true}]},allOnline(){return this.systems.every(x=>x.ok)}},\n watch:{msg:{handler(v){if(v?.payload?.kind==='state')this.state=v.payload},deep:true}},\n mounted(){this.send({kind:'refresh'})},\n methods:{initials(n){return String(n||'?').split(/\\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase()},statusLabel(s){return s==='available'?'TERSEDIA':s==='unavailable'?'TIDAK TERSEDIA':'STANDBY'},photoError(e){e.target.onerror=null;e.target.src=this.fallback},time(v){if(!v)return '—';try{return new Date(v).toLocaleString('id-ID')}catch{return v}}}\n}\n</script>\n<style>\n.fs-dashboard{font-family:Arial,sans-serif;color:#203844;padding:8px}.fs-brand-icon{float:left;display:grid;place-items:center;width:38px;height:38px;margin-right:12px;border-radius:10px;background:#dff4ef;color:#0f766e;font-size:25px;font-weight:700}.fs-status-icon{display:inline-grid;place-items:center;width:20px;height:20px;margin-right:7px;border-radius:6px;background:#294955;color:#82d4c4;font-style:normal}.fs-metrics article{position:relative;overflow:hidden}.fs-metrics article:after{position:absolute;right:14px;top:12px;width:28px;height:28px;display:grid;place-items:center;border-radius:8px;background:#edf5f4;color:#0f766e;font-size:16px;font-weight:700}.fs-metrics article:nth-child(1):after{content:'✓'}.fs-metrics article:nth-child(2):after{content:'×';color:#b52f2f;background:#fdeaea}.fs-metrics article:nth-child(3):after{content:'◷';color:#607780;background:#edf1f3}.fs-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;background:#fff;border:1px solid #dce6ea;border-radius:16px;padding:22px;margin-bottom:14px}.fs-heading span{font-size:10px;font-weight:700;letter-spacing:1.5px;color:#167666}.fs-heading h1{font-size:25px;margin:5px 0}.fs-heading p,.fs-section-title p{margin:0;color:#78909b;font-size:12px}.fs-heading button{border:0;border-radius:9px;padding:10px 16px;background:#0f766e;color:#fff;font-weight:700}.fs-layout{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:14px}.fs-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}.fs-metrics article{background:#fff;border:1px solid #dce6ea;border-radius:13px;padding:15px}.fs-metrics span,.fs-last span{display:block;font-size:9px;letter-spacing:1px;color:#78909b}.fs-metrics strong{display:block;font-size:28px;margin:5px 0}.fs-metrics small{color:#8aa0aa}.fs-section-title{display:flex;justify-content:space-between;align-items:center;margin:15px 3px 10px}.fs-section-title h2{font-size:17px;margin:0 0 3px}.fs-section-title>b{font-size:11px;background:#dff4ef;color:#0f766e;padding:6px 9px;border-radius:20px}.fs-user-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}.fs-user{display:flex;gap:13px;align-items:center;background:#fff;border:1px solid #dce6ea;border-left:6px solid #8999a1;border-radius:13px;padding:14px}.fs-user.fs-available{border-left-color:#159b72}.fs-user.fs-unavailable{border-left-color:#d84a4a}.fs-user img,.fs-avatar{width:72px;height:82px;border-radius:9px;object-fit:cover;background:#e7eef1;flex:0 0 auto}.fs-avatar{display:grid;place-items:center;font-size:24px;color:#66808b;font-weight:700}.fs-user-body small{font-size:9px;color:#82959e}.fs-user-body h3{font-size:15px;margin:3px 0 8px}.fs-user-body p{font-size:11px;margin:3px 0;color:#78909b}.fs-user-body p b{color:#314d59}.fs-user-body>span{display:inline-block;margin-top:7px;font-size:9px;font-weight:700;padding:5px 8px;border-radius:20px;background:#e6ecef;color:#607780}.fs-available .fs-user-body>span{background:#d9f5ec;color:#107a59}.fs-unavailable .fs-user-body>span{background:#fde3e3;color:#b52f2f}.fs-empty{background:#fff;border:1px dashed #b8c8cf;border-radius:12px;padding:35px;text-align:center;color:#78909b}.fs-side{background:#18313c;color:#fff;border-radius:15px;padding:18px;height:max-content;position:sticky;top:12px}.fs-side-title{font-size:11px;letter-spacing:1px}.fs-side-title span{float:right;color:#82d4c4}.fs-overall{margin:16px 0;padding:10px;border-radius:8px;background:#244854;font-size:11px;font-weight:700}.fs-overall i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px}.fs-online{color:#55d6ac!important}.fs-offline{color:#ff7b7b!important}.fs-overall.fs-online i{background:#55d6ac}.fs-overall.fs-offline i{background:#ff7b7b}.fs-side dl{margin:0}.fs-side dl div{display:flex;justify-content:space-between;border-bottom:1px solid #31505b;padding:10px 0;font-size:10px}.fs-side dt{color:#a9bbc2}.fs-side dd{margin:0;font-weight:700}.fs-last{margin-top:15px;background:#24444f;border-radius:10px;padding:12px}.fs-last strong{display:block;margin:6px 0;text-transform:uppercase}.fs-last small,.fs-note{color:#a9bbc2}.fs-note{display:block;margin-top:15px;line-height:1.7;font-size:9px}@media(max-width:850px){.fs-layout{grid-template-columns:1fr}.fs-side{position:static}.fs-metrics{grid-template-columns:1fr}.fs-heading{flex-direction:column}}\n</style>",
+        "storeOutMessages": false,
+        "passthru": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 380,
+        "y": 860,
+        "wires": [
+            [
+                "463ea38f28822c27"
+            ]
+        ]
+    },
+    {
+        "id": "774020af83b39a3d",
+        "type": "ui-template",
+        "z": "36f6efbc65098d6c",
+        "g": "d3305a4203530bb7",
+        "group": "daf95451b65171d2",
+        "page": "",
+        "ui": "",
+        "name": "Admin • login, registrasi, dan CRUD",
+        "order": 1,
+        "width": 12,
+        "height": 0,
+        "head": "",
+        "format": "<template>\n <section class=\"fa-root\">\n  <div v-if=\"!authenticated\" class=\"fa-login-page\">\n   <form class=\"fa-login-card\" @submit.prevent=\"login\">\n    <div class=\"fa-login-icon\" aria-label=\"Face recognition\"><svg viewBox=\"0 0 24 24\" role=\"img\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M4 4h5V2H4a2 2 0 0 0-2 2v5h2V4zm16-2h-5v2h5v5h2V4a2 2 0 0 0-2-2zM4 15H2v5a2 2 0 0 0 2 2h5v-2H4v-5zm18 0h-2v5h-5v2h5a2 2 0 0 0 2-2v-5zM7 8.5A1.5 1.5 0 1 0 10 8.5a1.5 1.5 0 0 0-3 0zm7 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0zM12 18c2.6 0 4.8-1.6 5.7-4H6.3c.9 2.4 3.1 4 5.7 4zm0-2c-1.2 0-2.3-.5-3.1-1.2h6.2c-.8.7-1.9 1.2-3.1 1.2z\"/></svg></div><small>FACE RECOGNITION SYSTEM</small><h1>Login Administrator</h1>\n    <p>Masuk untuk mendaftarkan dan mengelola profil pengguna.</p>\n    <label>Username<input v-model.trim=\"loginUser\" autocomplete=\"username\" required autofocus></label>\n    <label>Password<input v-model=\"loginPassword\" type=\"password\" autocomplete=\"current-password\" required></label>\n    <div v-if=\"authMessage\" class=\"fa-alert\">{{ authMessage }}</div>\n    <button class=\"fa-primary\" :disabled=\"authBusy\">{{ authBusy?'MEMERIKSA...':'MASUK' }}</button>\n   </form>\n  </div>\n\n  <template v-else>\n   <header class=\"fa-heading\"><div><small>FACE RECOGNITION / ADMIN</small><h1>Registrasi pengguna</h1><p>Face ID diterima dari Python setelah wajah dikenali dan tombol R ditekan.</p></div>\n   <div class=\"fa-actions\">\n  <button\n    type=\"button\"\n    class=\"fa-action-btn\"\n    title=\"Perbarui data\"\n    @click=\"refresh\"\n  >\n    <v-icon icon=\"mdi-refresh\" size=\"15\"></v-icon>\n    <span>Perbarui</span>\n  </button>\n\n  <button\n    type=\"button\"\n    class=\"fa-action-btn fa-danger\"\n    title=\"Keluar dari halaman admin\"\n    @click=\"logout\"\n  >\n    <v-icon icon=\"mdi-logout\" size=\"15\"></v-icon>\n    <span>Keluar</span>\n  </button>\n</div>\n   </header>\n   <div class=\"fa-layout\">\n    <main>\n     <article class=\"fa-pending\"><div><small>FACE ID DARI KAMERA</small><strong>{{ state.pending?.face_id || 'BELUM ADA' }}</strong><span v-if=\"state.pending?.confidence\">Confidence {{ Number(state.pending.confidence).toFixed(1) }}%</span></div><button class=\"fa-primary\" @click=\"openAdd\" :disabled=\"!state.pending?.face_id\">Registrasikan</button></article>\n     <article class=\"fa-card\"><div class=\"fa-title\"><div><h2>Data pengguna</h2><p>Profil disimpan di SQLite dan nama dikirim retained ke Python.</p></div><button class=\"fa-primary\" @click=\"openAdd\" :disabled=\"!state.pending?.face_id\">+ Tambah dari kamera</button></div>\n      <div class=\"fa-table\"><table><thead><tr><th>Foto</th><th>Face ID</th><th>Nama</th><th>NIM / Kelas</th><th>Status</th><th>Tindakan</th></tr></thead><tbody>\n       <tr v-for=\"user in state.users\" :key=\"user.face_id\"><td><img v-if=\"user.foto_base64\" :src=\"user.foto_base64\" :alt=\"user.nama\"><div v-else class=\"fa-avatar\">{{ initials(user.nama) }}</div></td><td><b>{{ user.face_id }}</b></td><td>{{ user.nama }}</td><td>{{ user.nim }}<small>{{ user.kelas }}</small></td><td><span class=\"fa-chip\" :class=\"'fa-'+user.status\">{{ statusLabel(user.status) }}</span></td><td><button @click=\"openEdit(user)\">Edit</button><button class=\"fa-danger\" @click=\"removeUser(user)\">Hapus</button></td></tr>\n       <tr v-if=\"!state.users.length\"><td colspan=\"6\" class=\"fa-empty\">Belum ada pengguna terdaftar.</td></tr>\n      </tbody></table></div>\n     </article>\n    </main>\n    <aside class=\"fa-side\"><h3>Status sistem</h3><div v-for=\"item in systems\" :key=\"item.key\"><span><i class=\"fa-system-icon\">{{ item.icon }}</i>{{ item.label }}</span><b :class=\"item.ok?'fa-online':'fa-offline'\">{{ item.ok?'TERHUBUNG':'TERPUTUS' }}</b></div><small>Node {{ state.config?.node_id || '—' }}<br>{{ time(state.updated_at) }}</small></aside>\n   </div>\n  </template>\n\n  <Teleport to=\"body\"><div v-if=\"dialog&&authenticated\" class=\"fa-overlay\" @click.self=\"close\"><form class=\"fa-modal\" @submit.prevent=\"save\"><header><h2>{{ editing?'Edit pengguna':'Registrasi pengguna' }}</h2><button type=\"button\" @click=\"close\">×</button></header><div class=\"fa-modal-body\"><label>Face ID<input v-model=\"form.face_id\" readonly required></label><label>Nama<input v-model.trim=\"form.nama\" maxlength=\"100\" required></label><label>NIM<input v-model.trim=\"form.nim\" maxlength=\"30\" required></label><label>Kelas<input v-model.trim=\"form.kelas\" maxlength=\"30\" required></label><label>Foto<input type=\"file\" accept=\"image/*\" @change=\"photo\"></label><img v-if=\"form.foto_base64\" class=\"fa-preview\" :src=\"form.foto_base64\"></div><footer><button type=\"button\" @click=\"close\">Batal</button><button class=\"fa-primary\">Simpan</button></footer></form></div></Teleport>\n </section>\n</template>\n<script>\nexport default {\n data(){return {authenticated:false,authBusy:false,authMessage:'',loginUser:'',loginPassword:'',clientId:'',sessionToken:'',sessionExpires:0,state:{users:[],system:{},pending:{},config:{},updated_at:null},dialog:false,editing:false,form:{face_id:'',nama:'',nim:'',kelas:'',foto_base64:''}}},\n computed:{systems(){const s=this.state.system||{};return[{key:'mqtt',icon:'⇄',label:'MQTT',ok:!!s.mqtt},{key:'sqlite',icon:'▤',label:'SQLite',ok:!!s.sqlite},{key:'esp32',icon:'▣',label:'ESP32',ok:!!s.esp32},{key:'camera',icon:'◉',label:'Kamera / Python',ok:!!s.camera},{key:'nodered',icon:'⌘',label:'Node-RED',ok:true}]}},\n watch:{msg:{handler(v){const p=v?.payload;if(p?.kind==='state')this.state=p;if(p?.kind==='auth'&&p.client_id===this.clientId)this.receiveAuth(p);if(p?.kind==='feedback'&&(!p.client_id||p.client_id===this.clientId)){if(p.unauthorized)this.lock(p.message);else this.notify(p.ok,p.message)}},deep:true}},\n mounted(){\n    this.loadSweetAlert().catch(()=>{});\n    this.clientId=sessionStorage.getItem('face-admin-client')||this.uid();sessionStorage.setItem('face-admin-client',this.clientId);this.sessionToken=sessionStorage.getItem('face-admin-session')||'';if(this.sessionToken){this.authBusy=true;this.send({kind:'session',client_id:this.clientId,session_token:this.sessionToken})}this.send({kind:'refresh'})},\n unmounted(){clearTimeout(this.authTimer);clearTimeout(this.sessionTimer)},\n methods:{\n  loadSweetAlert(){\n  if(window.Swal) return Promise.resolve(window.Swal);\n\n  if(window.__faceSwalPromise) {\n    return window.__faceSwalPromise;\n  }\n\n  window.__faceSwalPromise = new Promise((resolve,reject)=>{\n    const script=document.createElement('script');\n    script.id='face-sweetalert2';\n    script.src='https://cdn.jsdelivr.net/npm/sweetalert2@11';\n    script.onload=()=>resolve(window.Swal);\n    script.onerror=()=>reject(\n      new Error('SweetAlert2 gagal dimuat')\n    );\n    document.head.appendChild(script);\n  });\n\n  return window.__faceSwalPromise;\n},\n  uid(){return 'fa_'+(globalThis.crypto?.randomUUID?.().replaceAll('-','')||Date.now().toString(36)+Math.random().toString(36).slice(2))},\n  login(){if(this.authBusy)return;this.authBusy=true;this.authMessage='';this.send({kind:'login',client_id:this.clientId,username:this.loginUser,password:this.loginPassword});this.loginPassword='';clearTimeout(this.authTimer);this.authTimer=setTimeout(()=>{this.authBusy=false;this.authMessage='Node-RED belum merespons. Periksa Deploy dan koneksi.'},10000)},\n  receiveAuth(p){clearTimeout(this.authTimer);this.authBusy=false;if(p.status==='OK'){this.authenticated=true;this.authMessage='';this.sessionToken=p.session_token;this.sessionExpires=p.expires_ms;sessionStorage.setItem('face-admin-session',this.sessionToken);clearTimeout(this.sessionTimer);this.sessionTimer=setTimeout(()=>this.lock('Sesi berakhir. Silakan login kembali.'),Math.max(0,p.expires_ms-Date.now()));this.refresh()}else this.lock(p.status==='LOGGED_OUT'?'':p.message||'Login gagal')},\n  lock(message=''){this.authenticated=false;this.authBusy=false;this.authMessage=message;this.sessionToken='';this.dialog=false;sessionStorage.removeItem('face-admin-session');clearTimeout(this.sessionTimer)},\n  logout(){this.send({kind:'logout',client_id:this.clientId,session_token:this.sessionToken});this.lock()},\n  refresh(){this.send({kind:'refresh'})},\n  command(kind,body={}){if(!this.authenticated){this.lock('Silakan login terlebih dahulu.');return}this.send({kind,client_id:this.clientId,session_token:this.sessionToken,...body})},\n  initials(n){return String(n||'?').split(/\\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase()},\n  statusLabel(s){return s==='available'?'TERSEDIA':s==='unavailable'?'TIDAK TERSEDIA':'STANDBY'},\n  openAdd(){if(!this.state.pending?.face_id)return;this.editing=false;this.form={face_id:this.state.pending.face_id,nama:'',nim:'',kelas:'',foto_base64:''};this.dialog=true},\n  openEdit(u){this.editing=true;this.form={face_id:u.face_id,nama:u.nama,nim:u.nim,kelas:u.kelas,foto_base64:u.foto_base64||''};this.dialog=true},\n  close(){this.dialog=false},\n  photo(e){const f=e.target.files?.[0];if(!f)return;if(f.size>1500000){this.notify(false,'Ukuran foto maksimal 1,5 MB');e.target.value='';return}const r=new FileReader();r.onload=()=>this.form.foto_base64=r.result;r.readAsDataURL(f)},\n  save(){this.command(this.editing?'update':'create',{user:{...this.form}});this.dialog=false},\n  async removeUser(u){\n  try {\n    await this.loadSweetAlert();\n  } catch(error) {\n    if(window.confirm(\n      'Hapus '+u.nama+' ('+u.face_id+')?'\n    )){\n      this.command('delete',{\n        face_id:u.face_id\n      });\n    }\n    return;\n  }\n\n  const result=await window.Swal.fire({\n    icon: 'warning',\n    title: 'Hapus pengguna?',\n    html:\n      '<b>'+u.nama+'</b><br>' +\n      '<small>'+u.face_id+'</small>',\n    showCancelButton: true,\n    confirmButtonText: 'Ya, hapus',\n    cancelButtonText: 'Batal',\n    confirmButtonColor: '#b63232',\n    cancelButtonColor: '#64748b',\n    reverseButtons: true\n  });\n\n  if(result.isConfirmed){\n    this.command('delete',{\n      face_id:u.face_id\n    });\n  }\n},\n  async notify(ok,message){\n  try {\n    await this.loadSweetAlert();\n  } catch(error) {\n    window.alert(\n      (ok ? 'Berhasil: ' : 'Gagal: ') + message\n    );\n    return;\n  }\n\n  await window.Swal.fire({\n    icon: ok ? 'success' : 'error',\n    title: ok ? 'Berhasil' : 'Gagal',\n    text: String(message || ''),\n    confirmButtonText: 'OK',\n    confirmButtonColor: '#0f766e',\n    allowOutsideClick: false\n  });\n},\n  time(v){if(!v)return '—';try{return new Date(v).toLocaleString('id-ID')}catch{return v}}\n }\n}\n</script>\n<style>\n.fa-root{font-family:Arial,sans-serif;color:#203844;padding:8px}.fa-login-icon{display:grid;place-items:center;width:52px;height:52px;margin-bottom:15px;border-radius:14px;background:#dff4ef;color:#0f766e;font-size:24px}..fa-login-icon svg{width:30px;height:30px;display:block}.fa-system-icon{display:inline-grid;place-items:center;width:20px;height:20px;margin-right:7px;border-radius:6px;background:#294955;color:#82d4c4;font-style:normal}.fa-root *{box-sizing:border-box}.fa-login-page{min-height:560px;display:grid;place-items:center}.fa-login-card{width:min(390px,100%);background:#fff;border:1px solid #dce6ea;border-radius:16px;padding:28px;box-shadow:0 18px 50px #25465318}.fa-login-card small,.fa-heading small,.fa-pending small{color:#0f766e;font-size:10px;letter-spacing:1.3px;font-weight:700}.fa-login-card h1{font-size:24px;margin:8px 0}.fa-login-card p,.fa-heading p,.fa-title p{color:#78909b;font-size:12px;line-height:1.6}.fa-login-card label,.fa-modal label{display:flex;flex-direction:column;gap:7px;font-size:12px;margin-top:16px}.fa-login-card input,.fa-modal input{border:1px solid #c7d5db;border-radius:8px;padding:11px;font:inherit}.fa-login-card>button{width:100%;margin-top:20px}.fa-alert{background:#ffe9e9;color:#a43636;border-radius:8px;padding:10px;margin-top:14px;font-size:11px}.fa-heading{display:flex;justify-content:space-between;gap:20px;background:#fff;border:1px solid #dce6ea;border-radius:16px;padding:22px;margin-bottom:14px}.fa-heading h1{font-size:24px;margin:5px 0}.\n.fa-actions{\n  display:flex;\n  align-items:center;\n  justify-content:flex-end;\n  gap:7px;\n  flex-wrap:wrap;\n}\n\n.fa-action-btn{\n  display:inline-flex!important;\n  align-items:center;\n  justify-content:center;\n  gap:6px;\n  width:auto!important;\n  min-width:0!important;\n  height:34px;\n  padding:0 11px!important;\n  border-radius:7px!important;\n  font-size:11px;\n  font-weight:600;\n  line-height:1;\n  white-space:nowrap;\n}\n\n.fa-action-btn .v-icon{\n  font-size:15px!important;\n}.fa-root button,.fa-modal button{border:1px solid #c3d1d7;border-radius:8px;background:#fff;color:#294955;padding:9px 12px;cursor:pointer}.fa-primary{background:#0f766e!important;color:#fff!important;border-color:#0f766e!important}.fa-danger{color:#b63232!important;border-color:#e8b8b8!important}.fa-root button:disabled{opacity:.45;cursor:not-allowed}.fa-layout{display:grid;grid-template-columns:minmax(0,1fr) 245px;gap:14px}.fa-pending,.fa-card{background:#fff;border:1px solid #dce6ea;border-radius:14px;padding:17px;margin-bottom:14px}.fa-pending{display:flex;align-items:center;justify-content:space-between}.fa-pending strong{display:block;font-size:19px;margin:5px 0}.fa-pending span{font-size:10px;color:#0f766e}.fa-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.fa-title h2{font-size:17px;margin:0 0 4px}.fa-table{overflow:auto}.fa-table table{width:100%;border-collapse:collapse;font-size:11px}.fa-table th,.fa-table td{padding:10px;text-align:left;border-bottom:1px solid #e6eef1;vertical-align:middle}.fa-table th{font-size:9px;color:#718791;letter-spacing:.5px}.fa-table img,.fa-avatar{width:42px;height:48px;border-radius:7px;object-fit:cover;background:#e8eef1}.fa-avatar{display:grid;place-items:center;font-weight:700}.fa-table td small{display:block;color:#82959e;margin-top:3px}.fa-table td button{padding:5px 8px;margin:2px;font-size:10px}.fa-chip{font-size:8px;padding:4px 7px;border-radius:15px;background:#e7edef}.fa-chip.fa-available{background:#d9f5ec;color:#107a59}.fa-chip.fa-unavailable{background:#fde3e3;color:#b52f2f}.fa-empty{text-align:center!important;color:#78909b;padding:30px!important}.fa-side{background:#18313c;color:#fff;border-radius:14px;padding:17px;height:max-content;position:sticky;top:12px}.fa-side h3{font-size:13px;margin:0 0 13px}.fa-side>div{display:flex;justify-content:space-between;border-bottom:1px solid #31505b;padding:10px 0;font-size:10px}.fa-side b{font-size:9px}.fa-online{color:#55d6ac}.fa-offline{color:#ff7b7b}.fa-side>small{display:block;color:#9fb3ba;margin-top:14px;line-height:1.7;font-size:9px}.fa-overlay{position:fixed;inset:0;background:#102e4666;z-index:9999;display:flex;justify-content:center;align-items:flex-start;overflow:auto;padding:30px 15px}.fa-modal{width:min(540px,100%);background:#fff;border-radius:13px;max-height:calc(100dvh - 60px);display:flex;flex-direction:column;color:#294955}.fa-modal header,.fa-modal footer{display:flex;align-items:center;justify-content:space-between;padding:15px 20px;border-bottom:1px solid #e0e9ed}.fa-modal footer{justify-content:flex-end;gap:8px;border:0;border-top:1px solid #e0e9ed}.fa-modal h2{font-size:17px;margin:0}.fa-modal header button{font-size:22px;border:0}.fa-modal-body{padding:20px;overflow:auto}.fa-modal label{margin:0 0 14px}.fa-preview{max-width:150px;max-height:170px;border-radius:8px;object-fit:cover}@media(max-width:850px){.fa-layout{grid-template-columns:1fr}.fa-side{position:static}.fa-heading,.fa-title,.fa-pending{flex-direction:column;align-items:stretch}.fa-actions{flex-wrap:wrap}.fa-login-page{min-height:460px}}\n@media(max-width:850px){\n</style>",
+        "noerr": 0,
+        "storeOutMessages": false,
+        "passthru": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 640,
+        "y": 910,
+        "wires": [
+            [
+                "463ea38f28822c27"
+            ]
+        ]
+    },
+    {
+        "id": "d2a2128ccd1aa951",
+        "type": "mqtt out",
+        "z": "36f6efbc65098d6c",
+        "g": "6398c0f471fcd067",
+        "name": "MQTT TX • profil retained",
+        "topic": "",
+        "qos": "1",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "dd700d7e54fe72f7",
+        "x": 1190,
+        "y": 570,
+        "wires": []
+    },
+    {
+        "id": "263feecef98512a9",
+        "type": "link out",
+        "z": "36f6efbc65098d6c",
+        "g": "763d45f984b099df",
+        "name": "MQTT →",
+        "mode": "link",
+        "links": [
+            "e1f7066e3bfc78f4"
+        ],
+        "x": 760,
+        "y": 65,
+        "wires": []
+    },
+    {
+        "id": "0753109cbcdf7caf",
+        "type": "link out",
+        "z": "36f6efbc65098d6c",
+        "g": "763d45f984b099df",
+        "name": "SQL →",
+        "mode": "link",
+        "links": [
+            "fc77222b6233a4a8"
+        ],
+        "x": 760,
+        "y": 105,
+        "wires": []
+    },
+    {
+        "id": "219e7e762770222b",
+        "type": "link out",
+        "z": "36f6efbc65098d6c",
+        "g": "763d45f984b099df",
+        "name": "REFRESH →",
+        "mode": "link",
+        "links": [
+            "17994132b8632f1b"
+        ],
+        "x": 760,
+        "y": 145,
+        "wires": []
+    },
+    {
+        "id": "75fc31c93418ecee",
+        "type": "link in",
+        "z": "36f6efbc65098d6c",
+        "g": "763d45f984b099df",
+        "name": "← STATUS MQTT",
+        "links": [
+            "cb827524ffc8809a"
+        ],
+        "x": 920,
+        "y": 105,
+        "wires": [
+            [
+                "96f3364bf234408f"
+            ]
+        ]
+    },
+    {
+        "id": "e1f7066e3bfc78f4",
+        "type": "link in",
+        "z": "36f6efbc65098d6c",
+        "g": "f97393d89b90b7e6",
+        "name": "← KONFIGURASI",
+        "links": [
+            "263feecef98512a9"
+        ],
+        "x": 100,
+        "y": 280,
+        "wires": [
+            [
+                "d5d2c6c958878717"
+            ]
+        ]
+    },
+    {
+        "id": "d739a69279c83748",
+        "type": "link out",
+        "z": "36f6efbc65098d6c",
+        "g": "f97393d89b90b7e6",
+        "name": "SQL →",
+        "mode": "link",
+        "links": [
+            "fc77222b6233a4a8"
+        ],
+        "x": 1090,
+        "y": 285,
+        "wires": []
+    },
+    {
+        "id": "cb827524ffc8809a",
+        "type": "link out",
+        "z": "36f6efbc65098d6c",
+        "g": "f97393d89b90b7e6",
+        "name": "STATUS MQTT →",
+        "mode": "link",
+        "links": [
+            "75fc31c93418ecee"
+        ],
+        "x": 1090,
+        "y": 445,
+        "wires": []
+    },
+    {
+        "id": "fc77222b6233a4a8",
+        "type": "link in",
+        "z": "36f6efbc65098d6c",
+        "g": "6398c0f471fcd067",
+        "name": "← SQL MASUK (LINK)",
+        "links": [
+            "0753109cbcdf7caf",
+            "d739a69279c83748",
+            "931131a431d194c3"
+        ],
+        "x": 110,
+        "y": 585,
+        "wires": [
+            [
+                "c4e2e7932067432d"
+            ]
+        ]
+    },
+    {
+        "id": "17994132b8632f1b",
+        "type": "link in",
+        "z": "36f6efbc65098d6c",
+        "g": "6398c0f471fcd067",
+        "name": "← REFRESH",
+        "links": [
+            "219e7e762770222b"
+        ],
+        "x": 110,
+        "y": 545,
+        "wires": [
+            [
+                "1c332f7da8c3a6d6"
+            ]
+        ]
+    },
+    {
+        "id": "44be3a6747b3239d",
+        "type": "link in",
+        "z": "36f6efbc65098d6c",
+        "g": "6398c0f471fcd067",
+        "name": "← PERINTAH UI",
+        "links": [
+            "463ea38f28822c27"
+        ],
+        "x": 110,
+        "y": 665,
+        "wires": [
+            [
+                "e0321e1ee663b9b2"
+            ]
+        ]
+    },
+    {
+        "id": "82083b827e19386b",
+        "type": "link out",
+        "z": "36f6efbc65098d6c",
+        "g": "6398c0f471fcd067",
+        "name": "STATE UI →",
+        "mode": "link",
+        "links": [
+            "92a5f9daa6c74f59"
+        ],
+        "x": 1190,
+        "y": 625,
+        "wires": []
+    },
+    {
+        "id": "84eb047f561381cd",
+        "type": "link out",
+        "z": "36f6efbc65098d6c",
+        "g": "6398c0f471fcd067",
+        "name": "FEEDBACK →",
+        "mode": "link",
+        "links": [
+            "0a7b91ed9dacdda7"
+        ],
+        "x": 1190,
+        "y": 705,
+        "wires": []
+    },
+    {
+        "id": "931131a431d194c3",
+        "type": "link out",
+        "z": "36f6efbc65098d6c",
+        "g": "6398c0f471fcd067",
+        "name": "QUERY ULANG →",
+        "mode": "link",
+        "links": [
+            "fc77222b6233a4a8"
+        ],
+        "x": 1190,
+        "y": 545,
+        "wires": []
+    },
+    {
+        "id": "92a5f9daa6c74f59",
+        "type": "link in",
+        "z": "36f6efbc65098d6c",
+        "g": "d3305a4203530bb7",
+        "name": "← STATE UI",
+        "links": [
+            "82083b827e19386b"
+        ],
+        "x": 110,
+        "y": 860,
+        "wires": [
+            [
+                "8205d06393215cf2",
+                "774020af83b39a3d"
+            ]
+        ]
+    },
+    {
+        "id": "0a7b91ed9dacdda7",
+        "type": "link in",
+        "z": "36f6efbc65098d6c",
+        "g": "d3305a4203530bb7",
+        "name": "← FEEDBACK",
+        "links": [
+            "84eb047f561381cd"
+        ],
+        "x": 110,
+        "y": 920,
+        "wires": [
+            [
+                "774020af83b39a3d"
+            ]
+        ]
+    },
+    {
+        "id": "463ea38f28822c27",
+        "type": "link out",
+        "z": "36f6efbc65098d6c",
+        "g": "d3305a4203530bb7",
+        "name": "PERINTAH UI →",
+        "mode": "link",
+        "links": [
+            "44be3a6747b3239d"
+        ],
+        "x": 880,
+        "y": 890,
+        "wires": []
+    },
+    {
+        "id": "c4e2e7932067432d",
+        "type": "function",
+        "z": "36f6efbc65098d6c",
+        "g": "6398c0f471fcd067",
+        "name": "Normalisasi binding SQLite 2.0.1",
+        "func": "let sql=String(msg.topic||'');\n\nfunction fail(message){\n    return [null,{payload:{kind:'feedback',ok:false,client_id:msg.client_id||'',message}}];\n}\n\n// Format lama: ambil nilai msg.params sesuai urutan placeholder $nama.\nif(msg.params&&typeof msg.params==='object'&&!Array.isArray(msg.params)){\n    const keys=sql.match(/\\$[A-Za-z_][A-Za-z0-9_]*/g)||[];\n    const missing=keys.filter(key=>!Object.prototype.hasOwnProperty.call(msg.params,key));\n    if(missing.length)return fail('Parameter SQLite tidak tersedia: '+[...new Set(missing)].join(', '));\n    msg.payload=keys.map(key=>msg.params[key]);\n    delete msg.params;\n}\n\nif(!Array.isArray(msg.payload))msg.payload=[];\n\n// node-red-node-sqlite 2.0.1 menghitung placeholder dari karakter '$'.\n// Konversi setiap '?' menjadi placeholder bernama unik agar binding tidak dibuang.\nlet parameterIndex=0;\nif(sql.includes('?')){\n    sql=sql.replace(/\\?/g,()=>'$p'+(++parameterIndex));\n    msg.topic=sql;\n}\n\nconst placeholders=sql.match(/\\$[A-Za-z_][A-Za-z0-9_]*/g)||[];\nif(placeholders.length!==msg.payload.length){\n    return fail('Jumlah parameter SQLite tidak cocok: query '+placeholders.length+', data '+msg.payload.length);\n}\n\nif(msg.op==='create'){\n    const [faceId,nama,nim,kelas]=msg.payload;\n    if(!String(faceId||'').trim())return fail('Face ID kosong sebelum masuk SQLite');\n    if(!String(nama||'').trim())return fail('Nama kosong sebelum masuk SQLite');\n    if(!String(nim||'').trim())return fail('NIM kosong sebelum masuk SQLite');\n    if(!String(kelas||'').trim())return fail('Kelas kosong sebelum masuk SQLite');\n}\n\nif(msg.op==='update'){\n    const [nama,nim,kelas,,faceId]=msg.payload;\n    if(!String(faceId||'').trim())return fail('Face ID edit kosong sebelum masuk SQLite');\n    if(!String(nama||'').trim()||!String(nim||'').trim()||!String(kelas||'').trim()){\n        return fail('Nama, NIM, dan kelas wajib diisi');\n    }\n}\n\nreturn [msg,null];\n",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 585,
+        "wires": [
+            [
+                "ba469777e6a22140"
+            ],
+            [
+                "84eb047f561381cd"
+            ]
+        ]
+    },
+    {
+        "id": "2f32e19093ef6a92",
+        "type": "mqtt-broker",
+        "name": "MQTT Face Recognition",
+        "broker": "broker.hivemq.com",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "30",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "closeTopic": "",
+        "willTopic": "",
+        "willQos": "0"
+    },
+    {
+        "id": "sqlite-db",
+        "type": "sqlitedb",
+        "db": "face_security.db",
+        "mode": "RWC"
+    },
+    {
+        "id": "64707dc203a1c686",
+        "type": "ui-group",
+        "name": "Pemantauan Face Security",
+        "page": "f332e5928b714d1f",
+        "width": 12,
+        "height": 1,
+        "order": 1,
+        "showTitle": false,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default"
+    },
+    {
+        "id": "daf95451b65171d2",
+        "type": "ui-group",
+        "name": "Administrasi Face Security",
+        "page": "4677158dc938f2ab",
+        "width": 12,
+        "height": 1,
+        "order": 1,
+        "showTitle": false,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default"
+    },
+    {
+        "id": "dd700d7e54fe72f7",
+        "type": "mqtt-broker",
+        "name": "MQTT Face Recognition",
+        "broker": "broker.hivemq.com",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "30",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "closeTopic": "",
+        "willTopic": "",
+        "willQos": "0"
+    },
+    {
+        "id": "f332e5928b714d1f",
+        "type": "ui-page",
+        "name": "Face Recognition",
+        "ui": "0df8b8a20bb13f1b",
+        "path": "/face-security",
+        "icon": "face-recognition",
+        "layout": "grid",
+        "theme": "1402d3cfd7b5538a",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "tabs": [],
+        "order": 2,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "4677158dc938f2ab",
+        "type": "ui-page",
+        "name": "Admin Wajah",
+        "ui": "0df8b8a20bb13f1b",
+        "path": "/face-admin",
+        "icon": "account-cog",
+        "layout": "grid",
+        "theme": "1402d3cfd7b5538a",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "tabs": [],
+        "order": 3,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "0df8b8a20bb13f1b",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": true
+    },
+    {
+        "id": "1402d3cfd7b5538a",
+        "type": "ui-theme",
+        "name": "Face Security Theme",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0f766e",
+            "bgPage": "#eef2f7",
+            "groupBg": "#ffffff",
+            "groupOutline": "#e2e8f0"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "12px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "119a8a1995b40583",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-node-sqlite": "2.0.1",
+            "@flowfuse/node-red-dashboard": "1.34.1"
+        }
+    }
+]
