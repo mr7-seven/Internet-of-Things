@@ -1,0 +1,540 @@
+[
+    {
+        "id": "ace5096f3ff27a1a",
+        "type": "tab",
+        "label": "Object Monitoring and Evaluation System",
+        "disabled": false,
+        "info": "Misi deteksi objek multi-node menggunakan YOLO26 ONNX, MQTT, SQLite, ESP32, dan FlowFuse Dashboard 2.0."
+    },
+    {
+        "id": "97c6bd398c5cb647",
+        "type": "comment",
+        "z": "ace5096f3ff27a1a",
+        "name": "UBAH id_group DI NODE KONFIGURASI, PERIKSA BROKER, LALU DEPLOY",
+        "info": "Nilai id_group harus sama dengan python/config.json dan platformio/include/app_config.h.",
+        "x": 560,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "d7f6df8b5dff0c9b",
+        "type": "inject",
+        "z": "ace5096f3ff27a1a",
+        "name": "Inisialisasi sistem",
+        "props": [
+            {
+                "p": "kind",
+                "v": "init",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "0.5",
+        "topic": "",
+        "x": 130,
+        "y": 100,
+        "wires": [
+            [
+                "147b22967667e9f8"
+            ]
+        ]
+    },
+    {
+        "id": "a1c967a62a4f1451",
+        "type": "inject",
+        "z": "ace5096f3ff27a1a",
+        "name": "Refresh status 2 detik",
+        "props": [
+            {
+                "p": "kind",
+                "v": "tick",
+                "vt": "str"
+            }
+        ],
+        "repeat": "2",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 140,
+        "y": 160,
+        "wires": [
+            [
+                "b157f0d24e1cf398"
+            ]
+        ]
+    },
+    {
+        "id": "147b22967667e9f8",
+        "type": "function",
+        "z": "ace5096f3ff27a1a",
+        "name": "KONFIGURASI SMART MONITORING — UBAH DI SINI",
+        "func": "const config = {\n  id_group: 'kelompok-00',\n  default_node_count: 2,\n  camera_timeout_ms: 70000,\n  esp_timeout_ms: 25000,\n  admin_username: 'admin',\n  admin_password: 'admin123'\n};\nflow.set('smartMonitorConfig', config);\nif (msg.status) {\n  const text = String(msg.status.text || '').toLowerCase();\n  msg.kind = 'broker_status';\n  msg.connected = text.includes('connected') && !text.includes('disconnected');\n  return [msg, null];\n}\nmsg.kind = 'init';\nmsg.config = config;\nconst topics = [`${config.id_group}/node/register`];\nfor (let index = 1; index <= config.default_node_count; index++) {\n  const node = `node-${String(index).padStart(2,'0')}`;\n  topics.push(`${config.id_group}/${node}/detection/state`);\n  topics.push(`${config.id_group}/${node}/camera/status`);\n  topics.push(`${config.id_group}/${node}/esp32/status`);\n}\nreturn [msg, {action:'subscribe', topic:topics.map(topic=>({topic,qos:1}))}];\n",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "context.set('connected',false);",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 100,
+        "wires": [
+            [
+                "b157f0d24e1cf398"
+            ],
+            [
+                "47aa29d8752dc03c"
+            ]
+        ]
+    },
+    {
+        "id": "47aa29d8752dc03c",
+        "type": "mqtt in",
+        "z": "ace5096f3ff27a1a",
+        "name": "MQTT RX • topik eksplisit",
+        "topic": "",
+        "qos": "1",
+        "datatype": "utf8",
+        "broker": "om-mqtt-broker",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 1,
+        "x": 390,
+        "y": 260,
+        "wires": [
+            [
+                "b157f0d24e1cf398"
+            ]
+        ]
+    },
+    {
+        "id": "7d88b6d4c6978e54",
+        "type": "status",
+        "z": "ace5096f3ff27a1a",
+        "name": "Status broker MQTT",
+        "scope": [
+            "47aa29d8752dc03c",
+            "eb0fca791bd0e293"
+        ],
+        "x": 130,
+        "y": 200,
+        "wires": [
+            [
+                "147b22967667e9f8"
+            ]
+        ]
+    },
+    {
+        "id": "901d8aa505430cce",
+        "type": "link in",
+        "z": "ace5096f3ff27a1a",
+        "name": "Kontrol subscription MQTT",
+        "links": [
+            "89387020d585b108"
+        ],
+        "x": 245,
+        "y": 260,
+        "wires": [
+            [
+                "47aa29d8752dc03c"
+            ]
+        ]
+    },
+    {
+        "id": "89387020d585b108",
+        "type": "link out",
+        "z": "ace5096f3ff27a1a",
+        "name": "Kirim kontrol subscription",
+        "mode": "link",
+        "links": [
+            "901d8aa505430cce"
+        ],
+        "x": 1015,
+        "y": 290,
+        "wires": []
+    },
+    {
+        "id": "437d797eaaa64467",
+        "type": "link in",
+        "z": "ace5096f3ff27a1a",
+        "name": "Kembali ke controller",
+        "links": [
+            "13989803260de37d",
+            "61ff06c9c2e02b1d"
+        ],
+        "x": 570,
+        "y": 360,
+        "wires": [
+            [
+                "b157f0d24e1cf398"
+            ]
+        ]
+    },
+    {
+        "id": "b157f0d24e1cf398",
+        "type": "function",
+        "z": "ace5096f3ff27a1a",
+        "name": "Controller • autentikasi, aturan, CRUD, dan status",
+        "func": "const config = flow.get('smartMonitorConfig');\nif (!config) return null;\nconst COCO = ['person','bicycle','car','motorcycle','airplane','bus','train','truck','boat','traffic light','fire hydrant','stop sign','parking meter','bench','bird','cat','dog','horse','sheep','cow','elephant','bear','zebra','giraffe','backpack','umbrella','handbag','tie','suitcase','frisbee','skis','snowboard','sports ball','kite','baseball bat','baseball glove','skateboard','surfboard','tennis racket','bottle','wine glass','cup','fork','knife','spoon','bowl','banana','apple','sandwich','orange','broccoli','carrot','hot dog','pizza','donut','cake','chair','couch','potted plant','bed','dining table','toilet','tv','laptop','mouse','remote','keyboard','cell phone','microwave','oven','toaster','sink','refrigerator','book','clock','vase','scissors','teddy bear','hair drier','toothbrush'];\nconst COCO_SET = new Set(COCO), now = Date.now(), iso = new Date().toISOString();\nlet settings = context.get('settings') || {node_count:config.default_node_count};\nlet profiles = context.get('profiles') || [], runtime = context.get('runtime') || {};\nlet pending = context.get('pending') || {}, system = context.get('system') || {mqtt:false,sqlite:false};\nlet sessions = context.get('sessions') || {};\nfunction save(){context.set('settings',settings);context.set('profiles',profiles);context.set('runtime',runtime);context.set('pending',pending);context.set('system',system);context.set('sessions',sessions)}\nfunction ids(count=settings.node_count){return Array.from({length:Math.max(1,Number(count)||2)},(_,i)=>`node-${String(i+1).padStart(2,'0')}`)}\nfunction base(id){return `${config.id_group}/${id}`}\nfunction mqtt(topic,payload,retain=true){return {topic,payload:JSON.stringify(payload),qos:1,retain}}\nfunction sql(op,topic,payload=[],extra={}){return {_op:op,topic,payload,...extra}}\nfunction rules(value,mode){let obj=value;try{if(typeof obj==='string')obj=JSON.parse(obj)}catch{obj={}};if(!obj||Array.isArray(obj))return {};const out={};for(const [k,v] of Object.entries(obj)){if(!COCO_SET.has(k))continue;if(mode==='restricted')out[k]=true;else if(Number.isInteger(Number(v))&&Number(v)>=0&&Number(v)<=999)out[k]=Number(v)}return out}\nfunction profile(row){const mode=row.mode==='threshold'?'threshold':'restricted';return {node_id:String(row.node_id),nama:String(row.nama||''),nim:String(row.nim||''),kelas:String(row.kelas||''),area:String(row.area||''),camera_name:String(row.camera_name||''),foto_base64:String(row.foto_base64||''),active:Number(row.is_active)!==0,mode,rules:rules(row.rules_json,mode),config_version:Number(row.config_version)||0}}\nfunction evaluate(p,counts){\n const detail=[];\n // Evaluasi hanya kelas yang dikonfigurasi admin. Kelas lain pada payload\n // tidak ikut menentukan NORMAL/VIOLATION dan tidak dapat membatalkan alarm.\n if(p.mode==='restricted'){\n  for(const name of Object.keys(p.rules)){\n   const actual=Number(counts[name]||0);\n   if(actual>0)detail.push({object:name,actual,rule:'dilarang'});\n  }\n }else{\n  for(const [name,rawMax] of Object.entries(p.rules)){\n   const actual=Number(counts[name]||0),max=Number(rawMax);\n   if(actual>max)detail.push({object:name,actual,rule:`maksimal ${max}`});\n  }\n }\n return detail;\n}\nfunction snapshot(id){const p=profiles.find(x=>x.node_id===id),r=runtime[id]||{},camera=now-(r.camera_at||0)<config.camera_timeout_ms,esp=now-(r.esp_at||0)<config.esp_timeout_ms;let state='UNREGISTERED';if(p){if(!p.active)state='DISABLED';else if(!camera)state='OFFLINE';else state=r.state||'IDLE'}return {node_id:id,registered:!!p,nama:p?.nama||'',nim:p?.nim||'',kelas:p?.kelas||'',area:p?.area||'',camera_name:p?.camera_name||r.camera_name||'-',foto_base64:p?.foto_base64||'',active:p?.active??false,mode:p?.mode||'',rules:p?.rules||{},objects:r.objects||{},camera_online:camera,esp32_online:esp,state,detail:r.detail||[],event_id:r.event_id||'',updated_at:r.updated_at||null}}\nfunction state(){const nodes=ids().map(snapshot);return {payload:{kind:'state',config:{id_group:config.id_group,coco:COCO},settings,nodes,pending,system:{...system,nodered:true},violations:nodes.filter(n=>n.state==='VIOLATION'),updated_at:iso}}}\nfunction subscriptions(count=settings.node_count){const topics=[`${config.id_group}/node/register`];for(const id of ids(count)){topics.push(`${base(id)}/detection/state`,`${base(id)}/camera/status`,`${base(id)}/esp32/status`)}return [{action:'unsubscribe',topic:true},{action:'subscribe',topic:topics.map(topic=>({topic,qos:1}))}]}\nfunction publishConfig(p){return mqtt(`${base(p.node_id)}/monitor/config`,{id_group:config.id_group,node_id:p.node_id,enabled:p.active,mode:p.mode,rules:p.rules,area:p.area,camera_name:p.camera_name,config_version:p.config_version,timestamp:iso})}\nfunction transition(id,p,newState,detail){const r=runtime[id]||(runtime[id]={});if(r.state===newState&&JSON.stringify(r.detail||[])===JSON.stringify(detail))return [];\n const previous=r.state||'IDLE', out=[];r.state=newState;r.detail=detail;r.updated_at=iso;\n if(newState==='VIOLATION'&&previous!=='VIOLATION'){r.event_id=`${id}-${now}-${Math.random().toString(36).slice(2,7)}`;out.push(sql('event_open',`INSERT INTO violation_events(event_id,id_group,node_id,mode,started_at,objects_json,rules_json,details_json,status) VALUES(?,?,?,?,?,?,?,?, 'ACTIVE')`,[r.event_id,config.id_group,id,p.mode,iso,JSON.stringify(r.objects||{}),JSON.stringify(p.rules),JSON.stringify(detail)]));}\n if(previous==='VIOLATION'&&newState!=='VIOLATION'&&r.event_id){out.push(sql('event_close',`UPDATE violation_events SET ended_at=?,duration_seconds=CAST((julianday(?) - julianday(started_at))*86400 AS INTEGER),status='RESOLVED',end_reason=? WHERE event_id=?`,[iso,iso,newState,r.event_id]));r.event_id='';}\n out.push(mqtt(`${base(id)}/monitor/status`,{id_group:config.id_group,node_id:id,state:newState,detail,event_id:r.event_id||null,timestamp:iso}));\n out.push(mqtt(`${base(id)}/esp32/cmd`,{id_group:config.id_group,node_id:id,state:newState.toLowerCase(),alarm:newState==='VIOLATION',event_id:r.event_id||'',timestamp:iso}));return out}\nfunction auth(p){const item=sessions[p.session_token];return !!item&&item.client_id===p.client_id&&item.until>now}\nfunction feedback(ok,message,client_id='',extra={}){return {payload:{kind:'feedback',ok,message,client_id,...extra}}}\nfunction refresh(extra={}){return sql('load_settings','SELECT node_count FROM monitoring_settings WHERE id_group=?',[config.id_group],extra)}\n\nif(msg._op){system.sqlite=true;const op=msg._op;\n if(op==='create_nodes')return [sql('create_settings',`CREATE TABLE IF NOT EXISTS monitoring_settings(id_group TEXT PRIMARY KEY,node_count INTEGER NOT NULL DEFAULT 2,updated_at TEXT DEFAULT CURRENT_TIMESTAMP)`),null,null,null,null];\n if(op==='create_settings')return [sql('create_events',`CREATE TABLE IF NOT EXISTS violation_events(event_id TEXT PRIMARY KEY,id_group TEXT,node_id TEXT,mode TEXT,started_at TEXT,ended_at TEXT,duration_seconds INTEGER,objects_json TEXT,rules_json TEXT,details_json TEXT,status TEXT,end_reason TEXT)`),null,null,null,null];\n if(op==='create_events')return [sql('seed_settings','INSERT OR IGNORE INTO monitoring_settings(id_group,node_count) VALUES(?,?)',[config.id_group,config.default_node_count]),null,null,null,null];\n if(['seed_settings','save_node','delete_node','save_count','toggle_node'].includes(op)){if(op==='save_node')pending={};save();return [refresh(msg._feedback?{_feedback:msg._feedback}:{}),null,null,null,null]}\n if(op==='load_settings'){const row=Array.isArray(msg.payload)?msg.payload[0]:null;if(row)settings.node_count=Math.min(30,Math.max(1,Number(row.node_count)||2));return [sql('load_nodes','SELECT * FROM monitoring_nodes WHERE id_group=? ORDER BY node_id',[config.id_group],{_feedback:msg._feedback}),null,null,null,null];}\n if(op==='load_nodes'){profiles=(Array.isArray(msg.payload)?msg.payload:[]).map(profile);save();const configs=profiles.map(p=>publishConfig(p));return [null,configs,state(),msg._feedback||null,subscriptions()];}\n if(op==='event_open'||op==='event_close'){save();return [null,null,state(),null,null]}\n}\nlet p=msg.payload;\nif(typeof p==='string'||Buffer.isBuffer(p)){try{p=JSON.parse(p.toString())}catch{return null}}\nif(!p||typeof p!=='object'||Array.isArray(p))p=msg;\nlet kind=String(msg.kind||p.kind||'');\nif(msg.topic&&typeof msg.topic==='string'&&!kind){\n const parts=msg.topic.split('/').filter(Boolean);\n if(msg.topic===`${config.id_group}/node/register`)kind='registration';\n else if(parts.length===4&&parts[0]===config.id_group&&String(p.node_id||'')===parts[1]){\n  if(parts[2]==='detection'&&parts[3]==='state')kind='detection';\n  else if(parts[2]==='camera'&&parts[3]==='status')kind='camera';\n  else if(parts[2]==='esp32'&&parts[3]==='status')kind='esp32';\n }\n}\nif(['registration','camera','esp32','detection'].includes(kind)&&String(p.id_group||p.group_id||'')!==config.id_group)return null;\nif(kind==='init'){runtime={};pending={};save();return [sql('create_nodes',`CREATE TABLE IF NOT EXISTS monitoring_nodes(id_group TEXT NOT NULL,node_id TEXT NOT NULL,nama TEXT NOT NULL,nim TEXT NOT NULL,kelas TEXT NOT NULL,area TEXT NOT NULL,camera_name TEXT NOT NULL,foto_base64 TEXT DEFAULT '',is_active INTEGER NOT NULL DEFAULT 1,mode TEXT NOT NULL DEFAULT 'restricted',rules_json TEXT NOT NULL DEFAULT '{}',config_version INTEGER NOT NULL DEFAULT 1,updated_at TEXT DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY(id_group,node_id))`),null,null,null,null]}\nif(kind==='broker_status'){system.mqtt=!!msg.connected;save();return [null,null,state(),null,null]}\nif(kind==='tick'){const outs=[];for(const pr of profiles){const snap=snapshot(pr.node_id);if(pr.active&&snap.state==='OFFLINE')outs.push(...transition(pr.node_id,pr,'IDLE',[]));}save();return [outs.filter(x=>x._op),outs.filter(x=>!x._op),state(),null,null]}\nif(kind==='registration'){if(!ids().includes(p.node_id))return null;pending={node_id:p.node_id,event_id:p.event_id||'',received_at:iso};save();return [null,null,state(),feedback(true,`Permintaan registrasi ${p.node_id} diterima`),null]}\nif(kind==='camera'){if(!ids().includes(String(p.node_id||'')))return null;const r=runtime[p.node_id]||(runtime[p.node_id]={});if(p.online!==false){r.camera_at=now;r.camera_name=String(p.camera_name||r.camera_name||'Webcam')}else r.camera_at=0;save();return [null,null,state(),null,null]}\nif(kind==='esp32'){if(!ids().includes(String(p.node_id||'')))return null;const r=runtime[p.node_id]||(runtime[p.node_id]={});r.esp_at=p.online===false?0:now;r.esp_state=String(p.monitor_state||p.state||'online');save();return [null,null,state(),null,null]}\nif(kind==='detection'){\n const pr=profiles.find(x=>x.node_id===p.node_id);if(!pr)return null;\n const r=runtime[p.node_id]||(runtime[p.node_id]={});r.detection_at=now;r.camera_at=now;r.objects={};\n for(const [name,count] of Object.entries(p.objects||{})){\n  if(COCO_SET.has(name)&&Number.isInteger(Number(count))&&Number(count)>0)r.objects[name]=Number(count);\n }\n // Signature hanya memakai kelas aturan. Perubahan kelas lain tetap ditampilkan\n // pada dashboard, tetapi tidak mengubah status atau mematikan alarm.\n const monitoredCounts={};\n for(const name of Object.keys(pr.rules))monitoredCounts[name]=Number(r.objects[name]||0);\n const ruleSignature=JSON.stringify({version:pr.config_version,mode:pr.mode,counts:monitoredCounts});\n if(r.rule_signature===ruleSignature){save();return [null,null,state(),null,null]}\n r.rule_signature=ruleSignature;\n const detail=evaluate(pr,r.objects),next=!pr.active?'IDLE':(detail.length?'VIOLATION':'NORMAL');\n const outs=transition(pr.node_id,pr,next,detail);save();\n return [outs.filter(x=>x._op),outs.filter(x=>!x._op),state(),null,null];\n}\nif(kind==='login'){if(p.username===config.admin_username&&p.password===config.admin_password){const token=Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2);sessions[token]={client_id:p.client_id,until:now+8*3600000};save();return [null,null,null,feedback(true,'Login berhasil',p.client_id,{session_token:token}),null]}return [null,null,null,feedback(false,'Username atau password salah',p.client_id),null]}\nif(kind==='request_state')return [null,null,state(),null,null];\nif(['save_node','delete_node','set_count','toggle_node'].includes(kind)&&!auth(p))return [null,null,null,feedback(false,'Sesi admin tidak valid',p.client_id),null];\nif(kind==='set_count'){const count=Math.min(30,Math.max(1,Number(p.node_count)||2));return [sql('save_count','INSERT INTO monitoring_settings(id_group,node_count) VALUES(?,?) ON CONFLICT(id_group) DO UPDATE SET node_count=excluded.node_count,updated_at=CURRENT_TIMESTAMP',[config.id_group,count],{_feedback:feedback(true,'Jumlah node diperbarui',p.client_id)}),null,null,null,null]}\nif(kind==='save_node'){const id=String(p.node_id||'');if(!ids().includes(id))return [null,null,null,feedback(false,'Node ID di luar jumlah node',p.client_id),null];const mode=p.mode==='threshold'?'threshold':'restricted',validRules=rules(p.rules,mode);if(!p.nama||!p.nim||!p.kelas||!p.area||!p.camera_name||!p.foto_base64||!Object.keys(validRules).length)return [null,null,null,feedback(false,'Nama, NIM, kelas, foto, area, kamera, dan aturan wajib lengkap',p.client_id),null];const version=now;pending={};save();return [sql('save_node',`INSERT INTO monitoring_nodes(id_group,node_id,nama,nim,kelas,area,camera_name,foto_base64,is_active,mode,rules_json,config_version) VALUES(?,?,?,?,?,?,?,?,1,?,?,?) ON CONFLICT(id_group,node_id) DO UPDATE SET nama=excluded.nama,nim=excluded.nim,kelas=excluded.kelas,area=excluded.area,camera_name=excluded.camera_name,foto_base64=excluded.foto_base64,mode=excluded.mode,rules_json=excluded.rules_json,config_version=excluded.config_version,updated_at=CURRENT_TIMESTAMP`,[config.id_group,id,String(p.nama),String(p.nim),String(p.kelas),String(p.area),String(p.camera_name),String(p.foto_base64),mode,JSON.stringify(validRules),version],{_feedback:feedback(true,`Data ${id} berhasil disimpan`,p.client_id)}),null,null,null,null]}\nif(kind==='toggle_node'){const active=!!p.active;const pr=profiles.find(x=>x.node_id===p.node_id);if(!pr)return null;const outs=transition(pr.node_id,{...pr,active},active?'IDLE':'IDLE',[]);return [sql('toggle_node','UPDATE monitoring_nodes SET is_active=?,config_version=?,updated_at=CURRENT_TIMESTAMP WHERE id_group=? AND node_id=?',[active?1:0,now,config.id_group,pr.node_id],{_feedback:feedback(true,`${pr.node_id} ${active?'diaktifkan':'dinonaktifkan'}`,p.client_id)}),outs.filter(x=>!x._op),null,null,null]}\nif(kind==='delete_node')return [sql('delete_node','DELETE FROM monitoring_nodes WHERE id_group=? AND node_id=?',[config.id_group,p.node_id],{_feedback:feedback(true,'Node dihapus',p.client_id)}),mqtt(`${base(p.node_id)}/monitor/config`,{id_group:config.id_group,node_id:p.node_id,enabled:false,mode:'restricted',rules:{},config_version:now,timestamp:iso}),null,null,null];\nreturn null;\n",
+        "outputs": 5,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 730,
+        "y": 180,
+        "wires": [
+            [
+                "b88890bd35e5d57e"
+            ],
+            [
+                "eb0fca791bd0e293"
+            ],
+            [
+                "fa60d0bd9f1befe6",
+                "aec45f355354eee5"
+            ],
+            [
+                "aec45f355354eee5"
+            ],
+            [
+                "89387020d585b108"
+            ]
+        ]
+    },
+    {
+        "id": "b88890bd35e5d57e",
+        "type": "function",
+        "z": "ace5096f3ff27a1a",
+        "name": "Normalisasi binding SQLite 2.0.1",
+        "func": "let statement=String(msg.topic||'');\nif(!Array.isArray(msg.payload))msg.payload=[];\nlet index=0;\nif(statement.includes('?')){\n  statement=statement.replace(/\\?/g,()=>'$p'+(++index));\n  msg.topic=statement;\n}\nconst placeholders=statement.match(/\\$[A-Za-z_][A-Za-z0-9_]*/g)||[];\nif(placeholders.length!==msg.payload.length){\n  node.error(`Jumlah parameter SQLite tidak cocok: query ${placeholders.length}, data ${msg.payload.length}`,msg);\n  return null;\n}\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1080,
+        "y": 60,
+        "wires": [
+            [
+                "991d3e53c529f23f"
+            ]
+        ]
+    },
+    {
+        "id": "991d3e53c529f23f",
+        "type": "sqlite",
+        "z": "ace5096f3ff27a1a",
+        "mydb": "om-sqlite-db",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "SQLite Smart Monitoring",
+        "x": 1370,
+        "y": 60,
+        "wires": [
+            [
+                "13989803260de37d"
+            ]
+        ]
+    },
+    {
+        "id": "13989803260de37d",
+        "type": "link out",
+        "z": "ace5096f3ff27a1a",
+        "name": "Hasil SQLite",
+        "mode": "link",
+        "links": [
+            "437d797eaaa64467"
+        ],
+        "x": 1535,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "274795040bfa89f4",
+        "type": "catch",
+        "z": "ace5096f3ff27a1a",
+        "name": "Tangkap error SQLite",
+        "scope": [
+            "991d3e53c529f23f"
+        ],
+        "uncaught": false,
+        "x": 1060,
+        "y": 160,
+        "wires": [
+            [
+                "5205783e117b1679"
+            ]
+        ]
+    },
+    {
+        "id": "5205783e117b1679",
+        "type": "function",
+        "z": "ace5096f3ff27a1a",
+        "name": "Respons error database",
+        "func": "const text=String(msg.error?.message||msg.error||'');\nlet message='Operasi database gagal';\nif(text.includes('UNIQUE'))message='Node ID tersebut sudah terdaftar';\nelse if(text.includes('locked'))message='SQLite sedang terkunci; coba kembali';\nelse if(text)message+=': '+text;\nmsg.payload={kind:'feedback',ok:false,client_id:msg._client_id||'',message};\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1290,
+        "y": 160,
+        "wires": [
+            [
+                "aec45f355354eee5"
+            ]
+        ]
+    },
+    {
+        "id": "eb0fca791bd0e293",
+        "type": "mqtt out",
+        "z": "ace5096f3ff27a1a",
+        "name": "MQTT TX • konfigurasi dan ESP32",
+        "topic": "",
+        "qos": "1",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "om-mqtt-broker",
+        "x": 1070,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "fa60d0bd9f1befe6",
+        "type": "ui-template",
+        "z": "ace5096f3ff27a1a",
+        "group": "2b6bde1b770e9e76",
+        "page": "",
+        "ui": "",
+        "name": "Monitoring • node dan object counter",
+        "order": 1,
+        "width": 12,
+        "height": 0,
+        "head": "",
+        "format": "<template>\n  <div class=\"sm-shell\">\n    <main class=\"sm-main\">\n      <header class=\"sm-hero\">\n        <div><span>YOLO26 · ONNX RUNTIME CPU</span><h1><i class=\"mdi mdi-eye-outline\"></i> Object Detection Monitoring</h1><p>Status kamera dan objek seluruh node secara real-time</p></div>\n        <div class=\"sm-clock\">{{ state.updated_at ? new Date(state.updated_at).toLocaleTimeString('id-ID') : '--:--:--' }}</div>\n      </header>\n      <div class=\"sm-grid\">\n        <article v-for=\"node in pageNodes\" :key=\"node.node_id\" class=\"sm-card\" :class=\"'s-'+node.state.toLowerCase()\">\n          <div class=\"sm-cardtop\"><div><b><i class=\"mdi mdi-access-point\"></i> {{ node.node_id }}</b><small><i class=\"mdi mdi-map-marker-outline\"></i> {{ node.area || 'Belum didaftarkan' }}</small></div><span class=\"sm-status\"><i :class=\"node.state==='VIOLATION'?'mdi mdi-alert-circle-outline':node.state==='NORMAL'?'mdi mdi-check-circle-outline':'mdi mdi-clock-outline'\"></i> {{ node.state }}</span></div>\n          <div class=\"sm-person\">\n            <img v-if=\"node.foto_base64\" :src=\"node.foto_base64\" alt=\"Foto pengguna\">\n            <div v-else class=\"sm-avatar\">{{ (node.nama||node.node_id).slice(0,1).toUpperCase() }}</div>\n            <div><strong>{{ node.nama || 'Node belum terdaftar' }}</strong><small>{{ node.nim || '—' }} · {{ node.kelas || '—' }}</small></div>\n          </div>\n          <div class=\"sm-devices\"><div class=\"sm-camera\"><i :class=\"node.camera_online?'dot on':'dot'\"></i><div><small><i class=\"mdi mdi-camera-outline\"></i> Kamera</small><b>{{ node.camera_name || '-' }}</b></div><span>{{ node.camera_online?'ONLINE':'OFFLINE' }}</span></div><div class=\"sm-camera\"><i :class=\"node.esp32_online?'dot on':'dot'\"></i><div><small><i class=\"mdi mdi-chip\"></i> Perangkat</small><b>ESP32</b></div><span>{{ node.esp32_online?'ONLINE':'OFFLINE' }}</span></div></div>\n          <div class=\"sm-label\"><i class=\"mdi mdi-cube-scan\"></i> Objek saat ini</div>\n          <div v-if=\"Object.keys(node.objects||{}).length\" class=\"sm-objects\"><span v-for=\"(count,name) in node.objects\" :key=\"name\"><b>{{ count }}</b>{{ name }}</span></div>\n          <div v-else class=\"sm-empty\">Belum ada objek terdeteksi</div>\n          <div class=\"sm-rule\"><i class=\"mdi mdi-shield-search-outline\"></i> {{ node.mode==='threshold'?'Mode B · Batas jumlah':'Mode A · Objek terlarang' }}</div>\n        </article>\n      </div>\n      <div v-if=\"totalPages>1\" class=\"sm-pages\"><button @click=\"page=Math.max(1,page-1)\">‹</button><span>Halaman {{ page }} / {{ totalPages }}</span><button @click=\"page=Math.min(totalPages,page+1)\">›</button></div>\n    </main>\n    <aside class=\"sm-side\">\n      <h2><i class=\"mdi mdi-view-dashboard-outline\"></i> Status Sistem</h2><div class=\"sm-group\">{{ state.config?.id_group || '-' }}</div>\n      <div class=\"sm-sys\"><span><i class=\"mdi mdi-access-point-network\"></i> MQTT Broker <b :class=\"state.system?.mqtt?'ok':'bad'\">{{ state.system?.mqtt?'ONLINE':'OFFLINE' }}</b></span><span><i class=\"mdi mdi-database-outline\"></i> SQLite <b :class=\"state.system?.sqlite?'ok':'bad'\">{{ state.system?.sqlite?'READY':'WAIT' }}</b></span><span><i class=\"mdi mdi-sitemap-outline\"></i> Node-RED <b class=\"ok\">ONLINE</b></span></div>\n      <h3><i class=\"mdi mdi-chart-box-outline\"></i> Ringkasan</h3><div class=\"sm-stats\"><div><b>{{ nodes.length }}</b><span><i class=\"mdi mdi-access-point\"></i> Node</span></div><div><b>{{ online }}</b><span><i class=\"mdi mdi-camera-outline\"></i> Kamera</span></div><div><b>{{ violations.length }}</b><span><i class=\"mdi mdi-alert-outline\"></i> Pelanggaran</span></div><div><b>{{ objectTotal }}</b><span><i class=\"mdi mdi-cube-outline\"></i> Objek</span></div></div>\n      <div class=\"sm-legend\"><span><i class=\"green\"></i>NORMAL</span><span><i class=\"red\"></i>VIOLATION</span><span><i class=\"yellow\"></i>IDLE</span><span><i class=\"gray\"></i>OFFLINE</span></div>\n      <a href=\"/dashboard/object-admin\">Buka Dashboard Admin →</a>\n    </aside>\n  </div>\n</template>\n<script src=\"https://cdn.jsdelivr.net/npm/sweetalert2@11\"></script>\n<script>\nexport default {\n data(){return{state:{nodes:[],violations:[],system:{}},page:1,perPage:6,lastAlert:''}},\n computed:{nodes(){return this.state.nodes||[]},totalPages(){return Math.max(1,Math.ceil(this.nodes.length/this.perPage))},pageNodes(){return this.nodes.slice((this.page-1)*this.perPage,this.page*this.perPage)},online(){return this.nodes.filter(n=>n.camera_online).length},violations(){return this.state.violations||[]},objectTotal(){return this.nodes.reduce((sum,n)=>sum+Object.values(n.objects||{}).reduce((a,b)=>a+Number(b),0),0)}},\n watch:{msg:{deep:true,handler(value){if(value?.payload?.kind==='state'){this.state=value.payload;this.page=Math.min(this.page,this.totalPages);this.syncAlert()}}}},\n mounted(){this.send({payload:{kind:'request_state'}})},\n methods:{syncAlert(){const rows=this.violations.map(v=>{const photo=this.safePhoto(v.foto_base64),visual=photo?`<img class=\"alert-photo\" src=\"${photo}\" alt=\"Foto ${this.escape(v.node_id)}\">`:`<div class=\"alert-avatar\">${this.escape((v.nama||v.node_id||'?').slice(0,1).toUpperCase())}</div>`;return `<div class=\"alert-row\"><div class=\"alert-head\">${visual}<div><span class=\"alert-badge\">⚠ VIOLATION</span><b>${this.escape(v.node_id)} · ${this.escape(v.area)}</b><small>${this.escape(v.nama)} · ${this.escape(v.nim)} · ${this.escape(v.kelas)}</small><em>${v.mode==='threshold'?'Mode B — Batas jumlah':'Mode A — Objek terlarang'}</em></div></div><div class=\"alert-details\">${(v.detail||[]).map(d=>`<p><strong>${this.escape(d.object)}</strong><span>Aktual ${d.actual} · Ketentuan ${this.escape(d.rule)}</span></p>`).join('')}</div></div>`}).join('');const key=this.violations.map(v=>v.node_id+JSON.stringify(v.detail)).join('|');if(!rows){if(window.Swal?.isVisible())Swal.close();this.lastAlert='';return}const options={icon:'warning',title:`${this.violations.length} Pelanggaran Aktif`,html:`<div class=\"alert-list\">${rows}</div>`,showConfirmButton:false,allowOutsideClick:false,allowEscapeKey:false,width:700};if(window.Swal){if(Swal.isVisible()&&key!==this.lastAlert)Swal.update(options);else if(!Swal.isVisible())Swal.fire(options)}this.lastAlert=key},safePhoto(v){return typeof v==='string'&&/^data:image\\/(jpeg|png|webp);base64,/i.test(v)?v:''},escape(v){return String(v??'').replace(/[&<>'\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',\"'\":'&#39;','\"':'&quot;'}[c]))}}\n}\n</script>\n<style>\n.sm-shell{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:18px;min-height:calc(100vh - 96px);font-family:Inter,system-ui;color:#17324a;background:#f5f7fa;padding:18px;border-radius:20px}.sm-main{min-width:0}.sm-hero{display:flex;justify-content:space-between;align-items:end;padding:18px 22px;margin-bottom:16px;border:1px solid #dbe4ea;border-radius:16px;background:#fff;box-shadow:0 8px 24px #23445b10}.sm-hero span{font-size:10px;letter-spacing:1.8px;color:#07826b}.sm-hero h1{font-size:27px;margin:5px 0}.sm-hero p{margin:0;color:#718294}.sm-clock{font:700 19px monospace;color:#087e68}.sm-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.sm-card{background:#fff;border:1px solid #dbe5eb;border-left:5px solid #8b9baa;border-radius:16px;padding:17px;min-height:280px;box-shadow:0 9px 26px #28465b12}.sm-card.s-normal{border-left-color:#13a77f}.sm-card.s-violation{border-left-color:#e8495e;box-shadow:0 0 0 1px #e8495e22,0 10px 28px #e8495e18}.sm-card.s-idle{border-left-color:#e9b936}.sm-cardtop,.sm-person,.sm-camera{display:flex;align-items:center;justify-content:space-between}.sm-cardtop b{font-size:19px}.sm-cardtop small,.sm-person small{display:block;color:#718395;margin-top:4px}.sm-status{font-size:10px;font-weight:800;padding:7px 10px;border-radius:99px;background:#e8eef2;color:#53697a}.s-normal .sm-status{background:#dff7ef;color:#08785d}.s-violation .sm-status{background:#fde5e8;color:#bd283e}.s-idle .sm-status{background:#fff3cd;color:#8a6810}.sm-person{justify-content:flex-start;gap:11px;margin:16px 0}.sm-person img,.sm-avatar{width:44px;height:44px;border-radius:12px;object-fit:cover}.sm-avatar{display:grid;place-items:center;background:linear-gradient(135deg,#18a47c,#3d82bd);color:white;font-weight:800}.sm-camera{padding:10px 12px;background:#f4f7f9;border:1px solid #e2e9ed;border-radius:11px;gap:9px}.sm-camera div{flex:1}.sm-camera small,.sm-camera b{display:block}.sm-camera>span{font-size:10px;font-weight:800;color:#607487}.dot{width:9px;height:9px;border-radius:50%;background:#98a7b4}.dot.on{background:#15b788;box-shadow:0 0 8px #15b78866}.sm-label{margin:15px 0 9px;color:#718597;text-transform:uppercase;font-size:10px;letter-spacing:1.3px}.sm-objects{display:flex;gap:7px;flex-wrap:wrap}.sm-objects span{padding:7px 10px;background:#edf8f5;border:1px solid #cdebe2;border-radius:10px;font-size:12px}.sm-objects b{color:#087e68;margin-right:6px;font-size:15px}.sm-empty{padding:10px;color:#75899d;border:1px dashed #c6d3dc;border-radius:10px}.sm-rule{margin-top:14px;color:#71879a;font-size:11px}.sm-side{position:sticky;top:12px;height:fit-content;background:#fff;border:1px solid #dbe5eb;border-radius:16px;padding:18px;box-shadow:0 9px 26px #28465b12}.sm-side h2{margin:0 0 5px}.sm-group{color:#087e68;font-family:monospace}.sm-sys{display:grid;gap:7px;margin:18px 0}.sm-sys span{display:flex;justify-content:space-between;padding:10px;background:#f3f6f8;border-radius:9px;font-size:12px}.sm-sys b{font-size:10px}.ok{color:#07936e}.bad{color:#d33b50}.sm-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}.sm-stats div{background:#f0f7f5;border-radius:10px;padding:12px}.sm-stats b,.sm-stats span{display:block}.sm-stats b{font-size:22px;color:#087e68}.sm-stats span{font-size:10px;color:#718294}.sm-legend{display:grid;gap:8px;margin:18px 0;font-size:11px}.sm-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:8px}.green{background:#13a77f}.red{background:#e8495e}.yellow{background:#e9b936}.gray{background:#8b9baa}.sm-side a{display:block;text-decoration:none;text-align:center;color:white;background:#087e68;padding:11px;border-radius:10px}.sm-pages{display:flex;justify-content:center;align-items:center;gap:12px;margin:15px}.sm-pages button{border:0;border-radius:8px;padding:8px 14px;background:#e3ecef;color:#17324a}.alert-row{padding:12px;text-align:left;background:#f5f7fa;border-radius:10px;margin:8px}.alert-row small{display:block;color:#667;margin:3px 0 8px}.alert-row p{margin:4px 0}.alert-list{max-height:420px;overflow:auto}@media(max-width:900px){.sm-shell{grid-template-columns:1fr}.sm-side{position:static}.sm-grid{grid-template-columns:1fr}}@media(max-width:520px){.sm-shell{padding:10px}.sm-hero{align-items:start}.sm-clock{display:none}}\n.sm-person{gap:15px}.sm-person img,.sm-avatar{width:92px;height:92px;border-radius:16px}.sm-avatar{font-size:25px}.sm-devices{display:grid;grid-template-columns:1fr 1fr;gap:8px}.sm-devices .sm-camera{padding:10px 11px;gap:8px}.sm-devices .sm-camera>span{font-size:9px}.mdi{vertical-align:-1px}.sm-hero h1 .mdi{color:#087e68}.sm-sys span>.mdi{width:18px;color:#087e68}.alert-row{padding:14px}.alert-head{display:flex;align-items:center;gap:14px}.alert-head>div:last-child{min-width:0}.alert-photo,.alert-avatar{width:82px;height:82px;flex:0 0 82px;border-radius:14px;object-fit:cover}.alert-avatar{display:grid;place-items:center;background:linear-gradient(135deg,#e8495e,#ee8c51);color:white;font-size:28px;font-weight:800}.alert-head b,.alert-head small,.alert-head em{display:block}.alert-head b{font-size:16px;margin-top:5px}.alert-head em{font-size:11px;color:#6b7d8d;margin-top:4px;font-style:normal}.alert-badge{display:inline-block;padding:4px 8px;border-radius:99px;background:#fde5e8;color:#bd283e;font-size:10px;font-weight:800}.alert-details{margin-top:11px}.alert-details p{display:flex;justify-content:space-between;gap:12px;padding:8px 10px;margin:5px 0;background:white;border:1px solid #e5eaee;border-radius:8px}.alert-details span{color:#687b8c;font-size:12px}@media(max-width:520px){.sm-devices{grid-template-columns:1fr}.sm-person img,.sm-avatar{width:78px;height:78px}.alert-photo,.alert-avatar{width:68px;height:68px;flex-basis:68px}}\n</style>\n",
+        "noerr": 0,
+        "storeOutMessages": false,
+        "passthru": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1090,
+        "y": 340,
+        "wires": [
+            [
+                "61ff06c9c2e02b1d"
+            ]
+        ]
+    },
+    {
+        "id": "aec45f355354eee5",
+        "type": "ui-template",
+        "z": "ace5096f3ff27a1a",
+        "group": "aaaf75b5b632eec2",
+        "page": "",
+        "ui": "",
+        "name": "Admin • login, node, mode, dan aturan",
+        "order": 1,
+        "width": 12,
+        "height": 0,
+        "head": "",
+        "format": "<template><div class=\"ad-wrap\">\n <div v-if=\"!token\" class=\"ad-login\"><h1>Admin Monitoring</h1><p>Masuk untuk mengelola node dan aturan.</p><input v-model=\"login.username\" placeholder=\"Username\"><input v-model=\"login.password\" type=\"password\" placeholder=\"Password\"><button @click=\"doLogin\">Masuk</button><small>Default: admin / admin123 — ubah pada function KONFIGURASI.</small></div>\n <template v-else><header><div><span>CONTROL CENTER</span><h1>Manajemen Node</h1></div><div class=\"ad-count\"><label>Jumlah node</label><input v-model.number=\"nodeCount\" type=\"number\" min=\"1\" max=\"30\"><button @click=\"setCount\">Simpan</button></div></header>\n <div v-if=\"state.pending?.node_id\" class=\"ad-pending\"><b>Permintaan registrasi: {{ state.pending.node_id }}</b><button @click=\"editNode(state.pending.node_id)\">Isi biodata</button></div>\n <div class=\"ad-grid\"><article v-for=\"node in state.nodes\" :key=\"node.node_id\"><div class=\"ad-top\"><b>{{node.node_id}}</b><span :class=\"node.active?'active':'inactive'\">{{node.active?'AKTIF':'NONAKTIF'}}</span></div><div class=\"ad-user\"><img v-if=\"node.foto_base64\" :src=\"node.foto_base64\"><div v-else class=\"ad-avatar\">{{(node.nama||node.node_id).slice(0,1).toUpperCase()}}</div><div><h3>{{node.nama||'Belum terdaftar'}}</h3><small>{{node.nim||'—'}} · {{node.kelas||'—'}}</small></div></div><p>{{node.area||'Area belum diisi'}}</p><small>{{node.mode==='threshold'?'Mode B · Threshold':'Mode A · Restricted'}}</small><div class=\"ad-actions\"><button @click=\"editNode(node.node_id)\">{{node.registered?'Edit':'Daftarkan'}}</button><button v-if=\"node.registered\" @click=\"toggle(node)\">{{node.active?'Nonaktifkan':'Aktifkan'}}</button><button v-if=\"node.registered\" class=\"danger\" @click=\"remove(node)\">Hapus</button></div></article></div>\n </template>\n <div v-if=\"editing\" class=\"ad-modal\"><form @submit.prevent=\"save\"><div class=\"ad-formtop\"><h2>{{form.node_id}}</h2><button type=\"button\" @click=\"editing=false\">×</button></div>\n  <div class=\"ad-photo\"><img v-if=\"form.foto_base64\" :src=\"form.foto_base64\"><div v-else class=\"ad-photoempty\">Belum ada foto</div><label>Pilih Foto<input type=\"file\" accept=\"image/jpeg,image/png,image/webp\" @change=\"onPhoto\"></label><small>Foto wajib diisi dan otomatis diperkecil agar ringan untuk SQLite.</small></div>\n  <div class=\"ad-fields\"><label>Nama<input v-model=\"form.nama\" required></label><label>NIM<input v-model=\"form.nim\" required></label><label>Kelas<input v-model=\"form.kelas\" required></label><label>Area pemantauan<input v-model=\"form.area\" required></label><label>Nama kamera<input v-model=\"form.camera_name\" required></label><label>Mode<select v-model=\"form.mode\" @change=\"ruleRows=[{name:'',max:0}]\"><option value=\"restricted\">Mode A — Restricted</option><option value=\"threshold\">Mode B — Count Threshold</option></select></label></div>\n  <h3>Aturan objek</h3><div v-for=\"(rule,i) in ruleRows\" :key=\"i\" class=\"ad-rule\"><select v-model=\"rule.name\"><option value=\"\">Pilih kelas COCO</option><option v-for=\"name in state.config?.coco\" :key=\"name\" :value=\"name\">{{name}}</option></select><input v-if=\"form.mode==='threshold'\" v-model.number=\"rule.max\" type=\"number\" min=\"0\" max=\"999\" placeholder=\"Maksimal\"><span v-else>DILARANG</span><button type=\"button\" @click=\"ruleRows.splice(i,1)\">×</button></div><button type=\"button\" class=\"secondary\" @click=\"ruleRows.push({name:'',max:0})\">+ Tambah aturan</button><button class=\"save\">Simpan konfigurasi</button>\n </form></div>\n </div></template>\n<script src=\"https://cdn.jsdelivr.net/npm/sweetalert2@11\"></script>\n<script>\nexport default{\n data(){return{state:{nodes:[],config:{coco:[]}},login:{username:'admin',password:'admin123'},clientId:'admin-'+Math.random().toString(36).slice(2),token:'',nodeCount:2,editing:false,form:{},ruleRows:[]}},\n watch:{msg:{deep:true,handler(v){const p=v?.payload;if(p?.kind==='state'){this.state=p;this.nodeCount=p.settings.node_count}else if(p?.kind==='feedback'&&(!p.client_id||p.client_id===this.clientId)){if(p.session_token)this.token=p.session_token;if(window.Swal)Swal.fire({icon:p.ok?'success':'error',title:p.ok?'Berhasil':'Gagal',text:p.message,timer:p.ok?1800:0,showConfirmButton:!p.ok})}}}},\n mounted(){this.send({payload:{kind:'request_state'}})},\n methods:{\n  sendAdmin(data){this.send({payload:{...data,client_id:this.clientId,session_token:this.token}})},doLogin(){this.sendAdmin({kind:'login',...this.login})},setCount(){this.sendAdmin({kind:'set_count',node_count:this.nodeCount})},\n  editNode(id){const n=this.state.nodes.find(x=>x.node_id===id)||{};this.form={node_id:id,nama:n.nama||'',nim:n.nim||'',kelas:n.kelas||'',area:n.area||'',camera_name:n.camera_name==='-'?'Webcam Utama':(n.camera_name||'Webcam Utama'),foto_base64:n.foto_base64||'',mode:n.mode||'restricted'};this.ruleRows=Object.entries(n.rules||{}).map(([name,max])=>({name,max:max===true?0:max}));if(!this.ruleRows.length)this.ruleRows=[{name:'',max:0}];this.editing=true},\n  onPhoto(event){const file=event.target.files?.[0];if(!file)return;if(file.size>8*1024*1024){Swal.fire({icon:'error',title:'Foto terlalu besar',text:'Gunakan foto maksimum 8 MB.'});event.target.value='';return}const reader=new FileReader();reader.onload=()=>{const image=new Image();image.onload=()=>{const max=360,scale=Math.min(1,max/Math.max(image.width,image.height)),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(image.width*scale));canvas.height=Math.max(1,Math.round(image.height*scale));canvas.getContext('2d').drawImage(image,0,0,canvas.width,canvas.height);this.form.foto_base64=canvas.toDataURL('image/jpeg',0.82)};image.src=reader.result};reader.readAsDataURL(file)},\n  save(){if(!this.form.foto_base64){Swal.fire({icon:'warning',title:'Foto wajib diisi'});return}const rules={};for(const row of this.ruleRows)if(row.name)rules[row.name]=this.form.mode==='restricted'?true:Number(row.max);this.sendAdmin({kind:'save_node',...this.form,rules});this.editing=false},toggle(n){this.sendAdmin({kind:'toggle_node',node_id:n.node_id,active:!n.active})},remove(n){if(confirm(`Hapus ${n.node_id}?`))this.sendAdmin({kind:'delete_node',node_id:n.node_id})}\n }}\n</script>\n<style>\n.ad-wrap{min-height:calc(100vh - 90px);padding:22px;border-radius:20px;background:#f5f7fa;color:#183044;font-family:Inter,system-ui}.ad-login{max-width:390px;margin:60px auto;background:white;padding:30px;border-radius:18px;box-shadow:0 16px 45px #1c455526}.ad-login input,.ad-login button{box-sizing:border-box;width:100%;padding:12px;margin:6px 0;border:1px solid #d7e1e6;border-radius:9px}.ad-login button,.ad-count button,.ad-actions button,.save{background:#087e68;color:white;border:0;cursor:pointer}.ad-login small{display:block;margin-top:12px;color:#789}header{display:flex;justify-content:space-between;align-items:end;margin-bottom:18px}header span{font-size:11px;letter-spacing:2px;color:#07866f}header h1{margin:4px 0}.ad-count{display:flex;align-items:center;gap:8px;background:white;padding:10px;border-radius:12px}.ad-count input{width:65px;padding:8px}.ad-count button,.ad-actions button{padding:8px 11px;border-radius:8px}.ad-pending{display:flex;justify-content:space-between;align-items:center;background:#fff2c8;border:1px solid #ffd45b;padding:14px;border-radius:12px;margin-bottom:14px}.ad-pending button{border:0;border-radius:8px;padding:8px 12px;background:#8a6810;color:white}.ad-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}.ad-grid article{background:white;padding:17px;border-radius:14px;border:1px solid #dce7eb;box-shadow:0 8px 22px #26485810}.ad-top{display:flex;justify-content:space-between}.ad-top span{font-size:10px;font-weight:800;padding:5px 8px;border-radius:20px}.active{background:#d6f8ec;color:#087a60}.inactive{background:#e6eaed;color:#677}.ad-user{display:flex;align-items:center;gap:10px;margin:15px 0 8px}.ad-user img,.ad-avatar{width:48px;height:48px;border-radius:12px;object-fit:cover}.ad-avatar{display:grid;place-items:center;color:white;background:linear-gradient(135deg,#18a47c,#3d82bd);font-weight:800}.ad-grid h3{margin:0 0 4px}.ad-grid p,.ad-grid small{color:#728596}.ad-actions{display:flex;gap:6px;margin-top:15px;flex-wrap:wrap}.ad-actions .danger{background:#d64555}.ad-modal{position:fixed;inset:0;z-index:20;background:#0b1b2bbb;display:grid;place-items:center;padding:20px}.ad-modal form{width:min(760px,96vw);max-height:88vh;overflow:auto;background:white;padding:22px;border-radius:17px}.ad-formtop{display:flex;justify-content:space-between}.ad-formtop button{border:0;background:none;font-size:25px}.ad-photo{display:grid;grid-template-columns:100px 1fr;gap:8px 14px;align-items:center;padding:12px;background:#f4f8f8;border-radius:12px;margin-bottom:14px}.ad-photo img,.ad-photoempty{grid-row:1/3;width:92px;height:92px;border-radius:12px;object-fit:cover}.ad-photoempty{display:grid;place-items:center;text-align:center;background:#e3eaed;color:#778b9a;font-size:11px}.ad-photo label{display:block;width:max-content;background:#087e68;color:#fff;padding:9px 12px;border-radius:8px;cursor:pointer}.ad-photo input{display:none}.ad-photo small{color:#728596}.ad-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}.ad-fields label{font-size:12px;color:#627688}.ad-fields input,.ad-fields select,.ad-rule input,.ad-rule select{box-sizing:border-box;width:100%;padding:10px;border:1px solid #d4e0e5;border-radius:8px;margin-top:4px}.ad-rule{display:grid;grid-template-columns:2fr 1fr 35px;align-items:center;gap:8px;margin:7px 0}.ad-rule button{border:0;background:#fce1e4;color:#b42c3d;border-radius:7px;height:35px}.secondary,.save{padding:11px 14px;border-radius:9px;border:0;margin:10px 8px 0 0}.secondary{background:#e2ecef}.save{float:right}@media(max-width:900px){.ad-grid{grid-template-columns:1fr 1fr}}@media(max-width:600px){.ad-grid,.ad-fields{grid-template-columns:1fr}header{display:block}.ad-count{margin-top:12px}.ad-photo{grid-template-columns:80px 1fr}.ad-photo img,.ad-photoempty{width:76px;height:76px}}\n</style>\n",
+        "storeOutMessages": false,
+        "passthru": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1090,
+        "y": 400,
+        "wires": [
+            [
+                "61ff06c9c2e02b1d"
+            ]
+        ]
+    },
+    {
+        "id": "61ff06c9c2e02b1d",
+        "type": "link out",
+        "z": "ace5096f3ff27a1a",
+        "name": "Aksi dashboard",
+        "mode": "link",
+        "links": [
+            "437d797eaaa64467"
+        ],
+        "x": 1295,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "om-mqtt-broker",
+        "type": "mqtt-broker",
+        "name": "MQTT YOLO26 Object Mission",
+        "broker": "broker.hivemq.com",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "30",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "closeTopic": "",
+        "willTopic": "",
+        "willQos": "0"
+    },
+    {
+        "id": "om-sqlite-db",
+        "type": "sqlitedb",
+        "db": "object_mission.db",
+        "mode": "RWC"
+    },
+    {
+        "id": "2b6bde1b770e9e76",
+        "type": "ui-group",
+        "name": "Pemantauan Objek",
+        "page": "b12fb9bb26d54a21",
+        "width": 12,
+        "height": 1,
+        "order": 1,
+        "showTitle": false,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default"
+    },
+    {
+        "id": "aaaf75b5b632eec2",
+        "type": "ui-group",
+        "name": "Administrasi Monitoring",
+        "page": "81f769bd1b7b5a88",
+        "width": 12,
+        "height": 1,
+        "order": 1,
+        "showTitle": false,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default"
+    },
+    {
+        "id": "b12fb9bb26d54a21",
+        "type": "ui-page",
+        "name": "Object Detection Monitoring",
+        "ui": "0df8b8a20bb13f1b",
+        "path": "/object-monitoring",
+        "icon": "monitor-dashboard",
+        "layout": "grid",
+        "theme": "om-ui-theme",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "tabs": [],
+        "order": 2,
+        "className": "",
+        "visible": true,
+        "disabled": false
+    },
+    {
+        "id": "81f769bd1b7b5a88",
+        "type": "ui-page",
+        "name": "Object Detection Administration",
+        "ui": "0df8b8a20bb13f1b",
+        "path": "/object-admin",
+        "icon": "account-cog",
+        "layout": "grid",
+        "theme": "om-ui-theme",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "tabs": [],
+        "order": 3,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "0df8b8a20bb13f1b",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": true
+    },
+    {
+        "id": "om-ui-theme",
+        "type": "ui-theme",
+        "name": "Object Mission Theme",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0f766e",
+            "bgPage": "#eef2f7",
+            "groupBg": "#ffffff",
+            "groupOutline": "#e2e8f0"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "12px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "af76e4f00f8381e8",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-node-sqlite": "2.0.1",
+            "@flowfuse/node-red-dashboard": "1.36.1"
+        }
+    }
+]
