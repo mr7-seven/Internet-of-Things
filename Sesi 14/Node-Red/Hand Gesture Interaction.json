@@ -1,0 +1,474 @@
+[
+    {
+        "id": "2eddbfb6805213c9",
+        "type": "tab",
+        "label": "Hand Gesture Interactive IoT ",
+        "disabled": false,
+        "info": "MediaPipe multi-node, ESP32, MQTT, SQLite, dan Dashboard 2.0."
+    },
+    {
+        "id": "47140eac56e12ead",
+        "type": "comment",
+        "z": "2eddbfb6805213c9",
+        "name": "UBAH groupId HANYA DI FUNCTION KONFIGURASI • samakan dengan Python dan ESP32",
+        "x": 600,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "1f06dc62e2cdf89f",
+        "type": "inject",
+        "z": "2eddbfb6805213c9",
+        "name": "Inisialisasi database",
+        "props": [
+            {
+                "p": "kind",
+                "v": "init",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "0.5",
+        "topic": "",
+        "x": 130,
+        "y": 100,
+        "wires": [
+            [
+                "ed9de8e8feb23186"
+            ]
+        ]
+    },
+    {
+        "id": "d489d13f7177d56a",
+        "type": "inject",
+        "z": "2eddbfb6805213c9",
+        "name": "Refresh status 2 detik",
+        "props": [
+            {
+                "p": "kind",
+                "v": "tick",
+                "vt": "str"
+            }
+        ],
+        "repeat": "2",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "0.1",
+        "topic": "",
+        "x": 120,
+        "y": 140,
+        "wires": [
+            [
+                "933901e18cbde907"
+            ]
+        ]
+    },
+    {
+        "id": "ed9de8e8feb23186",
+        "type": "function",
+        "z": "2eddbfb6805213c9",
+        "name": "KONFIGURASI GROUP • UBAH GROUP ID DI SINI",
+        "func": "const config = {\n  groupId: 'group_00',\n  prefix: 'gesture',\n  timeoutMs: 30000,\n  adminUsername: 'admin',\n  adminPassword: 'admin123'\n};\nflow.set('gestureConfig', config);\nif (msg.status) {\n  const text = String(msg.status.text || '').toLowerCase();\n  msg.kind = 'broker_status';\n  msg.connected = text.includes('connected') && !text.includes('disconnected');\n  return [msg, null];\n}\nmsg.kind = 'init';\nconst topics = [];\nfor (const nodeId of ['node_01', 'node_02', 'node_03']) {\n  topics.push(`${config.prefix}/${config.groupId}/${nodeId}/python/status`);\n  topics.push(`${config.prefix}/${config.groupId}/${nodeId}/device/status`);\n  topics.push(`${config.prefix}/${config.groupId}/${nodeId}/availability/python`);\n  topics.push(`${config.prefix}/${config.groupId}/${nodeId}/availability/esp32`);\n}\ntopics.push(`${config.prefix}/${config.groupId}/node_03/event`);\nreturn [\n  msg,\n  {action: 'subscribe', topic: topics.map(topic => ({topic, qos: 1}))}\n];\n",
+        "outputs": 2,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 480,
+        "y": 100,
+        "wires": [
+            [
+                "933901e18cbde907"
+            ],
+            [
+                "22accb1f30e4acbd"
+            ]
+        ]
+    },
+    {
+        "id": "22accb1f30e4acbd",
+        "type": "mqtt in",
+        "z": "2eddbfb6805213c9",
+        "name": "MQTT RX ",
+        "topic": "",
+        "qos": "1",
+        "datatype": "utf8",
+        "broker": "gm-broker",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 1,
+        "x": 80,
+        "y": 220,
+        "wires": [
+            [
+                "933901e18cbde907"
+            ]
+        ]
+    },
+    {
+        "id": "48f11fdcb37e335c",
+        "type": "status",
+        "z": "2eddbfb6805213c9",
+        "name": "Status broker MQTT",
+        "scope": [
+            "22accb1f30e4acbd",
+            "54b045ba2cb392b4"
+        ],
+        "x": 110,
+        "y": 300,
+        "wires": [
+            [
+                "ed9de8e8feb23186"
+            ]
+        ]
+    },
+    {
+        "id": "87ec89287ea71798",
+        "type": "link in",
+        "z": "2eddbfb6805213c9",
+        "name": "Hasil SQLite",
+        "links": [
+            "4e130cb2773fc26a"
+        ],
+        "x": 465,
+        "y": 280,
+        "wires": [
+            [
+                "933901e18cbde907"
+            ]
+        ]
+    },
+    {
+        "id": "933901e18cbde907",
+        "type": "function",
+        "z": "2eddbfb6805213c9",
+        "name": "Controller • MQTT, SQLite, autentikasi, group terisolasi",
+        "func": "const cfg = flow.get('gestureConfig') || {groupId:'group_01',prefix:'gesture',timeoutMs:30000,adminUsername:'admin',adminPassword:'admin123'};\nconst now = Date.now(), iso = new Date().toISOString();\nlet profiles = context.get('profiles') || [];\nlet runtime = context.get('runtime') || {};\nlet sessions = context.get('sessions') || {};\nlet controllers = context.get('controllers') || {};\nlet appModes = context.get('appModes') || {};\nfor(const group of Object.keys(appModes))if(!['MEDIA_PLAYER','SNAKE_GAME'].includes(appModes[group]))appModes[group]='MEDIA_PLAYER';\nlet mqttOnline = context.get('mqttOnline') || false;\nfunction save(){context.set('profiles',profiles);context.set('runtime',runtime);context.set('sessions',sessions);context.set('controllers',controllers);context.set('appModes',appModes);context.set('mqttOnline',mqttOnline)}\nfunction sql(op,topic,payload=[],extra={}){return {_op:op,topic,payload,...extra}}\nfunction mqtt(group,node,suffix,payload,retain=false){return {topic:`${cfg.prefix}/${group}/${node}/${suffix}`,payload:JSON.stringify(payload),qos:1,retain}}\nfunction validId(value){return /^[A-Za-z0-9_-]+$/.test(String(value||''))}\nfunction auth(p){const s=sessions[p.session_token];return !!s&&s.client_id===p.client_id&&s.until>now}\nfunction feedback(ok,message,client_id='',extra={}){return {payload:{kind:'feedback',ok,message,client_id,...extra}}}\nfunction profileRow(row){return {group_id:String(row.group_id),node_id:String(row.node_id),nama:String(row.nama||''),nim:String(row.nim||''),kelas:String(row.kelas||''),area:String(row.area||''),foto_base64:String(row.foto_base64||''),active:Number(row.is_active)!==0}}\nfunction profile(group,node){return profiles.find(x=>x.group_id===group&&x.node_id===node)}\nfunction nodeType(node){return node==='node_01'?'TRAFFIC':node==='node_02'?'VIRTUAL_TOUCH':node==='node_03'?'INTERACTIVE':'UNKNOWN'}\nfunction groupRuntime(group){return runtime[group]||(runtime[group]={})}\nfunction nodeRuntime(group,node){const g=groupRuntime(group);return g[node]||(g[node]={})}\nfunction groups(){return [cfg.groupId]}\nfunction nodeSnapshot(group,node){const p=profile(group,node),r=nodeRuntime(group,node),type=nodeType(node);\n const pythonOnline=now-(r.pythonAt||0)<cfg.timeoutMs, espOnline=type==='INTERACTIVE'?false:now-(r.espAt||0)<cfg.timeoutMs;\n const cameraOnline=pythonOnline&&r.python?.camera_online!==false;\n return {group_id:group,node_id:node,type,registered:!!p,active:p?.active??true,nama:p?.nama||'',nim:p?.nim||'',kelas:p?.kelas||'',area:p?.area||'',foto_base64:p?.foto_base64||'',python_online:pythonOnline,camera_online:cameraOnline,esp32_online:espOnline,online:type==='INTERACTIVE'?cameraOnline:(cameraOnline&&espOnline),python:r.python||{},device:r.device||{},last_event:r.lastEvent||null,updated_at:r.updatedAt||null};}\nfunction state(){const gs=groups();const nodes=[];for(const group of gs)for(const node of ['node_01','node_02','node_03'])nodes.push(nodeSnapshot(group,node));return {payload:{kind:'state',group_id:cfg.groupId,mqtt_online:mqttOnline,groups:gs,nodes,app_modes:appModes,controllers:Object.fromEntries(Object.entries(controllers).map(([g,c])=>[g,{active:c.until>now}])),updated_at:iso}}}\nfunction load(extra={}){return sql('load_nodes','SELECT * FROM gesture_nodes WHERE group_id=? ORDER BY node_id',[cfg.groupId],extra)}\nfunction parseMqtt(msg,p){if(typeof msg.topic!=='string')return null;const parts=msg.topic.split('/').filter(Boolean);if(parts.length<4||parts[0]!==cfg.prefix)return null;const group=parts[1],node=parts[2],suffix=parts.slice(3).join('/');if(group!==cfg.groupId||!['node_01','node_02','node_03'].includes(node))return null;if(String(p.group_id||'')!==cfg.groupId||String(p.node_id||'')!==node)return null;return {group:cfg.groupId,node,suffix}}\n\nif(msg.error){const target=msg._feedback?.payload?.client_id||'';return [null,null,null,feedback(false,`Operasi database gagal: ${msg.error.message||'kesalahan SQLite'}`,target)]}\n\nif(msg._op){\n if(msg._op==='create_nodes')return [sql('create_events',`CREATE TABLE IF NOT EXISTS gesture_events(event_id TEXT PRIMARY KEY,group_id TEXT NOT NULL,node_id TEXT NOT NULL,app_mode TEXT,gesture TEXT,action TEXT,event_time TEXT NOT NULL)`),null,null,null];\n if(msg._op==='create_events')return [load(),null,null,null];\n if(msg._op==='load_nodes'){profiles=(Array.isArray(msg.payload)?msg.payload:[]).map(profileRow);save();return [null,null,state(),msg._feedback||null]}\n if(['save_node','delete_node','toggle_node','save_event'].includes(msg._op))return [load(msg._feedback?{_feedback:msg._feedback}:{}),null,null,null];\n}\nlet p=msg.payload;\nif(typeof p==='string'||Buffer.isBuffer(p)){try{p=JSON.parse(p.toString())}catch{return null}}\nif(!p||typeof p!=='object'||Array.isArray(p))p=msg;\nconst kind=String(msg.kind||p.kind||'');\nif(kind==='init'){runtime={};save();return [sql('create_nodes',`CREATE TABLE IF NOT EXISTS gesture_nodes(group_id TEXT NOT NULL,node_id TEXT NOT NULL,nama TEXT NOT NULL,nim TEXT NOT NULL,kelas TEXT NOT NULL,area TEXT NOT NULL,foto_base64 TEXT NOT NULL DEFAULT '',is_active INTEGER NOT NULL DEFAULT 1,updated_at TEXT DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY(group_id,node_id))`),null,null,null]}\nif(kind==='broker_status'){mqttOnline=!!msg.connected;save();return [null,null,state(),null]}\nif(kind==='tick'){for(const [group,nodes] of Object.entries(runtime))for(const [node,r] of Object.entries(nodes)){if(now-(r.pythonAt||0)>=cfg.timeoutMs)r.pythonOnline=false;if(now-(r.espAt||0)>=cfg.timeoutMs)r.espOnline=false;}for(const [group,c] of Object.entries(controllers))if(c.until<=now)delete controllers[group];save();return [null,null,state(),null]}\n\nconst route=parseMqtt(msg,p);\nif(route){const r=nodeRuntime(route.group,route.node);r.updatedAt=iso;\n if(route.suffix==='python/status'){r.pythonAt=now;r.python=p;}\n else if(route.suffix==='device/status'){r.espAt=now;r.device=p;}\n else if(route.suffix==='availability/python'){r.pythonAt=p.online===false?0:now;}\n else if(route.suffix==='availability/esp32'){r.espAt=p.online===false?0:now;}\n else if(route.suffix==='event'){\n  if(r.lastEvent?.event_id===p.event_id)return null;\n  r.lastEvent=p;r.pythonAt=now;save();\n  return [sql('save_event','INSERT OR IGNORE INTO gesture_events(event_id,group_id,node_id,app_mode,gesture,action,event_time) VALUES(?,?,?,?,?,?,?)',[String(p.event_id),route.group,route.node,String(p.app_mode||''),String(p.gesture||''),String(p.action||''),String(p.timestamp||iso)]),null,state(),null];\n }else return null;\n save();return [null,null,state(),null];}\n\nif(kind==='request_state')return [null,null,state(),null];\nif(kind==='login'){if(p.username===cfg.adminUsername&&p.password===cfg.adminPassword){const token=Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2);sessions[token]={client_id:p.client_id,until:now+8*3600000};save();return [null,null,null,feedback(true,'Login berhasil',p.client_id,{session_token:token})]}return [null,null,null,feedback(false,'Username atau password salah',p.client_id)]}\nif(['save_node','delete_node','toggle_node'].includes(kind)&&!auth(p))return [null,null,null,feedback(false,'Sesi admin tidak valid',p.client_id)];\nif(kind==='save_node'){\n const group=cfg.groupId,node=String(p.node_id||'');\n if(!['node_01','node_02','node_03'].includes(node))return [null,null,null,feedback(false,'Node ID tidak valid',p.client_id)];\n if(!p.nama||!p.nim||!p.kelas||!p.area||!p.foto_base64)return [null,null,null,feedback(false,'Nama, NIM, kelas, area, dan foto wajib lengkap',p.client_id)];\n const existed=!!profile(group,node),message=existed?`${node} berhasil diperbarui`:`${node} berhasil ditambahkan`;\n return [sql('save_node',`INSERT INTO gesture_nodes(group_id,node_id,nama,nim,kelas,area,foto_base64,is_active) VALUES(?,?,?,?,?,?,?,1) ON CONFLICT(group_id,node_id) DO UPDATE SET nama=excluded.nama,nim=excluded.nim,kelas=excluded.kelas,area=excluded.area,foto_base64=excluded.foto_base64,updated_at=CURRENT_TIMESTAMP`,[group,node,String(p.nama),String(p.nim),String(p.kelas),String(p.area),String(p.foto_base64)],{_feedback:feedback(true,message,p.client_id)}),null,null,null];}\nif(kind==='toggle_node')return [sql('toggle_node','UPDATE gesture_nodes SET is_active=?,updated_at=CURRENT_TIMESTAMP WHERE group_id=? AND node_id=?',[p.active?1:0,cfg.groupId,String(p.node_id)],{_feedback:feedback(true,'Status node berhasil diperbarui',p.client_id)}),null,null,null];\nif(kind==='delete_node')return [sql('delete_node','DELETE FROM gesture_nodes WHERE group_id=? AND node_id=?',[cfg.groupId,String(p.node_id)],{_feedback:feedback(true,'Data node berhasil dihapus',p.client_id)}),null,null,null];\nif(kind==='claim_control'||kind==='control_heartbeat'){\n const group=cfg.groupId;const current=controllers[group];\n if(current&&current.client_id!==p.client_id&&current.until>now)return [null,null,null,feedback(false,'Dashboard kelompok ini sedang dikendalikan browser lain',p.client_id)];\n controllers[group]={client_id:p.client_id,until:now+30000};save();return [null,null,state(),feedback(true,'Kontrol dashboard aktif',p.client_id)];}\nif(kind==='release_control'){const group=cfg.groupId;if(controllers[group]?.client_id===p.client_id)delete controllers[group];save();return [null,null,state(),null]}\nif(kind==='set_app_mode'){\n const group=cfg.groupId,mode=String(p.app_mode||'');const current=controllers[group];\n if(!current||current.client_id!==p.client_id||current.until<=now)return [null,null,null,feedback(false,'Klaim kontrol dashboard terlebih dahulu',p.client_id)];\n if(!['MEDIA_PLAYER','SNAKE_GAME'].includes(mode))return null;appModes[group]=mode;controllers[group].until=now+30000;save();\n const out=mqtt(group,'node_03','control',{group_id:group,node_id:'node_03',app_mode:mode,controller_id:p.client_id,timestamp:iso},true);\n return [null,out,state(),null];}\nreturn null;\n",
+        "outputs": 4,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 730,
+        "y": 210,
+        "wires": [
+            [
+                "ce3d7b1fb6aec0ca"
+            ],
+            [
+                "54b045ba2cb392b4"
+            ],
+            [
+                "119d038502103801",
+                "413d4e39103f7ac8"
+            ],
+            [
+                "413d4e39103f7ac8",
+                "119d038502103801"
+            ]
+        ]
+    },
+    {
+        "id": "ce3d7b1fb6aec0ca",
+        "type": "function",
+        "z": "2eddbfb6805213c9",
+        "name": "Normalisasi binding SQLite 2.0.1",
+        "func": "let statement=String(msg.topic||'');\nif(!Array.isArray(msg.payload))msg.payload=[];\nlet index=0;\nif(statement.includes('?')){\n  statement=statement.replace(/\\?/g,()=>'$p'+(++index));\n  msg.topic=statement;\n}\nconst placeholders=statement.match(/\\$[A-Za-z_][A-Za-z0-9_]*/g)||[];\nif(placeholders.length!==msg.payload.length){\n  node.error(`Jumlah parameter SQLite tidak cocok: query ${placeholders.length}, data ${msg.payload.length}`,msg);\n  return null;\n}\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1100,
+        "y": 100,
+        "wires": [
+            [
+                "38294ae723f978bb"
+            ]
+        ]
+    },
+    {
+        "id": "38294ae723f978bb",
+        "type": "sqlite",
+        "z": "2eddbfb6805213c9",
+        "mydb": "gm-sqlite-db",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "SQLite Gesture IoT",
+        "x": 1350,
+        "y": 100,
+        "wires": [
+            [
+                "4e130cb2773fc26a"
+            ]
+        ]
+    },
+    {
+        "id": "fd7c23b72f8a2610",
+        "type": "catch",
+        "z": "2eddbfb6805213c9",
+        "name": "Tangkap kegagalan SQLite",
+        "scope": [
+            "38294ae723f978bb"
+        ],
+        "uncaught": false,
+        "x": 390,
+        "y": 340,
+        "wires": [
+            [
+                "933901e18cbde907"
+            ]
+        ]
+    },
+    {
+        "id": "4e130cb2773fc26a",
+        "type": "link out",
+        "z": "2eddbfb6805213c9",
+        "name": "Kembali dari SQLite",
+        "mode": "link",
+        "links": [
+            "87ec89287ea71798"
+        ],
+        "x": 1485,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "54b045ba2cb392b4",
+        "type": "mqtt out",
+        "z": "2eddbfb6805213c9",
+        "name": "MQTT TX • control Node 3",
+        "topic": "",
+        "qos": "1",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "gm-broker",
+        "x": 1100,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "119d038502103801",
+        "type": "ui-template",
+        "z": "2eddbfb6805213c9",
+        "group": "c80c5af5f23b8b3e",
+        "page": "",
+        "ui": "",
+        "name": "Monitoring • 3 node dan aplikasi interaktif",
+        "order": 1,
+        "width": 12,
+        "height": 0,
+        "head": "",
+        "format": "<template>\n  <div class=\"gm-shell\">\n    <header class=\"gm-head\">\n      <div><small>MEDIAPIPE · MQTT · ESP32</small><h1><i class=\"mdi mdi-hand-wave-outline\"></i> Hand Gesture Interactive IoT</h1></div>\n      <div class=\"gm-tools\"><span :class=\"state.mqtt_online?'online':'offline'\"><i class=\"mdi mdi-access-point-network\"></i> MQTT {{ state.mqtt_online?'ONLINE':'OFFLINE' }}</span><select v-model=\"group\" @change=\"selectGroup\"><option disabled value=\"\">Pilih kelompok</option><option v-for=\"item in state.groups\" :key=\"item\" :value=\"item\">{{ item }}</option></select></div>\n    </header>\n\n    <div v-if=\"!group\" class=\"gm-empty\"><i class=\"mdi mdi-account-group-outline\"></i><b>Belum ada kelompok aktif</b><span>Jalankan aplikasi Python atau daftarkan node melalui halaman administrasi.</span></div>\n    <template v-else>\n      <section class=\"gm-topgrid\">\n        <article class=\"gm-card\">\n          <div class=\"gm-cardhead\"><div><small>NODE 1</small><h2><i class=\"mdi mdi-traffic-light\"></i> Traffic Light & Buzzer</h2></div><b :class=\"node1.online?'pill on':'pill'\">{{ node1.online?'ONLINE':'OFFLINE' }}</b></div>\n          <div class=\"gm-user\"><img v-if=\"node1.foto_base64\" :src=\"node1.foto_base64\"><i v-else class=\"mdi mdi-account-circle\"></i><span><b>{{ node1.nama||'Belum didaftarkan' }}</b><small>{{ node1.nim||'-' }} · {{ node1.area||'-' }}</small></span></div>\n          <div class=\"connection-grid\"><div><i class=\"mdi mdi-lan-connect\"></i><small>Node 1</small><b :class=\"node1.online?'state-on':'state-off'\">{{ node1.online?'ONLINE':'OFFLINE' }}</b></div><div><i class=\"mdi mdi-camera-outline\"></i><small>Kamera</small><b :class=\"node1.camera_online?'state-on':'state-off'\">{{ node1.camera_online?'ONLINE':'OFFLINE' }}</b></div><div><i class=\"mdi mdi-chip\"></i><small>ESP32</small><b :class=\"node1.esp32_online?'state-on':'state-off'\">{{ node1.esp32_online?'ONLINE':'OFFLINE' }}</b></div></div>\n          <div class=\"traffic-wrap\"><div class=\"traffic\"><i :class=\"lightClass('RED')\"></i><i :class=\"lightClass('YELLOW')\"></i><i :class=\"lightClass('GREEN')\"></i></div><div class=\"gm-states\"><p><i class=\"mdi mdi-traffic-light\"></i> Traffic <b>{{ node1.device?.traffic||'OFF' }}</b></p><p><i class=\"mdi mdi-bell-ring-outline\"></i> Buzzer <b>{{ node1.device?.buzzer||'OFF' }}</b></p><p><i class=\"mdi mdi-hand-wave-outline\"></i> Gesture <b>{{ node1.python?.gesture||'IDLE' }}</b></p></div></div>\n        </article>\n\n        <article class=\"gm-card\">\n          <div class=\"gm-cardhead\"><div><small>NODE 2</small><h2><i class=\"mdi mdi-gesture-tap\"></i> Virtual Touch Control</h2></div><b :class=\"node2.online?'pill on':'pill'\">{{ node2.online?'ONLINE':'OFFLINE' }}</b></div>\n          <div class=\"gm-user\"><img v-if=\"node2.foto_base64\" :src=\"node2.foto_base64\"><i v-else class=\"mdi mdi-account-circle\"></i><span><b>{{ node2.nama||'Belum didaftarkan' }}</b><small>{{ node2.nim||'-' }} · {{ node2.area||'-' }}</small></span></div>\n          <div class=\"connection-grid\"><div><i class=\"mdi mdi-lan-connect\"></i><small>Node 2</small><b :class=\"node2.online?'state-on':'state-off'\">{{ node2.online?'ONLINE':'OFFLINE' }}</b></div><div><i class=\"mdi mdi-camera-outline\"></i><small>Kamera</small><b :class=\"node2.camera_online?'state-on':'state-off'\">{{ node2.camera_online?'ONLINE':'OFFLINE' }}</b></div><div><i class=\"mdi mdi-chip\"></i><small>ESP32</small><b :class=\"node2.esp32_online?'state-on':'state-off'\">{{ node2.esp32_online?'ONLINE':'OFFLINE' }}</b></div></div>\n          <div class=\"lamp-row\"><i class=\"mdi mdi-lightbulb-on\" :style=\"bulbStyle\"></i><div><small>Relay aktual</small><b>{{ node2.device?.relay?'ON':'OFF' }}</b></div></div>\n          <div v-for=\"item in pwmRows\" :key=\"item.key\" class=\"pwm\"><label><span><i :style=\"{background:item.color}\"></i>{{ item.label }}</span><b>{{ item.value }}%</b></label><div><i :style=\"{width:item.value+'%',background:item.color}\"></i></div></div>\n        </article>\n      </section>\n\n      <article class=\"gm-interactive\">\n        <div class=\"gm-cardhead\"><div><small>NODE 3 · TANPA ESP32</small><h2><i class=\"mdi mdi-gamepad-variant-outline\"></i> Gesture Interactive Dashboard</h2></div><div><b :class=\"node3.python_online?'pill on':'pill'\">{{ node3.python_online?'PYTHON ONLINE':'PYTHON OFFLINE' }}</b><button class=\"claim\" @click=\"claim\">{{ controllerActive?'CONTROL ACTIVE':'CLAIM CONTROL' }}</button></div></div>\n        <div class=\"gm-user\"><img v-if=\"node3.foto_base64\" :src=\"node3.foto_base64\"><i v-else class=\"mdi mdi-account-circle\"></i><span><b>{{ node3.nama||'Belum didaftarkan' }}</b><small>{{ node3.nim||'-' }} · {{ node3.area||'-' }}</small></span></div>\n        <nav><button :class=\"appMode==='MEDIA_PLAYER'?'active':''\" @click=\"setMode('MEDIA_PLAYER')\"><i class=\"mdi mdi-play-box-multiple-outline\"></i> Media Player</button><button :class=\"appMode==='SNAKE_GAME'?'active':''\" @click=\"setMode('SNAKE_GAME')\"><i class=\"mdi mdi-snake\"></i> Snake Gesture</button><span>Gesture terakhir: <b>{{ node3.last_event?.gesture||node3.python?.gesture||'IDLE' }}</b></span></nav>\n\n        <div v-show=\"appMode==='MEDIA_PLAYER'\" class=\"media-layout\">\n          <div class=\"player\"><video ref=\"player\" controls preload=\"metadata\" @play=\"playing=true\" @pause=\"playing=false\"><source :src=\"currentMedia.url\" type=\"video/mp4\"></video><div><b>{{ currentMedia.title }}</b><span>{{ playing?'PLAYING':'PAUSED' }} · {{ muted?'MUTED':'SOUND ON' }}</span></div></div>\n          <aside><h3>Playlist</h3><button v-for=\"(media,index) in playlist\" :key=\"media.url\" :class=\"index===mediaIndex?'selected':''\" @click=\"playIndex(index)\"><i class=\"mdi mdi-play-circle-outline\"></i><span>{{ media.title }}</span></button><div class=\"media-guide\"><b><i class=\"mdi mdi-hand-wave-outline\"></i> Petunjuk gesture diam</b><span>Open Palm = Play</span><span>Fist = Pause</span><span>1 jari = Video sebelumnya</span><span>2 jari = Mute / suara</span><span>3 jari = Video berikutnya</span></div></aside>\n        </div>\n\n        <div v-show=\"appMode==='SNAKE_GAME'\" class=\"snake-layout\">\n          <div class=\"gamebar\"><span><b>{{ snake.score }}</b> Skor</span><span>Target <b>{{ snake.targetScore }}</b></span><span><b>{{ snake.won?'MENANG':(snake.running?'BERJALAN':(snake.gameOver?'KALAH':'PAUSE')) }}</b></span><span>Arah <b>{{ snake.direction.replace('MOVE_','') }}</b></span><button @click=\"restartSnake(true)\"><i class=\"mdi mdi-refresh\"></i> Restart</button></div>\n          <div class=\"snake-board\"><i v-for=\"cell in snakeCells\" :key=\"cell.index\" :class=\"cell.className\"></i></div>\n          <div class=\"snake-controls\"><section><b><i class=\"mdi mdi-hand-back-left-outline\"></i> Tangan kiri</b><span>Open Palm = Mulai/Lanjut</span><span>Fist = Pause</span><span>Thumb Up = Restart</span></section><section><b><i class=\"mdi mdi-hand-back-right-outline\"></i> Tangan kanan</b><span>1 jari = Atas</span><span>2 jari = Kanan</span><span>3 jari = Bawah</span><span>Open Palm = Kiri</span></section></div>\n          <p class=\"gamehelp\">Tahan gesture diam hingga stabil. Ular bergerak otomatis setelah permainan dimulai.</p>\n        </div>\n      </article>\n    </template>\n    <footer><span><i class=\"mdi mdi-database-outline\"></i> Status aktual Node 1 dan Node 2 berasal dari ESP32</span><a href=\"/dashboard/gesture-admin\">Administrasi <i class=\"mdi mdi-arrow-right\"></i></a></footer>\n  </div>\n</template>\n<script>\nexport default {\n data(){return{state:{groups:[],nodes:[],app_modes:{}},group:'',clientId:'web-'+Math.random().toString(36).slice(2),controllerActive:false,seenEvent:'',heartbeat:null,snakeTimer:null,appMode:'MEDIA_PLAYER',playlist:[{title:'Big Buck Bunny',url:'https://www.w3schools.com/html/mov_bbb.mp4'},{title:'Flower',url:'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4'},{title:'Sintel Trailer',url:'https://media.w3.org/2010/05/sintel/trailer.mp4'}],mediaIndex:0,playing:false,muted:false,snake:{cols:20,rows:14,body:[],food:{x:14,y:7},direction:'MOVE_RIGHT',running:false,gameOver:false,won:false,score:0,targetScore:100}}},\n computed:{\n  nodes(){return this.state.nodes||[]},\n  node1(){return this.node('node_01')},\n  node2(){return this.node('node_02')},\n  node3(){return this.node('node_03')},\n  currentMedia(){return this.playlist[this.mediaIndex]},\n  pwmRows(){const p=this.node2.device?.pwm||{};return[{key:'red',label:'LED Merah',color:'#ef4444',value:Number(p.red||0)},{key:'yellow',label:'LED Kuning',color:'#eab308',value:Number(p.yellow||0)},{key:'green',label:'LED Hijau',color:'#22c55e',value:Number(p.green||0)}]},\n  bulbStyle(){const on=!!this.node2.device?.relay;return{color:on?'#fbbf24':'#94a3b8',filter:on?'drop-shadow(0 0 18px #fbbf24)':'none'}},\n  snakeCells(){\n   const occupied=new Map(this.snake.body.map((p,i)=>[`${p.x},${p.y}`,i]));\n   return Array.from({length:this.snake.cols*this.snake.rows},(_,index)=>{\n    const x=index%this.snake.cols,y=Math.floor(index/this.snake.cols);\n    const part=occupied.get(`${x},${y}`);\n    const food=this.snake.food.x===x&&this.snake.food.y===y;\n    return{index,className:'snake-cell'+(part===0?' head':part!==undefined?' body':food?' food':'')};\n   });\n  }\n },\n watch:{msg:{deep:true,handler(value){const p=value?.payload;if(p?.kind==='feedback'&&p.client_id===this.clientId){if(String(p.message||'').toLowerCase().includes('kontrol'))this.controllerActive=!!p.ok;return}if(p?.kind!=='state')return;this.state=p;if(!this.group&&p.groups?.length){this.group=p.groups[0];this.selectGroup()}if(this.group){this.appMode=p.app_modes?.[this.group]||this.appMode;const event=this.node3.last_event;if(event?.event_id&&event.event_id!==this.seenEvent){this.seenEvent=event.event_id;this.applyEvent(event)}}}}},\n mounted(){this.loadSweetAlert();this.restartSnake(false);this.snakeTimer=setInterval(()=>this.stepSnake(),500);this.send({payload:{kind:'request_state'}});this.heartbeat=setInterval(()=>{if(this.group&&this.controllerActive)this.send({payload:{kind:'control_heartbeat',group_id:this.group,client_id:this.clientId}})},10000)},\n unmounted(){clearInterval(this.heartbeat);clearInterval(this.snakeTimer);if(this.group)this.send({payload:{kind:'release_control',group_id:this.group,client_id:this.clientId}})},\n methods:{loadSweetAlert(){if(window.Swal||document.getElementById('gesture-swal'))return;const script=document.createElement('script');script.id='gesture-swal';script.src='https://cdn.jsdelivr.net/npm/sweetalert2@11';document.head.appendChild(script)},showGameResult(won){const open=()=>window.Swal?.fire({icon:won?'success':'error',title:won?'Selamat, Anda Menang!':'Game Over',text:`Skor akhir: ${this.snake.score}`,confirmButtonText:'Main Lagi',confirmButtonColor:'#0f766e',allowOutsideClick:false}).then(()=>this.restartSnake(false));if(window.Swal){open();return}this.loadSweetAlert();const script=document.getElementById('gesture-swal');if(script)script.addEventListener('load',open,{once:true});else window.alert(`${won?'MENANG':'KALAH'} - Skor ${this.snake.score}`)},node(id){return this.nodes.find(n=>n.group_id===this.group&&n.node_id===id)||{device:{},python:{}}},selectGroup(){this.appMode=this.state.app_modes?.[this.group]||'MEDIA_PLAYER';this.claim()},claim(){if(!this.group)return;this.send({payload:{kind:'claim_control',group_id:this.group,client_id:this.clientId}});this.controllerActive=true},setMode(mode){if(!this.controllerActive)this.claim();this.appMode=mode;if(mode!=='SNAKE_GAME')this.snake.running=false;this.send({payload:{kind:'set_app_mode',group_id:this.group,app_mode:mode,client_id:this.clientId}})},lightClass(color){const traffic=this.node1.device?.traffic||'OFF';return['light',color.toLowerCase(),traffic===color?'lit':'',traffic==='BLINK'?'blink':'']},playIndex(index){this.mediaIndex=index;this.$nextTick(()=>{const v=this.$refs.player;v.load();v.play().catch(()=>{})})},applyEvent(event){if(event.app_mode!==this.appMode)return;if(this.appMode==='MEDIA_PLAYER')this.mediaAction(event.action);else this.snakeAction(event.action)},mediaAction(action){const v=this.$refs.player;if(!v)return;if(action==='PLAY')v.play().catch(()=>{});else if(action==='PAUSE')v.pause();else if(action==='NEXT')this.playIndex((this.mediaIndex+1)%this.playlist.length);else if(action==='PREVIOUS')this.playIndex((this.mediaIndex-1+this.playlist.length)%this.playlist.length);else if(action==='MUTE_TOGGLE'){v.muted=!v.muted;this.muted=v.muted}},randomFood(body,cols=20,rows=14){const used=new Set(body.map(p=>`${p.x},${p.y}`)),free=[];for(let y=0;y<rows;y++)for(let x=0;x<cols;x++)if(!used.has(`${x},${y}`))free.push({x,y});return free[Math.floor(Math.random()*free.length)]||{x:0,y:0}},restartSnake(autoStart=false){const cols=20,rows=14,body=[{x:5,y:7},{x:4,y:7},{x:3,y:7}];this.snake={cols,rows,body,food:this.randomFood(body,cols,rows),direction:'MOVE_RIGHT',running:autoStart,gameOver:false,won:false,score:0,targetScore:100}},snakeAction(action){if(action==='START_RESUME'){if(this.snake.gameOver||this.snake.won)this.restartSnake(true);else this.snake.running=true;return}if(action==='PAUSE'){this.snake.running=false;return}if(action==='RESTART'){this.restartSnake(true);return}const vectors={MOVE_UP:[0,-1],MOVE_RIGHT:[1,0],MOVE_DOWN:[0,1],MOVE_LEFT:[-1,0]},opposite={MOVE_UP:'MOVE_DOWN',MOVE_DOWN:'MOVE_UP',MOVE_LEFT:'MOVE_RIGHT',MOVE_RIGHT:'MOVE_LEFT'};if(vectors[action]&&opposite[this.snake.direction]!==action)this.snake.direction=action},stepSnake(){if(!this.snake.running||this.snake.gameOver||this.snake.won||this.appMode!=='SNAKE_GAME')return;const vectors={MOVE_UP:[0,-1],MOVE_RIGHT:[1,0],MOVE_DOWN:[0,1],MOVE_LEFT:[-1,0]},[dx,dy]=vectors[this.snake.direction],head=this.snake.body[0],next={x:head.x+dx,y:head.y+dy},eating=next.x===this.snake.food.x&&next.y===this.snake.food.y,collision=next.x<0||next.y<0||next.x>=this.snake.cols||next.y>=this.snake.rows||this.snake.body.some((p,i)=>i<this.snake.body.length-(eating?0:1)&&p.x===next.x&&p.y===next.y);if(collision){this.snake.running=false;this.snake.gameOver=true;this.showGameResult(false);return}const body=[next,...this.snake.body];let wonNow=false;if(eating){this.snake.score+=10;if(this.snake.score>=this.snake.targetScore){this.snake.running=false;this.snake.won=true;wonNow=true}else this.snake.food=this.randomFood(body,this.snake.cols,this.snake.rows)}else body.pop();this.snake.body=body;if(wonNow)this.showGameResult(true)}}\n}\n</script>\n<style>\n.gm-shell{font-family:Inter,system-ui;color:#172b3a;background:#f4f7f9;padding:18px;border-radius:18px;min-height:calc(100vh - 90px)}.gm-head,.gm-cardhead,.gm-tools,.gm-user,.lamp-row,.gm-interactive nav,.gamebar,footer{display:flex;align-items:center;justify-content:space-between}.gm-head{background:#fff;padding:17px 20px;border:1px solid #dbe4ea;border-radius:15px;margin-bottom:14px}.gm-head small,.gm-cardhead small{color:#0f8b76;letter-spacing:1.4px;font-size:10px}.gm-head h1,.gm-cardhead h2{margin:4px 0 0}.gm-tools{gap:10px}.gm-tools>span,.pill{font-size:10px;font-weight:800;padding:8px 10px;border-radius:99px;background:#fee2e2;color:#b91c1c}.gm-tools>span.online,.pill.on{background:#dcfce7;color:#08775b}.gm-tools select{padding:9px;border:1px solid #ccd8df;border-radius:9px}.gm-topgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.gm-card,.gm-interactive{background:#fff;border:1px solid #dce6eb;border-radius:16px;padding:17px;box-shadow:0 8px 22px #25455c0d}.gm-user{justify-content:flex-start;gap:10px;margin:15px 0;padding:10px;background:#f6f8fa;border-radius:11px}.gm-user img,.gm-user>i{width:48px;height:48px;border-radius:10px;object-fit:cover;font-size:48px;color:#8fa2b1}.gm-user span small,.player div span{display:block;color:#718394;margin-top:4px}.traffic-wrap{display:flex;justify-content:center;gap:32px;align-items:center}.traffic{display:grid;gap:8px;background:#202931;padding:11px;border-radius:18px}.light{width:46px;height:46px;border-radius:50%;background:#59636b;opacity:.25}.light.red.lit{background:#ef4444;opacity:1;box-shadow:0 0 18px #ef4444}.light.yellow.lit{background:#eab308;opacity:1;box-shadow:0 0 18px #eab308}.light.green.lit{background:#22c55e;opacity:1;box-shadow:0 0 18px #22c55e}.gm-states p{margin:8px 0;color:#667b8b}.gm-states b{color:#17364d}.lamp-row{justify-content:flex-start;gap:18px;margin:12px}.lamp-row>i{font-size:55px}.lamp-row small,.lamp-row b{display:block}.pwm{margin:10px 0}.pwm label{display:flex;justify-content:space-between;font-size:12px}.pwm label i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px}.pwm>div{height:10px;background:#e7edf1;border-radius:99px;overflow:hidden;margin-top:5px}.pwm>div i{display:block;height:100%;border-radius:99px}.gm-interactive{margin-top:14px}.gm-cardhead>div:last-child{display:flex;gap:8px}.claim{border:1px solid #0f8b76;background:#fff;color:#0f766e;border-radius:9px;padding:8px 10px}.gm-interactive nav{justify-content:flex-start;gap:8px;margin:17px 0;border-bottom:1px solid #e2e8ed;padding-bottom:12px}.gm-interactive nav button{border:0;background:#eef3f5;border-radius:9px;padding:10px 14px}.gm-interactive nav button.active{background:#0f766e;color:#fff}.gm-interactive nav span{margin-left:auto;color:#6c8190;font-size:12px}.media-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(220px,1fr);gap:15px}.player video{width:100%;max-height:410px;background:#111;border-radius:12px}.player>div{display:flex;justify-content:space-between;margin-top:8px}.media-layout aside{background:#f5f8fa;padding:12px;border-radius:12px}.media-layout aside button{display:flex;width:100%;gap:8px;border:0;background:#fff;padding:10px;margin:6px 0;border-radius:8px;text-align:left}.media-layout aside button.selected{background:#dff7ef;color:#08775b}.media-layout aside p,.gamehelp{font-size:11px;color:#718394}.gamebar{justify-content:flex-start;gap:22px;background:#f5f8fa;padding:10px 14px;border-radius:10px}.gamebar span b{color:#0f766e;font-size:19px}.gamebar button{margin-left:auto;border:0;background:#0f766e;color:#fff;padding:8px 12px;border-radius:8px}.board{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:620px;margin:18px auto}.board button{height:82px;border:2px solid #d9e3e8;background:#edf2f4;border-radius:12px;font-size:26px}.board button.selected{border-color:#0f8b76;box-shadow:0 0 0 3px #0f8b7625}.board button.open{background:#fff}.board button.matched{background:#dcfce7;border-color:#22a879}.gm-empty{display:grid;place-items:center;gap:8px;min-height:330px;background:#fff;border:1px dashed #cbd7de;border-radius:15px;color:#718394}.gm-empty i{font-size:55px;color:#0f8b76}footer{margin-top:14px;padding:10px 4px;color:#6a7f8f;font-size:11px}footer a{color:#0f766e;text-decoration:none}@media(max-width:850px){.gm-topgrid,.media-layout{grid-template-columns:1fr}.gm-head{align-items:flex-start;gap:12px;flex-direction:column}.gm-tools{width:100%;justify-content:space-between}.gm-interactive nav{flex-wrap:wrap}.gm-interactive nav span{margin-left:0;width:100%}}\n.connection-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.connection-grid>div{display:grid;grid-template-columns:auto 1fr;column-gap:7px;align-items:center;background:#f4f7f9;border:1px solid #e0e8ec;border-radius:10px;padding:9px}.connection-grid>div>i{grid-row:1/3;font-size:22px;color:#0f8b76}.connection-grid small{color:#718394;font-size:10px}.connection-grid b{font-size:10px}.state-on{color:#07815d}.state-off{color:#c24141}.board{gap:12px;max-width:900px;margin:20px auto}.board button{height:140px;padding:0;overflow:hidden;border-radius:14px;font-size:34px}.board button img{display:block;width:100%;height:100%;object-fit:cover}.board button.selected{box-shadow:0 0 0 4px #0f8b7630}@media(max-width:850px){.board button{height:105px}}@media(max-width:520px){.connection-grid{grid-template-columns:1fr}}\n.media-guide{display:grid;gap:6px;margin-top:14px;padding:11px;background:#e8f5f2;border:1px solid #b9ded6;border-radius:10px;font-size:11px;color:#365c57}.media-guide b{color:#0f766e;font-size:12px;margin-bottom:2px}.snake-board{display:grid;grid-template-columns:repeat(20,1fr);gap:1px;width:min(900px,100%);aspect-ratio:20/14;margin:18px auto;padding:7px;box-sizing:border-box;background:#17252d;border:3px solid #244552;border-radius:14px}.snake-cell{display:block;min-width:0;min-height:0;background:#20343d;border-radius:2px}.snake-cell.body{background:#28a879}.snake-cell.head{background:#8be04e;box-shadow:inset 0 0 0 2px #eaffce}.snake-cell.food{background:#ef4444;border-radius:50%;box-shadow:0 0 8px #ef4444}.snake-controls{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:900px;margin:0 auto}.snake-controls section{display:grid;gap:5px;padding:12px 14px;background:#f4f7f9;border:1px solid #dce6eb;border-radius:11px}.snake-controls section b{color:#0f766e;margin-bottom:2px}.snake-controls section span{font-size:11px;color:#5f7484}@media(max-width:520px){.connection-grid,.snake-controls{grid-template-columns:1fr}.snake-board{padding:4px}}\n.light.red.blink{--blink-color:#ef4444}.light.yellow.blink{--blink-color:#eab308}.light.green.blink{--blink-color:#22c55e}.light.blink{background:var(--blink-color);animation:trafficBlink .8s steps(1,end) infinite}@keyframes trafficBlink{0%,49%{opacity:1;box-shadow:0 0 18px var(--blink-color)}50%,100%{opacity:.15;box-shadow:none}}\n</style>\n",
+        "noerr": 0,
+        "storeOutMessages": false,
+        "passthru": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1140,
+        "y": 280,
+        "wires": [
+            [
+                "933901e18cbde907"
+            ]
+        ]
+    },
+    {
+        "id": "413d4e39103f7ac8",
+        "type": "ui-template",
+        "z": "2eddbfb6805213c9",
+        "group": "92360a72dfc0f043",
+        "page": "",
+        "ui": "",
+        "name": "Admin • login dan biodata node",
+        "order": 1,
+        "width": 12,
+        "height": 0,
+        "head": "",
+        "format": "<template>\n  <div class=\"ga-shell\">\n    <section v-if=\"!token\" class=\"login\"><i class=\"mdi mdi-shield-account-outline\"></i><h1>Gesture IoT Admin</h1><p>Masuk untuk mengelola biodata dan status node.</p><input v-model=\"login.username\" placeholder=\"Username\" @keyup.enter=\"doLogin\"><input v-model=\"login.password\" type=\"password\" placeholder=\"Password\" @keyup.enter=\"doLogin\"><button @click=\"doLogin\"><i class=\"mdi mdi-login\"></i> Masuk</button><small>Default: admin / admin123 — ubah pada node konfigurasi flow.</small></section>\n    <template v-else>\n      <header><div><small>DASHBOARD ADMINISTRASI</small><h1><i class=\"mdi mdi-account-cog-outline\"></i> Gesture Interactive IoT</h1></div><div><a href=\"/dashboard/gesture-monitoring\"><i class=\"mdi mdi-monitor-dashboard\"></i> Monitoring</a><button @click=\"logout\"><i class=\"mdi mdi-logout\"></i> Keluar</button></div></header>\n      <div v-if=\"notice\" :class=\"notice.ok?'notice ok':'notice bad'\">{{ notice.message }}</div>\n      <main>\n        <section class=\"form-card\">\n          <h2><i class=\"mdi mdi-account-plus-outline\"></i> {{ editing?'Perbarui Node':'Daftarkan Node' }}</h2>\n          <label>Group ID<input v-model.trim=\"form.group_id\" disabled><small class=\"hint\">Mengikuti konfigurasi Group ID pada flow agar topik tidak tertukar.</small></label>\n          <label>Node ID<select v-model=\"form.node_id\"><option value=\"node_01\">node_01 — Traffic Light + Buzzer</option><option value=\"node_02\">node_02 — Virtual Touch</option><option value=\"node_03\">node_03 — Interactive Dashboard</option></select></label>\n          <div class=\"two\"><label>Nama<input v-model.trim=\"form.nama\" placeholder=\"Nama mahasiswa\"></label><label>NIM<input v-model.trim=\"form.nim\" placeholder=\"NIM\"></label></div>\n          <div class=\"two\"><label>Kelas<input v-model.trim=\"form.kelas\" placeholder=\"Kelas\"></label><label>Area / Keterangan<input v-model.trim=\"form.area\" placeholder=\"Area pemantauan\"></label></div>\n          <label>Foto pengguna<input type=\"file\" accept=\"image/jpeg,image/png,image/webp\" @change=\"readPhoto\"></label>\n          <div class=\"preview\"><img v-if=\"form.foto_base64\" :src=\"form.foto_base64\"><i v-else class=\"mdi mdi-image-outline\"></i><span>Foto disimpan ke SQLite setelah diperkecil otomatis.</span></div>\n          <div class=\"actions\"><button class=\"secondary\" @click=\"reset\"><i class=\"mdi mdi-refresh\"></i> Reset</button><button @click=\"saveNode\"><i class=\"mdi mdi-content-save-outline\"></i> Simpan Node</button></div>\n        </section>\n        <section class=\"list-card\">\n          <div class=\"list-head\"><div><h2><i class=\"mdi mdi-account-group-outline\"></i> Node Terdaftar</h2><span>{{ registered.length }} node</span></div><select v-model=\"filterGroup\"><option value=\"\">Semua kelompok</option><option v-for=\"g in groups\" :key=\"g\">{{ g }}</option></select></div>\n          <div v-if=\"!filtered.length\" class=\"empty\">Belum ada node yang didaftarkan.</div>\n          <article v-for=\"node in filtered\" :key=\"node.group_id+node.node_id\">\n            <img :src=\"node.foto_base64\"><div class=\"identity\"><small>{{ node.group_id }} / {{ node.node_id }}</small><b>{{ node.nama }}</b><span>{{ node.nim }} · {{ node.kelas }} · {{ node.area }}</span></div><div class=\"status\"><i :class=\"node.online?'dot on':'dot'\"></i>{{ node.online?'ONLINE':'OFFLINE' }}</div><label class=\"switch\"><input type=\"checkbox\" :checked=\"node.active\" @change=\"toggle(node,$event.target.checked)\"><span></span></label><button class=\"icon edit\" @click=\"edit(node)\"><i class=\"mdi mdi-pencil-outline\"></i></button><button class=\"icon delete\" @click=\"remove(node)\"><i class=\"mdi mdi-delete-outline\"></i></button>\n          </article>\n        </section>\n      </main>\n    </template>\n  </div>\n</template>\n<script>\nexport default {\n data(){return{state:{nodes:[],groups:[]},clientId:'admin-'+Math.random().toString(36).slice(2),token:sessionStorage.getItem('gestureAdminToken')||'',login:{username:'',password:''},form:{group_id:'group_01',node_id:'node_01',nama:'',nim:'',kelas:'',area:'',foto_base64:''},editing:false,filterGroup:'',notice:null}},\n computed:{registered(){return(this.state.nodes||[]).filter(n=>n.registered)},groups(){return[...new Set(this.registered.map(n=>n.group_id))].sort()},filtered(){return this.registered.filter(n=>!this.filterGroup||n.group_id===this.filterGroup)}},\n watch:{msg:{deep:true,handler(value){const p=value?.payload;if(p?.kind==='state'){this.state=p;if(p.group_id)this.form.group_id=p.group_id}else if(p?.kind==='feedback'&&(!p.client_id||p.client_id===this.clientId)){this.notice={ok:p.ok,message:p.message};this.showAlert(p.ok,p.message);if(p.session_token){this.token=p.session_token;sessionStorage.setItem('gestureAdminToken',p.session_token);this.send({payload:{kind:'request_state'}})}setTimeout(()=>this.notice=null,3500)}}}},\n mounted(){this.loadSweetAlert();if(this.token)this.send({payload:{kind:'request_state'}})},\n methods:{loadSweetAlert(){if(window.Swal||document.getElementById('gesture-swal'))return;const script=document.createElement('script');script.id='gesture-swal';script.src='https://cdn.jsdelivr.net/npm/sweetalert2@11';document.head.appendChild(script)},showAlert(ok,message){const open=()=>window.Swal?.fire({icon:ok?'success':'error',title:ok?'Berhasil':'Gagal',text:message,confirmButtonColor:'#0f766e',timer:ok?2200:undefined,timerProgressBar:!!ok});if(window.Swal){open();return}this.loadSweetAlert();document.getElementById('gesture-swal')?.addEventListener('load',open,{once:true})},doLogin(){this.send({payload:{kind:'login',...this.login,client_id:this.clientId}})},logout(){sessionStorage.removeItem('gestureAdminToken');this.token=''},reset(){this.form={group_id:this.state.group_id||this.form.group_id||'group_01',node_id:'node_01',nama:'',nim:'',kelas:'',area:'',foto_base64:''};this.editing=false},saveNode(){this.send({payload:{kind:'save_node',...this.form,client_id:this.clientId,session_token:this.token}})},edit(n){this.form={group_id:n.group_id,node_id:n.node_id,nama:n.nama,nim:n.nim,kelas:n.kelas,area:n.area,foto_base64:n.foto_base64};this.editing=true;window.scrollTo({top:0,behavior:'smooth'})},toggle(n,active){this.send({payload:{kind:'toggle_node',group_id:n.group_id,node_id:n.node_id,active,client_id:this.clientId,session_token:this.token}})},remove(n){if(confirm(`Hapus ${n.group_id}/${n.node_id}?`))this.send({payload:{kind:'delete_node',group_id:n.group_id,node_id:n.node_id,client_id:this.clientId,session_token:this.token}})},readPhoto(event){const file=event.target.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{const img=new Image();img.onload=()=>{const size=320,scale=Math.min(size/img.width,size/img.height,1),canvas=document.createElement('canvas');canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);this.form.foto_base64=canvas.toDataURL('image/jpeg',.82)};img.src=reader.result};reader.readAsDataURL(file)}}\n}\n</script>\n<style>\n.ga-shell{min-height:calc(100vh - 90px);background:#f4f7f9;color:#172b3a;font-family:Inter,system-ui;padding:18px;border-radius:18px}.login{max-width:390px;margin:8vh auto;background:#fff;padding:30px;border:1px solid #dce5ea;border-radius:18px;box-shadow:0 18px 50px #1d3b4d18;text-align:center}.login>i{font-size:58px;color:#0f8b76}.login h1{margin:8px}.login p,.login small{color:#738694}.login input,.form-card input,.form-card select,.list-head select{box-sizing:border-box;width:100%;padding:11px;border:1px solid #ccd8df;border-radius:9px;margin:6px 0}.login button,.actions button{width:100%;border:0;background:#0f766e;color:#fff;padding:11px;border-radius:9px;margin:8px 0}.login small{display:block;margin-top:12px;font-size:10px}.ga-shell header{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid #dce5ea;border-radius:15px;padding:15px 20px;margin-bottom:14px}.ga-shell header small{color:#0f8b76;letter-spacing:1.4px}.ga-shell header h1{margin:4px 0}.ga-shell header a,.ga-shell header button{border:0;text-decoration:none;background:#edf4f3;color:#0f766e;padding:9px 12px;border-radius:9px;margin-left:7px}.notice{padding:11px 14px;border-radius:10px;margin:10px 0}.notice.ok{background:#dcfce7;color:#08775b}.notice.bad{background:#fee2e2;color:#b91c1c}.ga-shell main{display:grid;grid-template-columns:minmax(310px,.8fr) minmax(480px,1.5fr);gap:14px}.form-card,.list-card{background:#fff;border:1px solid #dce5ea;border-radius:15px;padding:17px;box-shadow:0 8px 22px #25455c0d}.form-card h2,.list-card h2{margin-top:0}.form-card label{display:block;font-size:11px;color:#5f7484;margin-top:9px}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.preview{display:flex;align-items:center;gap:12px;background:#f5f8fa;padding:10px;border-radius:10px}.preview img,.preview>i{width:75px;height:75px;object-fit:cover;border-radius:10px;font-size:60px;color:#91a3b0}.preview span{font-size:11px;color:#718494}.actions{display:flex;gap:8px;margin-top:13px}.actions button.secondary{background:#e9eff2;color:#3f596b}.list-head{display:flex;justify-content:space-between;align-items:center}.list-head>div span{font-size:11px;color:#718494}.list-head select{width:180px}.list-card article{display:grid;grid-template-columns:64px minmax(140px,1fr) auto auto 34px 34px;gap:11px;align-items:center;padding:11px 0;border-bottom:1px solid #e5ebef}.list-card article img{width:58px;height:58px;object-fit:cover;border-radius:11px}.identity small,.identity b,.identity span{display:block}.identity small{color:#0f8b76;font-family:monospace}.identity span{font-size:11px;color:#718494;margin-top:4px}.status{font-size:10px;font-weight:800}.dot{display:inline-block;width:8px;height:8px;background:#94a3b8;border-radius:50%;margin-right:5px}.dot.on{background:#10b981;box-shadow:0 0 8px #10b981}.switch input{display:none}.switch span{display:block;width:36px;height:20px;background:#cbd5dc;border-radius:99px;position:relative}.switch span:after{content:'';position:absolute;width:16px;height:16px;left:2px;top:2px;background:#fff;border-radius:50%;transition:.2s}.switch input:checked+span{background:#0f8b76}.switch input:checked+span:after{left:18px}.icon{border:0;width:32px;height:32px;border-radius:8px}.edit{background:#e0f2fe;color:#0369a1}.delete{background:#fee2e2;color:#b91c1c}.empty{text-align:center;padding:70px;color:#718494}@media(max-width:900px){.ga-shell main{grid-template-columns:1fr}.ga-shell header{align-items:flex-start;flex-direction:column;gap:10px}.two{grid-template-columns:1fr}}@media(max-width:600px){.list-card article{grid-template-columns:54px 1fr auto}.status,.switch,.icon{grid-row:2}.list-head{align-items:flex-start;flex-direction:column}.list-head select{width:100%}}\n.form-card input:disabled{background:#eef3f5;color:#0f766e;font-weight:700}.hint{display:block;color:#78909c;margin:2px 0 5px}\n</style>\n",
+        "storeOutMessages": false,
+        "passthru": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1110,
+        "y": 340,
+        "wires": [
+            [
+                "933901e18cbde907"
+            ]
+        ]
+    },
+    {
+        "id": "gm-broker",
+        "type": "mqtt-broker",
+        "name": "MQTT Gesture Interactive IoT",
+        "broker": "broker.emqx.io",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "30",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "closeTopic": "",
+        "willTopic": ""
+    },
+    {
+        "id": "gm-sqlite-db",
+        "type": "sqlitedb",
+        "db": "gesture_interactive_iot.db",
+        "mode": "RWC"
+    },
+    {
+        "id": "c80c5af5f23b8b3e",
+        "type": "ui-group",
+        "name": "Gesture Monitoring",
+        "page": "9c9d1ba2d6fbc52c",
+        "width": 12,
+        "height": 1,
+        "order": 1,
+        "showTitle": false,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default"
+    },
+    {
+        "id": "92360a72dfc0f043",
+        "type": "ui-group",
+        "name": "Gesture Administration",
+        "page": "21b5bfaea3941a6d",
+        "width": 12,
+        "height": 1,
+        "order": 1,
+        "showTitle": false,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default"
+    },
+    {
+        "id": "9c9d1ba2d6fbc52c",
+        "type": "ui-page",
+        "name": "Gesture Monitoring",
+        "ui": "0df8b8a20bb13f1b",
+        "path": "/gesture-monitoring",
+        "icon": "hand-wave-outline",
+        "layout": "grid",
+        "theme": "gm-theme",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "tabs": [],
+        "order": 2,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "21b5bfaea3941a6d",
+        "type": "ui-page",
+        "name": "Gesture Admin",
+        "ui": "0df8b8a20bb13f1b",
+        "path": "/gesture-admin",
+        "icon": "account-cog-outline",
+        "layout": "grid",
+        "theme": "gm-theme",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "tabs": [],
+        "order": 3,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "0df8b8a20bb13f1b",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": true
+    },
+    {
+        "id": "gm-theme",
+        "type": "ui-theme",
+        "name": "Gesture White Theme",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0f766e",
+            "bgPage": "#ffffff",
+            "groupBg": "#ffffff",
+            "groupOutline": "#dce5ea"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "12px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "0c6f79d06935be6e",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-node-sqlite": "2.0.1",
+            "@flowfuse/node-red-dashboard": "1.37.0"
+        }
+    }
+]
